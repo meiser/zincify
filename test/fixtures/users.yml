@@ -1,0 +1,19 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  login: MyString
+  email: MyString
+  sign_in_count: 1
+  current_sign_in_at: 2012-05-15 19:09:56
+  last_sign_in_at: 2012-05-15 19:09:56
+  current_sig_in_ip: MyString
+  last_sign_in_ip: MyString
+
+two:
+  login: MyString
+  email: MyString
+  sign_in_count: 1
+  current_sign_in_at: 2012-05-15 19:09:56
+  last_sign_in_at: 2012-05-15 19:09:56
+  current_sig_in_ip: MyString
+  last_sign_in_ip: MyString
