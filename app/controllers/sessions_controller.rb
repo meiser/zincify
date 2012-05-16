@@ -1,10 +1,14 @@
 class SessionsController < ApplicationController
+
+  skip_before_filter :authenticate_user!, :only => [:new, :create]
+
   def new
     @user = User.new
   end
 
   def create
-    user = User.authenticate(params[:user][:login_or_email], params[:user][:password])
+    reset_session
+    user = User.ldap_auth(params[:user][:login_or_email], params[:user][:password])
     if user
       session[:user_id] = user.id
       redirect_to root_url, :notice => "Logged in!"
@@ -15,8 +19,10 @@ class SessionsController < ApplicationController
   end
 
   def destroy
+    user = User.find_by_id(session[:user_id])
+    p user
     session[:user_id] = nil
-    flash[:notice] = "Invalid login or email or password"
+    flash[:notice] = "Logged out"
     redirect_to root_url
   end
 end
