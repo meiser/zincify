@@ -9,6 +9,13 @@
 <body>
 
 <%= flash[:notice] %>
+
+<% if current_user %>
+  <%= gravatar_image_tag(current_user.email, :alt => "#{current_user}")%><%= link_to "Abmelden", sessions_path, :method => :delete %>
+<% else %>
+  <%= link_to "Anmelden", new_sessions_path %>
+<% end %>
+
 <%= yield %>
 
 </body>

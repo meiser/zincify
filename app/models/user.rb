@@ -2,7 +2,7 @@ class User < ActiveRecord::Base
 
   attr_accessor :login_or_email
 
-  attr_accessible :email, :login
+  attr_accessible :email, :login, :password
 
   before_save :convert_email
 
@@ -25,13 +25,13 @@ class User < ActiveRecord::Base
      puts "DN: #{result.first.dn}"
      puts "MAIL: #{result.first["mail"].first}"
 
-     if user = User.find_by_email(result.first[:mail].first.downcase)
 
-     else
+     #user = User.find_by_email(result.first[:mail].first.downcase)
+
+     unless user = User.find_by_email(result.first[:mail].first.downcase)
       user = User.new
       user.login = result.first["sAMAccountName"].first
       user.email = result.first["mail"].first
-      user.save
      end
      return user
     end
@@ -40,8 +40,9 @@ class User < ActiveRecord::Base
 
    return nil
 
-   #rescue
-   # return nil
+   rescue
+
+    return nil
 
   end
 

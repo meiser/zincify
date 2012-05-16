@@ -11,6 +11,19 @@ class SessionsController < ApplicationController
     user = User.ldap_auth(params[:user][:login_or_email], params[:user][:password])
     if user
       session[:user_id] = user.id
+      user.sign_in_count ||= 0
+      user.sign_in_count += 1
+
+      old_current, new_current = user.current_sign_in_at, Time.now.utc
+      user.last_sign_in_at = old_current || new_current
+      user.current_sign_in_at = new_current
+
+      old_current, new_current = user.current_sign_in_ip, request.ip
+      user.last_sign_in_ip = old_current || new_current
+      user.current_sign_in_ip = new_current
+
+      user.save(:validate => false)
+
       redirect_to root_url, :notice => "Logged in!"
     else
       flash[:notice] = "Invalid login or email or password"
