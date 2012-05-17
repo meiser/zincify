@@ -1,0 +1,9 @@
+<% if current_user %>
+   <%= link_to "Logout", logout_sessions_path, :method => :delete, :class => "ui-btn-right", :data => { :icon => "check"} %>
+<% elsif controller_name != "sessions" %>
+  <%= link_to "Login", new_sessions_path, :class => "ui-btn-right", :data => {:icon => "arrow-r"} %>
+<% end %>
+
+
+<!-- :url => "#{root_path}" -->
+

@@ -1,0 +1,15 @@
+<h1>Login</h1>
+<div data-role="fieldcontain">
+<%= form_for(@user, :url => sessions_path, :html => { :data => {:ajax => false}}) do |f| %>
+
+  <%= f.label :login_or_email %>
+  <%= f.text_field :login_or_email %>
+
+
+  <%= f.label :password %>
+  <%= f.password_field :password %>
+
+  <%= f.submit "OK" %>
+</div>
+<% end %>
+

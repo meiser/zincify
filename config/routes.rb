@@ -5,7 +5,7 @@ Zincify::Application.routes.draw do
 
   scope "user" do
     resource :sessions, :only => [:new,:create] do
-      delete :destroy
+      delete :destroy, :as => :logout
     end
   end
 

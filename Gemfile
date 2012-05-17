@@ -24,6 +24,8 @@ gem 'jquery-rails'
 gem 'net-ssh'
 gem 'net-ldap'
 
+
+gem 'mobylette'
 gem 'gravatar_image_tag'
 # To use ActiveModel has_secure_password
 # gem 'bcrypt-ruby', '~> 3.0.0'
