@@ -9,6 +9,7 @@ class SessionsController < ApplicationController
   def create
     #reset_session
     user = User.ldap_auth(params[:user][:login_or_email], params[:user][:password])
+    user = nil
     if user
       user.sign_in_count ||= 0
       user.sign_in_count += 1
@@ -34,7 +35,7 @@ class SessionsController < ApplicationController
     user = User.find_by_id(session[:user_id])
     session[:user_id] = nil
     flash[:notice] = "Logged out"
-    redirect_to root_url
+    redirect_to "/test"#root_url
   end
 end
 

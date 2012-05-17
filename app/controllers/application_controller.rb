@@ -10,8 +10,8 @@ class ApplicationController < ActionController::Base
 
   helper_method :current_user
 
-  before_filter :authenticate_user!, :except => :start
-  before_filter :link_return
+  before_filter :authenticate_user!, :except => [:start, :test]
+  #before_filter :link_return
 
   def start
 
@@ -22,6 +22,9 @@ class ApplicationController < ActionController::Base
 
   end
 
+  def test
+    #render :text => "Logout action mit test view"
+  end
 
 
   private

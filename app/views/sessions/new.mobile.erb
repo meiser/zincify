@@ -1,6 +1,9 @@
+<%= javascript_include_tag do %>
+  $.mobile.changePage('#about','pop',false,true)
+<% end %>
 <h1>Login</h1>
 <div data-role="fieldcontain">
-<%= form_for(@user, :url => sessions_path, :html => { :data => {:ajax => false}}) do |f| %>
+<%= form_for(@user, :url => sessions_path, :html => { :data => {:ajax => true}}) do |f| %>
 
   <%= f.label :login_or_email %>
   <%= f.text_field :login_or_email %>

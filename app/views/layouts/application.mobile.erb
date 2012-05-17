@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
-	<title>My Page</title>
+	<title>Verzinkerei Plauen</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.css" />
 	<%= javascript_include_tag "application" %>
@@ -10,17 +10,16 @@
 </head>
 <body>
 
-<div data-role="page" data-url="<%= request.path %>">
-
+<div data-role="page<%#= jquery_mobile_role %>" data-url="<%= request.path %>" >
 	<div data-role="header">
 		<h1>Verzinkerei Plauen</h1>
-    <%= render "header" %>
+		<%= render "header" %>
 	</div><!-- /header -->
   <%= render "nav_bar" %>
 
 	<div data-role="content">
-  <%= flash[:notice] if flash%>
-			<%= yield %>
+  <h1><%= flash[:notice] if flash %></h1>
+	  <%= yield %>
 	</div><!-- /content -->
 
   <div data-role="footer" data-position="fixed">
@@ -29,7 +28,7 @@
 	  <% if Rails.env.development? %>
 	   <h1>Anfrage: <%= request.path %></h1>
      <h1>Referrer: <%= request.env["HTTP_REFERER"] %></h1>
-     <%= session.inspect %>
+     <h1><%= session.inspect %></h1>
     <% end %>
   </div>
 
