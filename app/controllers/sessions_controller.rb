@@ -9,7 +9,6 @@ class SessionsController < ApplicationController
   def create
     #reset_session
     user = User.ldap_auth(params[:user][:login_or_email], params[:user][:password])
-    user = nil
     if user
       user.sign_in_count ||= 0
       user.sign_in_count += 1
