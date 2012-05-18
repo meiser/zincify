@@ -1,7 +1,7 @@
 <% if current_user %>
-   <%= link_to "Logout #{current_user.login}", logout_sessions_path, :method => :delete, :class => "ui-btn-right", :data => { :icon => "check"} %>
+   <%= link_to "Logout #{current_user.login}",sessions_path, :method => :delete, :class => "ui-btn-right", :data => {:theme => "b", :role => :button, :icon => "delete"} %>
 <% elsif controller_name != "sessions" %>
-  <%= link_to "Login", new_sessions_path, :class => "ui-btn-right", :data => {"close-btn-text" => "Beenden", :rel => "dialog", :icon => "arrow-r"} %>
+  <%= link_to "Login", new_sessions_path, :class => "ui-btn-right", :data => {:role => :button, "close-btn-text" => "Beenden", :rel => "dialog", :icon => "arrow-r"} %>
 <% end %>
 
 

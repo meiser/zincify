@@ -4,28 +4,29 @@
 	<title>Verzinkerei Plauen</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.css" />
+	<%= stylesheet_link_tag "application" %>
 	<%= javascript_include_tag "application" %>
-	<script src="http://code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.js"></script>
+  <script src="http://code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.js"></script>
   <%= csrf_meta_tags %>
 </head>
 <body>
 
-<div data-role="page<%#= jquery_mobile_role %>" data-url="<%= request.path %>" >
+<div data-role="page<%#= jquery_mobile_role %>" data-url="<%= request.path %>" data-close-btn-text="Beenden" >
 	<div data-role="header">
 		<h1>Verzinkerei Plauen</h1>
 		<%= render "header" %>
 	</div><!-- /header -->
   <%= render "nav_bar" %>
-
-	<div data-role="content">
-  <h1><%= flash[:notice] if flash %></h1>
-	  <%= yield %>
+  <div data-role="content">
+	  <% flash.each do |key, value| %>
+      <%= content_tag(:div, value, :class => "flash_message #{key}") %>
+    <% end %>
+	    <%= yield %>
 	</div><!-- /content -->
 
   <div data-role="footer" data-position="fixed">
 	  <%= yield :footer %>
-
-	  <% if Rails.env.development? %>
+	  <% if Rails.env.development? and params["debug"] %>
 	   <h1>Anfrage: <%= request.path %></h1>
      <h1>Referrer: <%= request.env["HTTP_REFERER"] %></h1>
      <h1><%= session.inspect %></h1>

@@ -23,9 +23,9 @@ class SessionsController < ApplicationController
 
       user.save(:validate => false)
       session[:user_id] = user.id
-      redirect_to "/dashboard", :notice => "Logged in!"
+      redirect_to "/dashboard", :notice => t(".signed_in", :scope => :authentification)
     else
-      flash[:notice] = "Invalid login or email or password"
+      flash[:error] = t(".invalid", :scope => :authentification)
       redirect_to :action => :new
     end
   end
@@ -33,8 +33,8 @@ class SessionsController < ApplicationController
   def destroy
     user = User.find_by_id(session[:user_id])
     session[:user_id] = nil
-    flash[:notice] = "Logged out"
-    redirect_to "/test"#root_url
+    flash[:notice] = t(".signed_out", :scope => :authentification)
+    redirect_to root_url
   end
 end
 

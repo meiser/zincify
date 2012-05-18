@@ -1,0 +1,23 @@
+de:
+ activerecord:
+  attributes:
+   user:
+    login: Login
+    email: E-mail
+    login_or_email: Kennung
+    password: Passwort
+   commission:
+    orno: Kommission
+    cross_param: Kundenreferenz
+    appointment: Kundentermin
+    created_at: Eingangsdatum
+    updated_at: letzte Änderung
+ helpers:
+  submit:
+   commission:
+    create: Auftrag erstellen
+ commissions:
+  index:
+   new: Neuen Auftrag anlegen
+  created_commission: Auftrag wurde erfolgreich angelegt
+

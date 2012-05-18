@@ -2,13 +2,8 @@ Zincify::Application.routes.draw do
 
   root :to => "application#start"
   match "dashboard" => "application#dashboard", :as => :dashboard
-  match "test" => "application#test"
 
-  scope "user" do
-    resource :sessions, :only => [:new,:create] do
-      delete :destroy, :as => :logout
-    end
-  end
+  resource :sessions, :only => [:new,:create, :destroy]
 
   #get "users/new"
 

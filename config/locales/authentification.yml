@@ -1,0 +1,6 @@
+de:
+ authentification:
+  signed_in: Erfolgreich angemeldet
+  signed_out: Erfolgreich abgemeldet
+  invalid: Ungültiger Benutzername oder ungültiges Kennwort.
+

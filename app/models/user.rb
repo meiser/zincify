@@ -2,7 +2,7 @@ class User < ActiveRecord::Base
 
   attr_accessor :login_or_email
 
-  attr_accessible :email, :login, :password
+  attr_accessible :email, :login, :password, :login_or_email
 
   before_save :convert_email
 
