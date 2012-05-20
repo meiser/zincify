@@ -2,12 +2,9 @@ Zincify::Application.routes.draw do
 
   root :to => "application#start"
   match "dashboard" => "application#dashboard", :as => :dashboard
-
   resource :sessions, :only => [:new,:create, :destroy]
 
-  #get "users/new"
 
-  #get "users/create"
 
   # The priority is based upon order of creation:
   # first created -> highest priority.

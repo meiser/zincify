@@ -46,9 +46,14 @@ class ApplicationController < ActionController::Base
       true
     else
       flash[:notice] = "Erst anmelden"
+      session[:return_to] = request.path
       redirect_to :controller => "sessions", :action => "new"
     end
 
+  end
+
+  def default_url_options
+    {:locale => I18n.locale, :debug => true }.merge(super)
   end
 
 end
