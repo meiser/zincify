@@ -2,7 +2,7 @@
 
 <ul data-role="listview" data-inset="true" data-filter="true" data-filter-placeholder="Suche" >
 <% @commissions.each do |commission| %>
-  <li data-filtertext="<%= [commission.orno, commission.reference, commission.appointment, commission.created_at, commission.updated_at].join(",")%>"><%= commission.orno %></td></li>
+  <li data-filtertext="<%= [commission.orno, commission.reference, commission.appointment, commission.created_at, commission.updated_at].join(",")%>"><%= link_to commission.orno, commission %></li>
 <% end %>
 </ul>
 

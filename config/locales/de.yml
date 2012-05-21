@@ -8,7 +8,7 @@ de:
     password: Passwort
    commission:
     orno: Kommission
-    cross_param: Kundenreferenz
+    reference: Kundenreferenz
     appointment: Kundentermin
     created_at: Eingangsdatum
     updated_at: letzte Änderung
