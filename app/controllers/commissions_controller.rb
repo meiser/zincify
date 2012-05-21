@@ -2,10 +2,11 @@ class CommissionsController < ApplicationController
   # GET /commissions
   # GET /commissions.json
   def index
-    @commissions = Commission.all
+    @commissions = Commission.last(150).reverse
 
     respond_to do |format|
       format.html # index.html.erb
+      format.mobile
       format.json { render json: @commissions }
     end
   end
@@ -17,6 +18,7 @@ class CommissionsController < ApplicationController
 
     respond_to do |format|
       format.html # show.html.erb
+      format.mobile
       format.json { render json: @commission }
     end
   end
@@ -25,9 +27,10 @@ class CommissionsController < ApplicationController
   # GET /commissions/new.json
   def new
     @commission = Commission.new
-
+    @dialog = true
     respond_to do |format|
       format.html # new.html.erb
+      format.mobile
       format.json { render json: @commission }
     end
   end
@@ -44,10 +47,12 @@ class CommissionsController < ApplicationController
 
     respond_to do |format|
       if @commission.save
-        format.html { redirect_to @commission, notice: 'Commission was successfully created.' }
+        format.html { redirect_to commissions_url, notice: 'Commission was successfully created.' }
+        format.mobile { redirect_to commissions_url, notice: 'Commission was successfully created.'}
         format.json { render json: @commission, status: :created, location: @commission }
       else
         format.html { render action: "new" }
+        format.mobile { render action: "new" }
         format.json { render json: @commission.errors, status: :unprocessable_entity }
       end
     end
@@ -61,9 +66,11 @@ class CommissionsController < ApplicationController
     respond_to do |format|
       if @commission.update_attributes(params[:commission])
         format.html { redirect_to @commission, notice: 'Commission was successfully updated.' }
+        format.mobile { redirect_to @commission, notice: 'Commission was successfully updated.' }
         format.json { head :no_content }
       else
         format.html { render action: "edit" }
+        format.mobile { render action: "edit" }
         format.json { render json: @commission.errors, status: :unprocessable_entity }
       end
     end
@@ -77,7 +84,9 @@ class CommissionsController < ApplicationController
 
     respond_to do |format|
       format.html { redirect_to commissions_url }
+      format.mobile { redirect_to commissions_url }
       format.json { head :no_content }
     end
   end
 end
+

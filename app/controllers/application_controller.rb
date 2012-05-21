@@ -13,18 +13,15 @@ class ApplicationController < ActionController::Base
   before_filter :authenticate_user!, :except => [:start, :test]
 
   def start
-
+   if session[:user_id]
+    redirect_to :dashboard
+   end
   end
 
 
   def dashboard
 
   end
-
-  def test
-    #render :text => "Logout action mit test view"
-  end
-
 
   private
 
@@ -43,9 +40,9 @@ class ApplicationController < ActionController::Base
 
   end
 
-  def default_url_options
-    {:locale => I18n.locale, :debug => true }.merge(super)
-  end
+  #def default_url_options
+  #  {:locale => I18n.locale, :debug => true }.merge(super)
+  #end
 
 end
 

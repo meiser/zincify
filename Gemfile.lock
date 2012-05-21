@@ -75,6 +75,8 @@ GEM
       activesupport (= 3.2.3)
       bundler (~> 1.0)
       railties (= 3.2.3)
+    rails-i18n (0.6.3)
+      i18n (~> 0.5)
     railties (3.2.3)
       actionpack (= 3.2.3)
       activesupport (= 3.2.3)
@@ -118,6 +120,7 @@ DEPENDENCIES
   net-ldap
   net-ssh
   rails (= 3.2.3)
+  rails-i18n
   sass-rails (~> 3.2.3)
   sqlite3
   therubyracer

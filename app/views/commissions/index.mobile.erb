@@ -1,17 +1,22 @@
 <h1>Kommissionen</h1>
 
-<ul data-role="listview" data-inset="true" data-filter="true" data-filter-placeholder="Suche">
+<ul data-role="listview" data-inset="true" data-filter="true" data-filter-placeholder="Suche" >
 <% @commissions.each do |commission| %>
-  <li><%= commission.orno %></td></li>
+  <li data-filtertext="<%= [commission.orno, commission.reference, commission.appointment, commission.created_at, commission.updated_at].join(",")%>"><%= commission.orno %></td></li>
 <% end %>
 </ul>
 
-<!--
-<div data-role="controlgroup">
-<a href="index.html" data-role="button">Link button</a>
-<a href="index.html" data-role="button">Link button</a>
-<a href="index.html" data-role="button">Link button</a>
-<a href="index.html" data-role="button">Link button</a>
+
+<% content_for :footer do %>
+<div data-role="navbar">
+	<ul>
+    <li>
+    <%= link_to "Dashboard", dashboard_path, :class => "ui-btn-active", :data => {:role => "button", :icon => "home", :iconpos => "top"} %>
+    </li>
+    <li>
+    <%= link_to "Neuer Auftrag", new_commission_path, :data => {:role => "button", :icon => "add", :iconpos => "top"} %>
+    </li>
+	</ul>
 </div>
--->
+<% end %>
 

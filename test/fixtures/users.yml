@@ -1,19 +1,20 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
 
 one:
-  login: MyString
-  email: MyString
+  login: m.mueller
+  email: m.mueller@test.de
   sign_in_count: 1
   current_sign_in_at: 2012-05-15 19:09:56
   last_sign_in_at: 2012-05-15 19:09:56
-  current_sig_in_ip: MyString
-  last_sign_in_ip: MyString
+  current_sign_in_ip: 127.0.0.1
+  last_sign_in_ip: 127.0.0.1
 
 two:
-  login: MyString
-  email: MyString
+  login: w.schmidt
+  email: w.schmidt@test.de
   sign_in_count: 1
   current_sign_in_at: 2012-05-15 19:09:56
   last_sign_in_at: 2012-05-15 19:09:56
-  current_sig_in_ip: MyString
-  last_sign_in_ip: MyString
+  current_sign_in_ip: 127.0.0.1
+  last_sign_in_ip: 127.0.0.1
+

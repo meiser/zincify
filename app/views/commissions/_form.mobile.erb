@@ -21,7 +21,9 @@
   </div>
   <div class="field">
     <%= f.label :appointment %><br />
-    <%#= f.datetime_select :appointment %>
+    <div data-role="controlgroup">
+      <%= f.datetime_select :appointment %>
+    </div>
   </div>
   <div class="actions">
     <%= f.submit %>

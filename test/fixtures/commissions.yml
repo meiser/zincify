@@ -1,11 +1,24 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
-
 one:
-  orno: MyString
-  reference: MyString
-  appointment: 2012-05-21 15:06:12
+  orno: 123467890
+  reference: Company 1
+  appointment: 2012-05-17 14:47:23
 
 two:
-  orno: MyString
-  reference: MyString
-  appointment: 2012-05-21 15:06:12
+  orno: 223456789
+  reference: Company 2
+  appointment: 2012-05-20 15:06:39
+
+three:
+  orno: 323456789
+  reference: Company 3
+  appointment: 2012-05-21 08:06:12
+
+
+<% for i in 1..20000 %>
+fix_<%= i %>:
+  orno: <%= i %>
+  reference: Company <%= 1 %>
+  appointment: <%= Time.at(rand * Time.now.to_i) %>
+<% end %>
+
