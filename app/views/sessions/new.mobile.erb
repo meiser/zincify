@@ -1,5 +1,5 @@
 <div data-role="fieldcontain">
-<%= form_for(@user, :url => sessions_path, :html => { :data => {:ajax => true}}) do |f| %>
+<%= form_for(@user, :url => sessions_path) do |f| %>
 
   <%= f.label :login_or_email %>
   <%= f.text_field :login_or_email %>

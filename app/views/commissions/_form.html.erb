@@ -1,0 +1,30 @@
+<%= form_for(@commission) do |f| %>
+  <% if @commission.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@commission.errors.count, "error") %> prohibited this commission from being saved:</h2>
+
+      <ul>
+      <% @commission.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :orno %><br />
+    <%= f.text_field :orno %>
+  </div>
+  <div class="field">
+    <%= f.label :reference %><br />
+    <%= f.text_field :reference %>
+  </div>
+  <div class="field">
+    <%= f.label :appointment %><br />
+    <%#= f.datetime_select :appointment %>
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>
+

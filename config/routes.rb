@@ -1,5 +1,7 @@
 Zincify::Application.routes.draw do
 
+  resources :commissions
+
   root :to => "application#start"
   match "dashboard" => "application#dashboard", :as => :dashboard
   resource :sessions, :only => [:new,:create, :destroy]

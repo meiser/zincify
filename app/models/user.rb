@@ -11,7 +11,8 @@ class User < ActiveRecord::Base
   end
 
 
-  def self.ldap_auth(key, password)
+  def self.ldap_auth(key, password=nil)
+   return nil if password.empty?
    return User.first if LDAP_CONFIG['enabled'] == false
    ldap = initialize_ldap_con
 

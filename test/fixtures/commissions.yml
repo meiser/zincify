@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  orno: MyString
+  reference: MyString
+  appointment: 2012-05-21 15:06:12
+
+two:
+  orno: MyString
+  reference: MyString
+  appointment: 2012-05-21 15:06:12

@@ -1,2 +1,14 @@
-<h1>Dashboard</h1>
+	<div data-role="navbar">
+      <ul>
+        <li>
+        <%= link_to "Home", root_path, :class => "ui-btn-active", :data => { :icon => "home", :iconpos => "top"} %>
+        </li>
+        <li>
+        <%= link_to "Auftragserfassung", commissions_path, :data => { :icon => "grid", :iconpos => "top"} %>
+        </li>
+        <li>
+        <%= link_to "Options", "#", :data => { :icon => "gear", :iconpos => "top"} %>
+        </li>
+      </ul>
+  </div>
 

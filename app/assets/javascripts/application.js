@@ -12,5 +12,10 @@
 //
 //= require jquery
 //= require jquery_ujs
-//= require_tree .
+// require_tree .
+
+
+if (typeof history.pushState == "undefined") {
+    alert("PushState not supported by Browser");// pushState is supported!
+}
 

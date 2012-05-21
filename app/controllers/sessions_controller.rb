@@ -3,6 +3,7 @@ class SessionsController < ApplicationController
   skip_before_filter :authenticate_user!, :only => [:new, :create]
 
   def new
+    @dialog = true
     @user = User.new
   end
 
@@ -23,12 +24,14 @@ class SessionsController < ApplicationController
 
       user.save(:validate => false)
       session[:user_id] = user.id
-      path = session[:return_to] || "/dashboard"
+      #path = session[:return_to] || "/dashboard"
 
-      redirect_to path, :notice => t(".signed_in", :scope => :authentification)
-      session[:return_to] = nil
+      redirect_to "/dashboard", :notice => t(".signed_in", :scope => :authentification)
     else
       flash[:error] = t(".invalid", :scope => :authentification)
+      @dialog = true
+      p "skeller########################################"
+      p params
       redirect_to :action => :new
     end
   end
@@ -36,6 +39,7 @@ class SessionsController < ApplicationController
   def destroy
     user = User.find_by_id(session[:user_id])
     session[:user_id] = nil
+    session[:return_to] = nil
     flash[:notice] = t(".signed_out", :scope => :authentification)
     redirect_to root_url
   end
