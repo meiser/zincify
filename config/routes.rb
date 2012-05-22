@@ -6,7 +6,7 @@ Zincify::Application.routes.draw do
   match "dashboard" => "application#dashboard", :as => :dashboard
   resource :sessions, :only => [:new,:create, :destroy]
 
-
+  #match "websocket" =>  CommissionsPusher.new
 
   # The priority is based upon order of creation:
   # first created -> highest priority.
