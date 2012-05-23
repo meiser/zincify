@@ -1,3 +1,12 @@
+<header>
+  <div class="ym-wrapper">
+    <div class="ym-wbox">
+			<h1>Verzinkerei Plauen</h1>
+	  </div>
+	</div>
+</header>
+
+
 <% unless @dialog == true %>
   <% if current_user  %>
     <%= link_to "Logout #{current_user.login}",sessions_path, :method => :delete, :class => "ui-btn-right", :data => { :icon => "delete"} %>

@@ -19,3 +19,9 @@ if (typeof history.pushState == "undefined") {
     alert("PushState not supported by Browser");// pushState is supported!
 }
 
+$(document).ready(function() {
+    setTimeout(function() {
+        $('.flash-alert,.flash-notice,.flash-error,.flash-info').fadeOut();
+    }, 5000);
+});
+
