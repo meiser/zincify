@@ -64,6 +64,9 @@ module Zincify
 
     # Middleware for websocket-rails needs threadsafe!
     # Configure Rails Asynchronous Request Processing
+
+    # Observers for Websocket functionality
+    config.active_record.observers = :commission_observer
   end
 end
 

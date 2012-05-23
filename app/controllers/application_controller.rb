@@ -11,7 +11,7 @@ class ApplicationController < ActionController::Base
   helper_method :current_user
 
   before_filter :authenticate_user!, :except => [:start, :test]
-
+  before_filter :set_to_mobile
   def start
    if session[:user_id]
     redirect_to :dashboard
@@ -24,6 +24,10 @@ class ApplicationController < ActionController::Base
   end
 
   private
+
+  def set_to_mobile
+   request.format = "mobile"
+  end
 
   def current_user
     @current_user ||= User.find_by_id(session[:user_id]) if session[:user_id]

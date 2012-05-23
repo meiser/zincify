@@ -2,7 +2,8 @@ $(document).bind("mobileinit", function(){
   $.extend(  $.mobile , {
     ajaxEnabled: false,
     ns: "",
-    pushStateEnabled: false
+    pushStateEnabled: false,
+    defaultTransition: 'none'
   });
 });
 

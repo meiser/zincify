@@ -1,9 +1,9 @@
 class CommissionsController < ApplicationController
   # GET /commissions
   # GET /commissions.json
+
   def index
     @commissions = Commission.last(150).reverse
-
     respond_to do |format|
       format.html # index.html.erb
       format.mobile
@@ -48,7 +48,7 @@ class CommissionsController < ApplicationController
     respond_to do |format|
       if @commission.save
         format.html { redirect_to commissions_url, notice: 'Commission was successfully created.' }
-        format.mobile { redirect_to commissions_url, notice: 'Commission was successfully created.'}
+        format.mobile { redirect_to @commission, notice: 'Commission was successfully created.'}
         format.json { render json: @commission, status: :created, location: @commission }
       else
         format.html { render action: "new" }
