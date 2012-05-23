@@ -1,9 +1,9 @@
 $(document).bind("mobileinit", function(){
   $.extend(  $.mobile , {
-    ajaxEnabled: false,
+    ajaxEnabled: true,
     ns: "",
-    pushStateEnabled: false,
-    defaultTransition: 'none'
+    pushStateEnabled: true,
+    defaultPageTransition: 'slide'
   });
 });
 

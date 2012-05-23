@@ -37,7 +37,7 @@
 <%= javascript_tag do %>
 
 $(function(){
-  var my_client = new Faye.Client("http://localhost:4000/faye");
+  var my_client = new Faye.Client("<%= FAYE_URL %>");
   my_client.subscribe("/messages/new", function(data){
     alert(data);
   });

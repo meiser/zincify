@@ -6,8 +6,8 @@
 	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.css" />
 	<%= stylesheet_link_tag "application" %>
 	<%= javascript_include_tag "application", "mobile" %>
-  <script src="http://code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.js"></script>
-  <%= javascript_include_tag "http://localhost:4000/faye.js" %>
+  <!--<script src="http://code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.js"></script>-->
+  <%= javascript_include_tag FAYE_URL+".js" %>
   <%= yield :head %>
   <%= javascript_tag do %>
 
