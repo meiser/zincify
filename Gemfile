@@ -21,9 +21,11 @@ group :assets do
 end
 
 gem 'jquery-rails'
+gem 'jquery-ui-rails'
+
 gem 'net-ssh'
 gem 'net-ldap'
-
+gem 'ruby-informix'
 
 gem 'mobylette'
 gem 'gravatar_image_tag'

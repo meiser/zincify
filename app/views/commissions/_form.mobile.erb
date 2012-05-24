@@ -1,4 +1,4 @@
-<%= form_for(@commission) do |f| %>
+<%= form_for(@commission,:html => {:class => "ym-form"}) do |f| %>
   <% if @commission.errors.any? %>
     <div id="error_explanation">
       <h2><%= pluralize(@commission.errors.count, "error") %> prohibited this commission from being saved:</h2>
@@ -11,21 +11,24 @@
     </div>
   <% end %>
 
-  <div class="field">
+  <div class="ym-fbox-text">
     <%= f.label :orno %><br />
     <%= f.text_field :orno %>
   </div>
-  <div class="field">
+  <div class="ym-fbox-text">
     <%= f.label :reference %><br />
     <%= f.text_field :reference %>
   </div>
-  <div class="field">
-    <%= f.label :appointment %><br />
-    <div data-role="controlgroup">
-      <%= f.date_select :appointment %>
-    </div>
+
+  <div class="ym-fbox-select">
+    <%= select("baan","printer", @printers, {:include_blank => 'Kein Ausdruck'}) %>
   </div>
-  <div class="actions">
+  <!--<div class="ym-fbox-text">
+    <%= f.label :appointment %><br />
+    <%= f.datetime_select :appointment %>
+  </div>-->
+
+  <div class="ym-fbox-button">
     <%= f.submit %>
   </div>
 <% end %>

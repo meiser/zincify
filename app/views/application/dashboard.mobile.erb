@@ -1,40 +1,11 @@
-    <div class="ym-grid">
-      <div class="ym-g50 ym-gl">
-        <div class="ym-gbox">
-          <!-- content -->
-          Inhalt Links
-        </div>
-      </div>
-      <div class="ym-g50 ym-gr">
-        <div class="ym-gbox">
-          <!-- content -->
-          Inhalt rechts
-        </div>
-      </div>
-    </div>
-
-<% content_for :nav do %>
-<!--<div data-role="navbar">
-	<ul>
-		<li><a href="a.html" class="ui-btn-active">One</a></li>
-		<li><a href="b.html">Two</a></li>
-	</ul>
-</div>-->
-<% end %>
-
 <% content_for :footer do %>
-<div data-role="navbar">
-	<ul>
-    <li>
-    <%= link_to "Dashboard", dashboard_path, :class => "ui-btn-active", :data => {:role => "button", :icon => "home", :iconpos => "top"} %>
-    </li>
-    <li>
-    <%= link_to "1. Auftragserfassung", commissions_path, :data => {:role => "button", :icon => "grid", :iconpos => "top"} %>
-    </li>
-    <li>
-<%= link_to "Optionen", "#", :data => {:role => "button", :icon => "gear", :iconpos => "top"} %>
-	  </li>
-	</ul>
-</div>
+
+    <%= link_to "Dashboard", dashboard_path, :class => "ym-button active" %>
+
+    <%= link_to "Auftragserfassung", commissions_path, :class => "ym-button" %>
+
+    <%= link_to "Optionen", "#", :class => "ym-button", :style => "float:right;"  %>
+
+
 <% end %>
 

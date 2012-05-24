@@ -19,21 +19,11 @@
 </div>
 
 <% content_for :footer do %>
-<div data-role="navbar">
-	<ul>
-    <li>
-    <%= link_to "Dashboard", dashboard_path, :data => {:role => "button", :icon => "home", :iconpos => "top"} %>
-    </li>
-    <li>
-    <%= link_to "Neuer Auftrag", new_commission_path, :data => {:role => "button", :icon => "add", :iconpos => "top"} %>
-    </li>
-	  <li><%= link_to "#{request.host_with_port}", new_commission_path, :id => "user-name" %></li>
-	  <li><%= link_to "Start Message", "", :id => "send full-name" %></li>
-	</ul>
-</div>
+
+    <%= link_to "Neuen Auftrag anlegen", new_commission_path, :class => "ym-button ym-add" %>
 
 <% end %>
-
+<!--
 <%= javascript_tag do %>
 
 $(function(){
@@ -43,5 +33,5 @@ $(function(){
   });
 });
 
-<% end %>
+<% end %>-->
 

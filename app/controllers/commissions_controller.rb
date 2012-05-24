@@ -27,7 +27,21 @@ class CommissionsController < ApplicationController
   # GET /commissions/new.json
   def new
     @commission = Commission.new
-    @dialog = true
+
+    #begin
+      db = Informix.connect("erp","informix", "informix123")
+
+      @printers = db.cursor('select * from twhmei005120') do |cur|
+        cur.open
+        cur.fetch_all
+      end
+      db.close
+
+      @printers.collect!{ |p| [baan(p[1]).strip,p[2].strip] }
+    #rescue
+    #  @printers = []
+    #end
+
     respond_to do |format|
       format.html # new.html.erb
       format.mobile
@@ -42,11 +56,20 @@ class CommissionsController < ApplicationController
 
   # POST /commissions
   # POST /commissions.json
+
+
   def create
     @commission = Commission.new(params[:commission])
 
+    printer = params[:baan][:printer] || false
+
     respond_to do |format|
       if @commission.save
+        path = Rails.root.join("public","system")
+        FileUtils.mkdir_p path
+        File.open(Rails.root.join(path,"#{@commission.orno}_#{Time.now}"),"w") do |f|
+          f.puts("#{printer}|#{@commission.orno}|#{@commission.appointment}")
+        end
         format.html { redirect_to commissions_url, notice: 'Commission was successfully created.' }
         format.mobile { redirect_to @commission, notice: 'Commission was successfully created.'}
         format.json { render json: @commission, status: :created, location: @commission }
@@ -88,5 +111,20 @@ class CommissionsController < ApplicationController
       format.json { head :no_content }
     end
   end
+
+
+  private
+
+
+  def baan(str)
+    #str.encode!("UTF-8","ASCII-8BIT", {:undef => :replace, :replace => 'ue'})
+    #str.encode!("UTF-8","ASCII-8BIT")
+    str.force_encoding("UTF-8")
+    #p str.length#str.encode("UTF-8","ASCII-8BIT",{:undef => :replace, :invalid => :replace, :fallback => {"\xFC" => 'b'}})
+    #p str.strip!
+    #p str.length
+  end
+
+
 end
 
