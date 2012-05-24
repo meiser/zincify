@@ -29,7 +29,7 @@ class CommissionsController < ApplicationController
     @commission = Commission.new
 
     #begin
-      db = Informix.connect("erp","informix", "informix123")
+      db = Informix.connect("test","test", "test123")
 
       @printers = db.cursor('select * from twhmei005120') do |cur|
         cur.open
