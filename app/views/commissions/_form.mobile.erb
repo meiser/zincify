@@ -21,7 +21,8 @@
   </div>
 
   <div class="ym-fbox-select">
-    <%= select("baan","printer", @printers, {:include_blank => 'Kein Ausdruck'}) %>
+    <%= label_tag "baan[printer]", "Drucker" %>
+    <%= select("baan","printer", @printers, {:selected => current_user.preferences.default_printer || "0009", :include_blank => 'Kein Ausdruck'}) %>
   </div>
   <!--<div class="ym-fbox-text">
     <%= f.label :appointment %><br />

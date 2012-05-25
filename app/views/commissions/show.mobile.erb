@@ -1,20 +1,53 @@
-<p id="notice"><%= notice %></p>
+<%= link_to edit_commission_path(@commission), :class => "ym-button ym-add" do %>
+  <%= t('.edit') %>
+<% end %>
 
-<p>
-  <b>Orno:</b>
-  <%= @commission.orno %>
-</p>
+<table>
+  <tr>
+    <th><%= t('activerecord.attributes.commission.orno') %></th>
+    <th><%= t('activerecord.attributes.commission.reference') %></th>
+    <th><%= t('activerecord.attributes.commission.appointment') %></th>
+    <th><%= t('activerecord.attributes.commission.created_at') %> (<%= t('activerecord.attributes.commission.updated_at')%>)</th>
+   <!-- <th></th>
+    <th></th>
+    <th></th>-->
+  </tr>
 
-<p>
-  <b>Reference:</b>
-  <%= @commission.reference %>
-</p>
+  <tr>
+    <td><%= @commission.orno %></td>
+    <td><%= @commission.reference %></td>
+    <td><%= l(@commission.appointment, :format => :short ) %></td>
+    <th><%= l(@commission.created_at, :format => :short ) %> (<%= l(@commission.updated_at, :format => :short ) %>)</th>
+    <!--<td><%= link_to 'Show', @commission %></td>
+    <td><%= link_to 'Edit', edit_commission_path(@commission) %></td>
+    <td><%= link_to 'Destroy', @commission, confirm: 'Are you sure?', method: :delete %></td>-->
+  </tr>
+</table>
 
-<p>
-  <b>Appointment:</b>
-  <%= @commission.appointment %>
-</p>
+<h2>Status</h2>
+
+<div class="status"></div>
 
 
-<%= link_to 'Edit', edit_commission_path(@commission) %> |
-<%= link_to 'Back', commissions_path %>
+<%= javascript_tag do %>
+$(function(){
+  var my_client = new Faye.Client("<%= FAYE_URL %>");
+  my_client.subscribe("/status<%= url_for @commission %>", function(data){
+    $("div.status").toggleClass("highlight");
+  });
+});
+<% end %>
+
+<% content_for :footer do %>
+  <%= link_to new_commission_path, :class => "ym-button ym-edit" do %>
+    <%= t('.new') %>
+  <% end %>
+<% end %>
+
+
+
+<%= link_to 'Zurück', commissions_path, :class => "ym-button ym-spark"  %>
+<%= link_to new_commission_path, :class => "ym-button ym-edit" do %>
+  <%= t('.new') %>
+<% end %>
+

@@ -1,0 +1,13 @@
+<h4>Einstellungen für <%= current_user.login %></h4>
+<%= form_for(@user, :html => {:class => "ym-form"}) do |f| %>
+
+  <div class="ym-fbox-select">
+    <%= f.label :default_printer, "Drucker" %>
+    <%= f.select(:default_printer, @printers, {:include_blank => 'Kein Ausdruck'}) %>
+  </div>
+
+  <div class="ym-fbox-button">
+    <%= f.submit "Einstellungen für #{current_user.login} speichern" %>
+  </div>
+<% end %>
+

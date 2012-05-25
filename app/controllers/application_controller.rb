@@ -12,6 +12,7 @@ class ApplicationController < ActionController::Base
 
   before_filter :authenticate_user!, :except => [:start, :test]
   before_filter :set_to_mobile
+
   def start
    if session[:user_id]
     redirect_to :dashboard

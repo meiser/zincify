@@ -2,6 +2,8 @@ class CommissionsController < ApplicationController
   # GET /commissions
   # GET /commissions.json
 
+  before_filter :load_printers
+
   def index
     @commissions = Commission.last(150).reverse
     respond_to do |format|
@@ -27,20 +29,6 @@ class CommissionsController < ApplicationController
   # GET /commissions/new.json
   def new
     @commission = Commission.new
-
-    #begin
-      db = Informix.connect("test","test", "test123")
-
-      @printers = db.cursor('select * from twhmei005120') do |cur|
-        cur.open
-        cur.fetch_all
-      end
-      db.close
-
-      @printers.collect!{ |p| [baan(p[1]).strip,p[2].strip] }
-    #rescue
-    #  @printers = []
-    #end
 
     respond_to do |format|
       format.html # new.html.erb
@@ -112,19 +100,11 @@ class CommissionsController < ApplicationController
     end
   end
 
-
   private
 
-
-  def baan(str)
-    #str.encode!("UTF-8","ASCII-8BIT", {:undef => :replace, :replace => 'ue'})
-    #str.encode!("UTF-8","ASCII-8BIT")
-    str.force_encoding("UTF-8")
-    #p str.length#str.encode("UTF-8","ASCII-8BIT",{:undef => :replace, :invalid => :replace, :fallback => {"\xFC" => 'b'}})
-    #p str.strip!
-    #p str.length
+  def load_printers
+   @printers = BAAN_PRINTERS
   end
-
 
 end
 

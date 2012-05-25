@@ -15,9 +15,12 @@ de:
  helpers:
   submit:
    commission:
-    create: Auftrag erstellen
+    create: Kommission erstellen
+    update: Kommission ändern
  commissions:
   index:
    new: Neuen Auftrag anlegen
+  show:
+   edit: Auftrag bearbeiten
   created_commission: Auftrag wurde erfolgreich angelegt
 

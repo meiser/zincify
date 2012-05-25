@@ -1,37 +1,37 @@
-<h1>Kommissionen</h1>
-
-<div class="ui-grid-a">
-<div class="ui-block-a">
-<ul data-role="listview" data-inset="true" data-filter="true" data-filter-placeholder="Suche" >
-<% @commissions.each do |commission| %>
-  <li data-filtertext="<%= [commission.orno, commission.reference, l(commission.appointment, :format => :short), l(commission.created_at, :format => :short), l(commission.updated_at, :format => :long)].join(",")%>">
-  <%= link_to commission do %>
-    <%= commission.orno %><span class="ui-li-count ui-btn-up-c ui-btn-corner-all"><%= commission.reference %> an Traverse <%= Random.rand(20) %></span>
-  <% end %>
-  </li>
+<%= link_to new_commission_path, :class => "ym-button ym-add" do %>
+  <%= t('.new') %>
 <% end %>
-</ul>
-</div>
-<div class="ui-block-b">
 
-</div>
+<table>
+  <tr>
+    <th><%= t('activerecord.attributes.commission.orno') %></th>
+    <th><%= t('activerecord.attributes.commission.reference') %></th>
+    <th><%= t('activerecord.attributes.commission.appointment') %></th>
+    <th><%= t('activerecord.attributes.commission.created_at') %> (<%= t('activerecord.attributes.commission.updated_at')%>)</th>
+    <th></th>
+   <!-- <th></th>
+    <th></th>
+    <th></th>-->
+  </tr>
 
-</div>
+<% @commissions.each do |commission| %>
+  <tr>
+    <td><%= commission.orno %></td>
+    <td><%= commission.reference %></td>
+    <td><%= l(commission.appointment, :format => :short ) %></td>
+    <td><%= l(commission.created_at, :format => :short ) %> (<%= l(commission.updated_at, :format => :short ) %>)</th>
+    <td><%= link_to "mehr", commission, :class => "ym-button ym-play" %></td>
+    <!--<td><%= link_to 'Show', commission %></td>
+    <td><%= link_to 'Edit', edit_commission_path(commission) %></td>
+    <td><%= link_to 'Destroy', commission, confirm: 'Are you sure?', method: :delete %></td>-->
+  </tr>
+  <% end %>
+</table>
+
 
 <% content_for :footer do %>
-
-    <%= link_to "Neuen Auftrag anlegen", new_commission_path, :class => "ym-button ym-add" %>
-
+  <%= link_to new_commission_path, :class => "ym-button ym-add" do %>
+    <%= t('.new') %>
+  <% end %>
 <% end %>
-<!--
-<%= javascript_tag do %>
-
-$(function(){
-  var my_client = new Faye.Client("<%= FAYE_URL %>");
-  my_client.subscribe("/messages/new", function(data){
-    alert(data);
-  });
-});
-
-<% end %>-->
 

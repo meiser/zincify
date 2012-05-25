@@ -1,8 +1,11 @@
 class User < ActiveRecord::Base
 
-  attr_accessor :login_or_email
+  attr_accessor :login_or_email, :default_printer
 
-  attr_accessible :email, :login, :password, :login_or_email
+  attr_accessible :password, :login_or_email
+
+  serialize :preferences, OpenStruct
+
 
   before_save :convert_email
 
