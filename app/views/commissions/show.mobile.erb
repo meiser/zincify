@@ -1,4 +1,4 @@
-<%= link_to edit_commission_path(@commission), :class => "ym-button ym-add" do %>
+<%= link_to edit_commission_path(@commission), :class => "ym-button ym-edit" do %>
   <%= t('.edit') %>
 <% end %>
 
@@ -32,7 +32,8 @@
 <%= javascript_tag do %>
 $(function(){
   var my_client = new Faye.Client("<%= FAYE_URL %>");
-  my_client.subscribe("/status<%= url_for @commission %>", function(data){
+  my_client.subscribe("/<%= @commission.id %>", function(data){
+    console.log(data);
     $("div.status").toggleClass("highlight");
   });
 });
@@ -47,7 +48,7 @@ $(function(){
 
 
 <%= link_to 'Zurück', commissions_path, :class => "ym-button ym-spark"  %>
-<%= link_to new_commission_path, :class => "ym-button ym-edit" do %>
+<%= link_to new_commission_path, :class => "ym-button ym-add" do %>
   <%= t('.new') %>
 <% end %>
 

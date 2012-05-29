@@ -21,6 +21,7 @@ de:
   index:
    new: Neuen Auftrag anlegen
   show:
+   new: Weiteren Auftrag anlegen
    edit: Auftrag bearbeiten
   created_commission: Auftrag wurde erfolgreich angelegt
 

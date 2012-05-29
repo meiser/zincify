@@ -11,7 +11,7 @@
       <!--[if lte IE 7]>
         <%= stylesheet_link_tag "yaml/core/iehacks.min", :media => "all" %>
       <![endif]-->
-      <%= javascript_include_tag "application", params[:controller], FAYE_URL %>
+      <%= javascript_include_tag "application", params[:controller], FAYE_JS %>
       <%= yield :head %>
     </head>
     <body>
