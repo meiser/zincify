@@ -24,9 +24,9 @@ class SessionsController < ApplicationController
 
       user.save(:validate => false)
       session[:user_id] = user.id
-      #path = session[:return_to] || "/dashboard"
+      path = session[:return_to] || "/dashboard"
 
-      redirect_to "/dashboard", :notice => t(".signed_in", :scope => :authentification)
+      redirect_to path, :notice => t(".signed_in", :scope => :authentification)
     else
       flash[:error] = t(".invalid", :scope => :authentification)
       @dialog = true

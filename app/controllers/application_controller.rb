@@ -10,7 +10,7 @@ class ApplicationController < ActionController::Base
 
   helper_method :current_user
 
-  before_filter :authenticate_user!, :except => [:start, :test]
+  before_filter :authenticate_user!, :except => :start
   before_filter :set_to_mobile
 
   def start

@@ -10,10 +10,13 @@
       </ul>
     </div>
   <% end %>
-
   <div class="ym-fbox-text">
     <%= f.label :orno %><br />
-    <%= f.text_field :orno %>
+    <% if controller.action_name == "new"  %>
+      <%= f.text_field :orno, :disabled => true, :value => "Wird vom System vergeben" %>
+    <% else %>
+      <%=f.text_field :orno, :disabled => true %>
+    <% end %>
   </div>
   <div class="ym-fbox-text">
     <%= f.label :reference %><br />
@@ -22,7 +25,7 @@
 
   <div class="ym-fbox-select">
     <%= label_tag "baan[printer]", "Drucker" %>
-    <%= select("baan","printer", @printers, {:selected => current_user.preferences.default_printer || "0009", :include_blank => 'Kein Ausdruck'}) %>
+    <%= select("baan","printer", @printers, {:selected => current_user.preferences.default_printer || @printers.first.second, :include_blank => 'Kein Ausdruck'}) %>
   </div>
   <!--<div class="ym-fbox-text">
     <%= f.label :appointment %><br />
