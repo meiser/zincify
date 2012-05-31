@@ -25,8 +25,10 @@
 
   <div class="ym-fbox-select">
     <%= label_tag "baan[printer]", "Drucker" %>
-    <%= select("baan","printer", @printers, {:selected => current_user.preferences.default_printer || @printers.first.second, :include_blank => 'Kein Ausdruck'}) %>
+    <%= collection_select("baan","printer", @printers, :ident, :description, {:id => "baan_printer_list", :selected => current_user.preferences.default_printer || @printers.first.ident, :include_blank => 'Kein Ausdruck'}) %>
   </div>
+  <%= link_to "Update", printer_path(:skip_mobile => true), :remote => true, :method => :put %>
+  <div id="loading" style="width:20px; height:20px; background-color:red;"></div>
   <!--<div class="ym-fbox-text">
     <%= f.label :appointment %><br />
     <%= f.datetime_select :appointment %>

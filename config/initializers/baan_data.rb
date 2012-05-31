@@ -1,16 +1,15 @@
  require 'informix'
 
  begin
-  db = Informix.connect(ENV["INFORMIXSERVER"], ENV["INFORMIXUSER"], ENV["INFORMIXPWD"])
-  printers = db.cursor('select * from twhmei005120') do |cur|
-   cur.open
-   cur.fetch_all
+  if Printer.all.empty?
+   Rails.logger.info "Begin der Synchronisierung mit BAAN zur Ermittlung aller Drucker"
+   Printer.synchronize_with_baan
+   Rails.logger.info "Synchronisierung mit BAAN erfolgreich abgeschlossen"
+  else
+    Rails.logger.info "Druckerinitialisierung mit BAAN nicht notwendig"
   end
-  db.close
-  printers.collect!{ |p| [p[1].force_encoding("UTF-8").strip,p[2].force_encoding("UTF-8").strip] }
- rescue
-   printers = []
- ensure
-   BAAN_PRINTERS = printers
+
+ rescue => e
+   Rails.logger(e)
  end
 

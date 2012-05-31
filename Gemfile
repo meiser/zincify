@@ -26,6 +26,7 @@ gem 'jquery-ui-rails'
 gem 'net-ssh'
 gem 'net-ldap'
 gem 'ruby-informix'
+gem 'whenever', :require => false
 
 gem 'mobylette'
 gem 'gravatar_image_tag'

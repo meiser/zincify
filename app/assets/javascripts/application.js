@@ -24,5 +24,13 @@ $(document).ready(function() {
     setTimeout(function() {
         $('.flash-alert,.flash-notice,.flash-error,.flash-info').fadeOut();
     }, 5000);
+
+
+  // create a convenient toggleLoading function
+  var toggleLoading = function() { $("#loading").toggle() };
+
+  $("#baan_printer")
+  .bind("ajax:loading", toggleLoading)
+  .bind("ajax:complete", toggleLoading);
 });
 

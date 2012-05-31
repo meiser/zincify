@@ -8,6 +8,8 @@ Zincify::Application.routes.draw do
 
   resource :user, :only => [:edit, :update]
 
+  resource :printer, :only => :update
+
   #match "websocket" =>  CommissionsPusher.new
 
   # The priority is based upon order of creation:

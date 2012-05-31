@@ -103,7 +103,7 @@ class CommissionsController < ApplicationController
   private
 
   def load_printers
-   @printers = BAAN_PRINTERS
+   @printers = Printer.all
   end
 
 end
