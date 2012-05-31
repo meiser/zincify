@@ -1,5 +1,9 @@
 Zincify::Application.routes.draw do
 
+  resources :deliveries do
+   get :autocomplete_customer_name, :on => :collection
+  end
+
   resources :commissions
 
   root :to => "application#start"

@@ -11,17 +11,10 @@ class Printer < ActiveRecord::Base
 
   def self.synchronize_with_baan
    db = Informix.connect(ENV["INFORMIXSERVER"], ENV["INFORMIXUSER"], ENV["INFORMIXPWD"])
-   printers = db.cursor('select * from twhmei005120') do |cur|
-    cur.open
-    cur.fetch_all
-   end
-   db.close
-   #printers.collect!{ |p| [p[1].force_encoding("UTF-8").strip,p[2].force_encoding("UTF-8").strip] }
-
-   printers.each do |printer|
-    baan_printer = Printer.create(
-     :ident => printer[2].force_encoding("UTF-8").strip,
-     :description => printer[1].force_encoding("UTF-8").strip
+   db.foreach_hash("select t_drbez, t_drcd from twhmei005120") do |r|
+    Printer.create(
+     :ident => r["t_drcd"].force_encoding("UTF-8").strip,
+     :description => r["t_drbez"].force_encoding("UTF-8").strip
     )
    end
    return true

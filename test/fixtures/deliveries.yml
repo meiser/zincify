@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  customer_id: 1
+  reference: MyString
+  deadline: 2012-05-31
+
+two:
+  customer_id: 1
+  reference: MyString
+  deadline: 2012-05-31

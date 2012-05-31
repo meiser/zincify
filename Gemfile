@@ -33,6 +33,8 @@ gem 'gravatar_image_tag'
 gem 'rails-i18n'
 
 gem 'faye'
+
+gem 'rails3-jquery-autocomplete'
 #gem 'net-http'
 # To use ActiveModel has_secure_password
 # gem 'bcrypt-ruby', '~> 3.0.0'
