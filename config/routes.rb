@@ -1,6 +1,7 @@
 Zincify::Application.routes.draw do
 
   resources :deliveries do
+   post :print, :on => :member
    get :autocomplete_customer_name, :on => :collection
   end
 

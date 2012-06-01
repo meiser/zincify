@@ -15,6 +15,9 @@
   <%= @delivery.deadline %>
 </p>
 
+<% content_for :footer do %>
+ <%= link_to('Label ausdrucken', print_delivery_path(@delivery), :method => :post, :class => "ym-button", :remote => true) %>
+<% end %>
 
 <%= link_to 'Edit', edit_delivery_path(@delivery) %> |
 <%= link_to 'Back', deliveries_path %>
