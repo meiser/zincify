@@ -33,5 +33,8 @@ $(document).ready(function() {
   $("#baan_printer")
   .bind("ajax:loading", toggleLoading)
   .bind("ajax:complete", toggleLoading);
+  $("#datepicker").datepicker();
+  $("#datepicker").datepicker( "option", "dateFormat", "DD, d MM, yy" );
+
 });
 

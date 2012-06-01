@@ -9,3 +9,4 @@ class CreateDeliveries < ActiveRecord::Migration
     end
   end
 end
+

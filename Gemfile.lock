@@ -72,6 +72,7 @@ GEM
     jquery-ui-rails (0.4.0)
       jquery-rails
       railties (>= 3.1.0)
+    jquery_datepicker (0.3.4)
     jruby-pageant (1.0.2)
     json (1.7.3)
     libv8 (3.3.10.4)
@@ -152,6 +153,7 @@ DEPENDENCIES
   gravatar_image_tag
   jquery-rails
   jquery-ui-rails
+  jquery_datepicker
   mobylette
   net-ldap
   net-ssh

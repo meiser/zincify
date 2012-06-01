@@ -1,0 +1,21 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <b>Customer:</b>
+  <%= @delivery.customer.name %>
+</p>
+
+<p>
+  <b>Reference:</b>
+  <%= @delivery.reference %>
+</p>
+
+<p>
+  <b>Deadline:</b>
+  <%= @delivery.deadline %>
+</p>
+
+
+<%= link_to 'Edit', edit_delivery_path(@delivery) %> |
+<%= link_to 'Back', deliveries_path %>
+

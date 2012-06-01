@@ -1,0 +1,38 @@
+<%= form_for(@delivery,:html => {:class => "ym-form"}) do |f| %>
+  <% if @delivery.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@delivery.errors.count, "error") %> prohibited this delivery from being saved:</h2>
+
+      <ul>
+      <% @delivery.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="ym-fbox-text">
+    <%= f.label :customer_id %><br />
+    <%= f.hidden_field :customer_id %>
+
+
+    <%= autocomplete_field_tag("customer_name", "", autocomplete_customer_name_deliveries_path, :id_element => '#delivery_customer_id') %>
+    <% if controller.action_name == "edit" %>
+      <span><%= @delivery.customer.name %></span>
+    <% end %>
+
+  </div>
+  <div class="ym-fbox-text">
+    <%= f.label :reference %><br />
+    <%= f.text_field :reference %>
+  </div>
+  <div class="ym-fbox-text">
+    <%= f.label :deadline %><br />
+    <%= f.datepicker :deadline, :dateFormat => "yy-mm-dd" %>
+    <%#= f.text_field :deadline, :id => "datepicker" %>
+  </div>
+  <div class="ym-fbox-button">
+    <%= f.submit %>
+  </div>
+<% end %>
+

@@ -12,11 +12,19 @@ de:
     appointment: Kundentermin
     created_at: Eingangsdatum
     updated_at: letzte Änderung
+   delivery:
+    customer_id: Kunde
+    created_at: Lieferschein erstellt
+    reference: Kundenreferenz
+    deadline: Abholtermin
  helpers:
   submit:
    commission:
     create: Kommission erstellen
-    update: Kommission ändern
+    update: Kommission aktualisieren
+   delivery:
+    create: Lieferschein Kundenauftrag abspeichern
+    update: Lieferschein Kundenauftrag aktualisieren
  commissions:
   index:
    new: Neuen Auftrag anlegen

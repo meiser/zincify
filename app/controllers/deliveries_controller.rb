@@ -1,6 +1,6 @@
 class DeliveriesController < ApplicationController
 
-  autocomplete :customer, :name, :full => true
+  autocomplete :customer, :name, :full => true, :display_value => :name_with_address, :extra_data => [:address]
 
   # GET /deliveries
   # GET /deliveries.json
@@ -63,10 +63,10 @@ class DeliveriesController < ApplicationController
 
     respond_to do |format|
       if @delivery.update_attributes(params[:delivery])
-        format.html { redirect_to @delivery, notice: 'Delivery was successfully updated.' }
+        format.mobile { redirect_to @delivery, notice: 'Delivery was successfully updated.' }
         format.json { head :no_content }
       else
-        format.html { render action: "edit" }
+        format.mobile { render action: "edit" }
         format.json { render json: @delivery.errors, status: :unprocessable_entity }
       end
     end
@@ -79,7 +79,7 @@ class DeliveriesController < ApplicationController
     @delivery.destroy
 
     respond_to do |format|
-      format.html { redirect_to deliveries_url }
+      format.mobile { redirect_to deliveries_url }
       format.json { head :no_content }
     end
   end

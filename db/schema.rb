@@ -22,6 +22,7 @@ ActiveRecord::Schema.define(:version => 20120531133942) do
   end
 
   create_table "customers", :force => true do |t|
+    t.string   "bpid"
     t.string   "name"
     t.text     "address"
     t.datetime "created_at", :null => false

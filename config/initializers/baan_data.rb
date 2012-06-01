@@ -13,7 +13,13 @@ begin
   Customer.synchronize_with_baan
  end
 
-rescue => e
- Rails.logger(e)
+#rescue ActiveRecord::StatementInvalid => e
+# Rails.logger.error e.message
+rescue Exception => e
+
+ #Rails.logger.error e.message
+ p e.message
+ p e.backtrace
+ #exit
 end
 
