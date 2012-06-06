@@ -12,6 +12,8 @@ de:
     appointment: Kundentermin
     created_at: Eingangsdatum
     updated_at: letzte Änderung
+   customer:
+    name: Kunde
    delivery:
     customer_id: Kunde
     created_at: Lieferschein erstellt
@@ -25,6 +27,13 @@ de:
    delivery:
     create: Lieferschein Kundenauftrag abspeichern
     update: Lieferschein Kundenauftrag aktualisieren
+ deliveries:
+  index:
+   new: Neue Anlieferung anlegen
+  show:
+   new: Weitere Anlieferung anlegen
+   edit: Anlieferung bearbeiten
+  created_delivery: Anlieferung wurde erfolgreich angelegt
  commissions:
   index:
    new: Neuen Auftrag anlegen

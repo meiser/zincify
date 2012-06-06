@@ -28,7 +28,7 @@ gem 'net-ldap'
 gem 'ruby-informix'
 gem 'whenever', :require => false
 
-gem 'mobylette'
+#gem 'mobylette'
 gem 'gravatar_image_tag'
 gem 'rails-i18n'
 
@@ -36,6 +36,7 @@ gem 'faye'
 
 gem 'rails3-jquery-autocomplete'
 gem 'jquery_datepicker'
+gem 'net-sftp'
 #gem 'net-http'
 # To use ActiveModel has_secure_password
 # gem 'bcrypt-ruby', '~> 3.0.0'

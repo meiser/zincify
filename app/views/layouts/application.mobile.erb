@@ -67,7 +67,7 @@
                         <%#= link_to("Zurück", url_for(:back), :class => "ym-button") if request.referer %>
                         <%= yield :footer %>
                           <!--<p>© Meiser <%= Time.now.year %> &ndash; Layout based on <a href="http://www.yaml.de">YAML</a></p>-->
-                        <%= link_to "Einstellungen #{current_user.login}", edit_user_path, :class => "ym-button ym-star", :style => "float:right;" if current_user %>
+                        <%= link_to "Einstellungen #{current_user.login}", edit_user_path(current_user), :class => "ym-button ym-star", :style => "float:right;" if current_user %>
 
                         </div>
 		    </div>

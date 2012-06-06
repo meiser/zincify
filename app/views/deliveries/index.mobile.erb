@@ -1,10 +1,10 @@
-<h1>Listing deliveries</h1>
+<h1>Anlieferungen</h1>
 
 <table>
   <tr>
-    <th>Customer</th>
-    <th>Reference</th>
-    <th>Deadline</th>
+    <th><%= t('activerecord.attributes.customer.name') %></th>
+    <th><%= t('activerecord.attributes.delivery.reference') %></th>
+    <th><%= t('activerecord.attributes.delivery.deadline') %></th>
     <th></th>
     <th></th>
     <th></th>
@@ -12,7 +12,7 @@
 
 <% @deliveries.each do |delivery| %>
   <tr>
-    <td><%= delivery.customer_id %></td>
+    <td><%= delivery.customer.bpid %> <%= delivery.customer.name %></td>
     <td><%= delivery.reference %></td>
     <td><%= delivery.deadline %></td>
     <td><%= link_to 'Show', delivery %></td>
@@ -24,4 +24,5 @@
 
 <br />
 
-<%= link_to 'New Delivery', new_delivery_path %>
+<%= link_to t('.new'), new_delivery_path %>
+

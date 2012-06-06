@@ -1,10 +1,10 @@
 class ApplicationController < ActionController::Base
 
-  include Mobylette::RespondToMobileRequests
+  #include Mobylette::RespondToMobileRequests
 
-  mobylette_config do |config|
-   config[:skip_xhr_requests] = false
-  end
+  #mobylette_config do |config|
+  # config[:skip_xhr_requests] = false
+  #end
 
   protect_from_forgery
 
@@ -28,7 +28,7 @@ class ApplicationController < ActionController::Base
 
 
   def set_mobile
-   request.format = "mobile"
+   request.format = "mobile" if request.format == "html"
   end
 
 

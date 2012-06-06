@@ -3,7 +3,7 @@
 
   <div class="ym-fbox-select">
     <%= f.label :default_printer, "Drucker" %>
-    <%= f.select(:default_printer, @printers, {:include_blank => 'Kein Ausdruck'}) %>
+    <%= collection_select("user",:default_printer, @printers, :ident, :description, {:id => "baan_printer_list", :selected => current_user.preferences.default_printer || @printers.first.ident, :include_blank => 'Kein Ausdruck'}) %>
   </div>
 
   <div class="ym-fbox-button">

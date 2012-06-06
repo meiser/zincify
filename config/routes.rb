@@ -11,7 +11,7 @@ Zincify::Application.routes.draw do
   match "dashboard" => "application#dashboard", :as => :dashboard
   resource :sessions, :only => [:new,:create, :destroy]
 
-  resource :user, :only => [:edit, :update]
+  resources :users, :only => [:edit, :update]
 
   resource :printer, :only => :update
 

@@ -67,6 +67,7 @@ module Zincify
 
     # Observers for Websocket functionality
     config.active_record.observers = :commission_observer
+
   end
 end
 
