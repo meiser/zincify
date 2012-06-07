@@ -13,6 +13,7 @@
 //= require jquery
 //= require jquery_ujs
 //= require jquery.ui.all
+//= require jquery.ui.datepicker-de
 //= require autocomplete-rails
 // require_tree .
 
@@ -29,10 +30,10 @@ $(document).ready(function() {
 
   // create a convenient toggleLoading function
   var toggleLoading = function() { $("#loading").toggle() };
-
   $("#baan_printer")
   .bind("ajax:loading", toggleLoading)
   .bind("ajax:complete", toggleLoading);
+
   $("#datepicker").datepicker();
   $("#datepicker").datepicker( "option", "dateFormat", "DD, d MM, yy" );
 

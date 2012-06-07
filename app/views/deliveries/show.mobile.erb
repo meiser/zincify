@@ -27,7 +27,13 @@
   <%= l @delivery.indate, :format => :long %>
 </p>-->
 
+
 <%= link_to 'Etikett drucken', print_delivery_path(@delivery), :class => "ym-button", :remote => true, :method => :post %>
-<%= link_to 'Edit', edit_delivery_path(@delivery), :class => "ym-button" %>
-<%= link_to 'Back', deliveries_path, :class => "ym-button" %>
+<%= link_to 'Anlieferung bearbeiten', edit_delivery_path(@delivery), :class => "ym-button" %>
+
+
+
+<%= content_for :footer do %>
+ <%= link_to "Anlieferungen", deliveries_path, :class => "ym-button" %>
+<% end %>
 

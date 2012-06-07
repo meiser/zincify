@@ -22,10 +22,7 @@ module ApplicationHelper
  def model_messages(model)
   if model.errors.any?
    output = ""
-   model.errors.full_messages.each do |msg|
-    output << content_tag(:p, msg, :class => "flash-error box error")
-   end
-   return output.html_safe
+   return content_tag(:p, model.errors.full_messages.to_sentence, :class => "flash-error box error").html_safe
   else
    return nil
   end

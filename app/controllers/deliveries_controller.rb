@@ -5,7 +5,7 @@ class DeliveriesController < ApplicationController
   # GET /deliveries
   # GET /deliveries.json
   def index
-    @deliveries = Delivery.order("indate").page(params[:page]).per(10)
+    @deliveries = Delivery.order("indate desc").page(params[:page]).per(10)
 
     respond_to do |format|
       format.html # index.html.erb
@@ -43,10 +43,10 @@ class DeliveriesController < ApplicationController
   # POST /deliveries
   # POST /deliveries.json
   def create
-    @delivery = Delivery.new(params[:delivery])
+    @delivery = Delivery.create(params[:delivery])
 
     respond_to do |format|
-      if @delivery.save
+      if @delivery.valid?
         format.mobile { redirect_to deliveries_path, notice: t("deliveries.created") }
         format.json { render json: @delivery, status: :created, location: @delivery }
       else
