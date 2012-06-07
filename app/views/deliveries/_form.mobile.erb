@@ -1,15 +1,14 @@
 <%= form_for(@delivery,:html => {:class => "ym-form"}) do |f| %>
-  <% if @delivery.errors.any? %>
-    <div id="error_explanation">
-      <h2><%= pluralize(@delivery.errors.count, "error") %> prohibited this delivery from being saved:</h2>
-
-      <ul>
+  <%= content_for :messages do %>
+    <%= model_messages(@delivery) %>
+  <% end %>
+  <!--<% if @delivery.errors.any? %>
+         <ul>
       <% @delivery.errors.full_messages.each do |msg| %>
         <li><%= msg %></li>
       <% end %>
       </ul>
-    </div>
-  <% end %>
+  <% end %>-->
 
   <div class="ym-fbox-text">
     <%= f.label :customer_id %><br />
@@ -26,13 +25,26 @@
     <%= f.label :reference %><br />
     <%= f.text_field :reference %>
   </div>
+
   <div class="ym-fbox-text">
-    <%= f.label :deadline %><br />
-    <%= f.datepicker :deadline, :dateFormat => "yy-mm-dd" %>
+    <%= f.label :indate %><br />
+    <%= f.datepicker :indate, :dateFormat => "yy-mm-dd" %>
+    <%#= f.text_field :deadline, :id => "datepicker" %>
+  </div>
+
+  <div class="ym-fbox-text">
+    <%= f.label :outdate %><br />
+    <%= f.datepicker :outdate, :dateFormat => "yy-mm-dd" %>
+    <%#= f.text_field :deadline, :id => "datepicker" %>
+  </div>
+  <div class="ym-fbox-text">
+    <%= f.label :remarks %><br />
+    <%= f.text_area :remarks, :size => "30x5" %>
     <%#= f.text_field :deadline, :id => "datepicker" %>
   </div>
   <div class="ym-fbox-button">
     <%= f.submit %>
   </div>
+
 <% end %>
 

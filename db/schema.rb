@@ -29,13 +29,22 @@ ActiveRecord::Schema.define(:version => 20120604050926) do
     t.datetime "updated_at", :null => false
   end
 
+  add_index "customers", ["bpid"], :name => "index_customers_on_bpid"
+  add_index "customers", ["name"], :name => "index_customers_on_name"
+
   create_table "deliveries", :force => true do |t|
     t.integer  "customer_id"
+    t.string   "commission"
     t.string   "reference"
-    t.date     "deadline"
+    t.date     "indate"
+    t.date     "outdate"
+    t.text     "remarks"
+    t.string   "slug"
     t.datetime "created_at",  :null => false
     t.datetime "updated_at",  :null => false
   end
+
+  add_index "deliveries", ["slug"], :name => "index_deliveries_on_slug", :unique => true
 
   create_table "printers", :force => true do |t|
     t.string   "ident"

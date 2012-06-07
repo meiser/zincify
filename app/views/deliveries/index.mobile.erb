@@ -1,28 +1,38 @@
-<h1>Anlieferungen</h1>
-
+<!--
 <table>
   <tr>
-    <th><%= t('activerecord.attributes.customer.name') %></th>
+     <th><%= t('activerecord.attributes.customer.name') %></th>
     <th><%= t('activerecord.attributes.delivery.reference') %></th>
     <th><%= t('activerecord.attributes.delivery.deadline') %></th>
     <th></th>
     <th></th>
-    <th></th>
-  </tr>
+  </tr>-->
 
+<nav class="ym-vlist">
+<h6>Anlieferungen</h6>
+
+
+<% unless @deliveries.empty? %>
+
+<ul>
 <% @deliveries.each do |delivery| %>
-  <tr>
-    <td><%= delivery.customer.bpid %> <%= delivery.customer.name %></td>
-    <td><%= delivery.reference %></td>
-    <td><%= delivery.deadline %></td>
-    <td><%= link_to 'Show', delivery %></td>
-    <td><%= link_to 'Edit', edit_delivery_path(delivery) %></td>
-    <td><%= link_to 'Destroy', delivery, confirm: 'Are you sure?', method: :delete %></td>
-  </tr>
+  <li>
+  <%= link_to delivery_path(delivery), :class => "ym-button" do %>
+    <%= delivery.customer.name %>
+    <span style=""><%= delivery.commission %></span>
+    <%= l delivery.outdate, :format => :long %>
+    <!--<td><%= link_to 'Destroy', delivery, confirm: 'Are you sure?', method: :delete %></td>-->
+  <% end %>
+  </li>
 <% end %>
-</table>
+</ul>
+</nav>
 
-<br />
+<%= paginate @deliveries %>
 
-<%= link_to t('.new'), new_delivery_path %>
+<% end %>
+
+<%= content_for :footer do %>
+  <%= link_to t(".new"), new_delivery_path, :class => "ym-button ym-add" %>
+<% end %>
 

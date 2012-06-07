@@ -19,6 +19,7 @@
     <div id="message_container">
       <div id="message_box">
         <%= yaml_messages(flash) -%>
+        <%= yield :messages %>
       </div>
     </div>
 
@@ -64,7 +65,7 @@
 	    <div class="ym-wrapper">
 		    <div class="ym-wbox">
 			                  <div class="ym-cbox">
-                        <%#= link_to("Zurück", url_for(:back), :class => "ym-button") if request.referer %>
+                        <%= link_to(t("dashboard"), dashboard_path, :class => "ym-button") unless request.path == dashboard_path %>
                         <%= yield :footer %>
                           <!--<p>© Meiser <%= Time.now.year %> &ndash; Layout based on <a href="http://www.yaml.de">YAML</a></p>-->
                         <%= link_to "Einstellungen #{current_user.login}", edit_user_path(current_user), :class => "ym-button ym-star", :style => "float:right;" if current_user %>

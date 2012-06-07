@@ -1,4 +1,5 @@
 de:
+ dashboard: Dashboard
  activerecord:
   attributes:
    user:
@@ -16,18 +17,23 @@ de:
     name: Kunde
    delivery:
     customer_id: Kunde
+    commission: Kommissionsnummer
+    remarks: Anmerkungen
     created_at: Lieferschein erstellt
     reference: Kundenreferenz
-    deadline: Abholtermin
+    indate: Anlieferung am
+    outdate: Abholtermin
  helpers:
   submit:
    commission:
     create: Kommission erstellen
     update: Kommission aktualisieren
    delivery:
-    create: Lieferschein Kundenauftrag abspeichern
-    update: Lieferschein Kundenauftrag aktualisieren
+    create: Anlieferung speichern
+    update: Anlieferung aktualisieren
  deliveries:
+  created: Anlieferung wurde angelegt
+  updated: Anlieferung wurde aktualisiert
   index:
    new: Neue Anlieferung anlegen
   show:

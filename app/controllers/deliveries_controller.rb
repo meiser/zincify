@@ -5,7 +5,7 @@ class DeliveriesController < ApplicationController
   # GET /deliveries
   # GET /deliveries.json
   def index
-    @deliveries = Delivery.all
+    @deliveries = Delivery.order("indate").page(params[:page]).per(10)
 
     respond_to do |format|
       format.html # index.html.erb
@@ -47,7 +47,7 @@ class DeliveriesController < ApplicationController
 
     respond_to do |format|
       if @delivery.save
-        format.mobile { redirect_to @delivery, notice: 'Delivery was successfully created.' }
+        format.mobile { redirect_to deliveries_path, notice: t("deliveries.created") }
         format.json { render json: @delivery, status: :created, location: @delivery }
       else
         format.mobile { render action: "new" }
@@ -63,7 +63,7 @@ class DeliveriesController < ApplicationController
 
     respond_to do |format|
       if @delivery.update_attributes(params[:delivery])
-        format.mobile { redirect_to @delivery, notice: 'Delivery was successfully updated.' }
+        format.mobile { redirect_to @delivery, notice: t("deliveries.updated") }
         format.json { head :no_content }
       else
         format.mobile { render action: "edit" }
@@ -91,9 +91,9 @@ class DeliveriesController < ApplicationController
 <!DOCTYPE labels SYSTEM "label.dtd">
 <labels _FORMAT="E:TESTZEBR.ZPL">
 <label>
-<variable name="commission">#{Random.rand(1000000000...9999999999)}</variable>
-<variable name="annahme">#{l @delivery.created_at, :format => :short}</variable>
-<variable name="abgabe">#{l(@delivery.deadline >> 2 + 500,:format => :short)}</variable>
+<variable name="commission">#{@delivery.commission}</variable>
+<variable name="annahme">#{l @delivery.indate, :format => :long}</variable>
+<variable name="abgabe">#{l(@delivery.outdate,:format => :long)}</variable>
 <variable name="customer">#{@delivery.customer.name}</variable>
 </label>
 </labels>

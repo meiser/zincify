@@ -105,3 +105,30 @@ a.ym-button:before{
     background-color:green;
 }
 
+
+/*FORMATING UNORDERD LISTS*/
+
+.ym-vlist a {
+    border: none;
+    width: 100%;
+}
+
+.ym-vlist a.ym-button {
+    width: 100%;
+    margin: 1px 0;
+    padding-left: 1em;
+}
+
+.ym-vlist li span {
+    border:none;
+}
+
+.ym-vlist li {
+    width: 100%;
+}
+
+.ym-vlist ul {
+    border:none;
+    width: 100%;
+}
+

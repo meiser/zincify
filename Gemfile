@@ -36,7 +36,8 @@ gem 'faye'
 
 gem 'rails3-jquery-autocomplete'
 gem 'jquery_datepicker'
-gem 'net-sftp'
+gem 'kaminari'
+gem "friendly_id", "~> 4.0.7"
 #gem 'net-http'
 # To use ActiveModel has_secure_password
 # gem 'bcrypt-ruby', '~> 3.0.0'

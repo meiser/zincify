@@ -1,24 +1,33 @@
-<p id="notice"><%= notice %></p>
-
+<nav class="ym-vlist">
+<h6>Anlieferung mit Kommissionsnummer <%= @delivery.commission %></h6>
+<ul>
+  <li>
+  <%= link_to '#', :class => "ym-button" do %>
+    <%= @delivery.customer.name %>
+    <span style=""><%= @delivery.reference %></span>
+    <%= l @delivery.indate, :format => :long %> >> M
+    >> <%= l @delivery.outdate, :format => :long %>
+  <% end %>
+  </li>
+</ul>
+</nav>
+<!--
 <p>
-  <b>Customer:</b>
-  <%= @delivery.customer.name %>
+<%= t('activerecord.attributes.customer.name') %>
+<%= @delivery.customer.name %>
 </p>
 
 <p>
-  <b>Reference:</b>
+  <%= t('activerecord.attributes.delivery.reference') %>
   <%= @delivery.reference %>
 </p>
 
 <p>
-  <b>Deadline:</b>
-  <%= @delivery.deadline %>
-</p>
+  <%= t('activerecord.attributes.delivery.deadline') %>
+  <%= l @delivery.indate, :format => :long %>
+</p>-->
 
-<% content_for :footer do %>
- <%= link_to('Label ausdrucken', print_delivery_path(@delivery), :method => :post, :class => "ym-button", :remote => true) %>
-<% end %>
-
-<%= link_to 'Edit', edit_delivery_path(@delivery) %> |
-<%= link_to 'Back', deliveries_path %>
+<%= link_to 'Etikett drucken', print_delivery_path(@delivery), :class => "ym-button", :remote => true, :method => :post %>
+<%= link_to 'Edit', edit_delivery_path(@delivery), :class => "ym-button" %>
+<%= link_to 'Back', deliveries_path, :class => "ym-button" %>
 
