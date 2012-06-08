@@ -1,10 +1,12 @@
 Zincify::Application.routes.draw do
 
+  resources :traverses do
+   get :fill, :on => :collection
+  end
+
   resources :deliveries do
    post :print, :on => :member
   end
-
-  match "makeready" => "application#arm", :as => :arm
 
   resources :commissions
 

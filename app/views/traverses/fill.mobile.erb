@@ -1,0 +1,10 @@
+<%= form_for(Traverse.new) do |f| %>
+    <div class="ym-fbox-text">
+    <%= f.label :name %><br />
+    <%= f.collection_select(:name, Traverse.order("name asc"), :id, :name, :include_blank => false, :style => "width:400px;") %>
+  </div>
+
+
+
+<% end %>
+

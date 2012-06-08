@@ -1,7 +1,7 @@
 de:
  dashboard: Dashboard
  delivery: Anlieferungen
- arm: Aufrüststationen
+ traverse: Aufrüststationen
  activerecord:
   attributes:
    user:

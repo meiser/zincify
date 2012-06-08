@@ -1,0 +1,7 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+<% for i in 1..999 %>
+fix_<%= i %>:
+  name: Traverse <%= i %>
+  remarks: Remark <%= i %>
+<% end %>
+
