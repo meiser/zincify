@@ -39,12 +39,11 @@ ActiveRecord::Schema.define(:version => 20120604050926) do
     t.date     "indate"
     t.date     "outdate"
     t.text     "remarks"
-    t.string   "slug"
     t.datetime "created_at",  :null => false
     t.datetime "updated_at",  :null => false
   end
 
-  add_index "deliveries", ["slug"], :name => "index_deliveries_on_slug", :unique => true
+  add_index "deliveries", ["commission"], :name => "index_deliveries_on_commission", :unique => true
 
   create_table "printers", :force => true do |t|
     t.string   "ident"

@@ -14,7 +14,8 @@
  *= require yaml/navigation/vlist
  *= require yaml/screen/typography
  *= require yaml/forms/gray-theme
- *= require common
  *= require jquery.ui.all
+ *= require chosen
+ *= require common
 */
 

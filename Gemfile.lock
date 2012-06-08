@@ -61,7 +61,6 @@ GEM
       yajl-ruby (>= 1.0.0)
     faye-websocket (0.4.5)
       eventmachine (>= 0.12.0)
-    friendly_id (4.0.7)
     gravatar_image_tag (1.1.2)
     hike (1.2.1)
     http_parser.rb (0.5.3)
@@ -108,8 +107,6 @@ GEM
       railties (= 3.2.3)
     rails-i18n (0.6.4)
       i18n (~> 0.5)
-    rails3-jquery-autocomplete (1.0.7)
-      rails (~> 3.0)
     railties (3.2.3)
       actionpack (= 3.2.3)
       activesupport (= 3.2.3)
@@ -153,7 +150,6 @@ PLATFORMS
 DEPENDENCIES
   coffee-rails (~> 3.2.1)
   faye
-  friendly_id (~> 4.0.7)
   gravatar_image_tag
   jquery-rails
   jquery-ui-rails
@@ -163,7 +159,6 @@ DEPENDENCIES
   net-ssh
   rails (= 3.2.3)
   rails-i18n
-  rails3-jquery-autocomplete
   ruby-informix
   sass-rails (~> 3.2.3)
   sqlite3

@@ -7,10 +7,9 @@ class CreateDeliveries < ActiveRecord::Migration
       t.date :indate
       t.date :outdate
       t.text :remarks
-      t.string :slug
       t.timestamps
     end
-    add_index :deliveries, :slug, :unique => true
+    add_index :deliveries, :commission, :unique => true
   end
 
 end

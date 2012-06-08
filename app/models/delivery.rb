@@ -1,5 +1,4 @@
 class Delivery < ActiveRecord::Base
-  extend FriendlyId
 
   attr_accessible :customer_id, :indate,:outdate, :reference, :remarks
 
@@ -9,10 +8,7 @@ class Delivery < ActiveRecord::Base
   before_create :set_indate
 
 
-
-  #friendly_id :commission, :use => :slug
-
-  validates_presence_of :customer, :outdate, :indate, :remarks
+  validates_presence_of :customer, :outdate
 
   private
 
@@ -22,11 +18,11 @@ class Delivery < ActiveRecord::Base
   end
 
   def set_indate
+    p "set_indate"
     if self.indate.nil?
-     self.indate=self.created_at
+     self.indate=Time.now
     end
   end
-  #http://harvesthq.github.com/chosen/
 
 end
 

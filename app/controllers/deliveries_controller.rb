@@ -1,12 +1,9 @@
 class DeliveriesController < ApplicationController
 
-  autocomplete :customer, :name, :full => true, :display_value => :name_with_address, :extra_data => [:address]
-
   # GET /deliveries
   # GET /deliveries.json
   def index
-    @deliveries = Delivery.order("indate desc").page(params[:page]).per(10)
-
+    p @deliveries = Delivery.order("outdate asc").page(params[:page]).per(10)
     respond_to do |format|
       format.html # index.html.erb
       format.json { render json: @deliveries }
@@ -28,7 +25,6 @@ class DeliveriesController < ApplicationController
   # GET /deliveries/new.json
   def new
     @delivery = Delivery.new
-
     respond_to do |format|
       format.html # new.html.erb
       format.json { render json: @delivery }
@@ -43,13 +39,14 @@ class DeliveriesController < ApplicationController
   # POST /deliveries
   # POST /deliveries.json
   def create
-    @delivery = Delivery.create(params[:delivery])
+    @delivery = Delivery.new(params[:delivery])
 
     respond_to do |format|
-      if @delivery.valid?
+      if @delivery.save
         format.mobile { redirect_to deliveries_path, notice: t("deliveries.created") }
         format.json { render json: @delivery, status: :created, location: @delivery }
       else
+
         format.mobile { render action: "new" }
         format.json { render json: @delivery.errors, status: :unprocessable_entity }
       end

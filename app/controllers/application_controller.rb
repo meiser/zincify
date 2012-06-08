@@ -24,6 +24,10 @@ class ApplicationController < ActionController::Base
   end
 
 
+  def arm
+
+  end
+
   private
 
 

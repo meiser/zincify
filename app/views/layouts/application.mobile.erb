@@ -27,9 +27,9 @@
       <header>
 	    <div class="ym-wrapper">
 		    <div class="ym-wbox">
-	         <%#= link_to root_path, :id =>"logo" do %>
+	         <%= link_to root_path, :id =>"logo" do %>
             <%= image_tag "meiser.gif", :class =>"logo", :style => "margin-left: 10px" %>
-           <%# end %>
+           <% end %>
            <%= render "user_status" %>
         </div>
 	    </div>
@@ -65,10 +65,13 @@
 	    <div class="ym-wrapper">
 		    <div class="ym-wbox">
 			                  <div class="ym-cbox">
-                        <%= link_to(t("dashboard"), dashboard_path, :class => "ym-button") unless request.path == dashboard_path %>
+                        <%= link_to(t("dashboard"), dashboard_path, :class => "ym-button") %>
+                        <%= link_to t("delivery"), deliveries_path, :class => "ym-button" %>
+                        <%= link_to(t("arm"), arm_path, :class => "ym-button") %>
+
                         <%= yield :footer %>
+
                           <!--<p>© Meiser <%= Time.now.year %> &ndash; Layout based on <a href="http://www.yaml.de">YAML</a></p>-->
-                        <%= link_to "Einstellungen #{current_user.login}", edit_user_path(current_user), :class => "ym-button ym-star", :style => "float:right;" if current_user %>
 
                         </div>
 		    </div>

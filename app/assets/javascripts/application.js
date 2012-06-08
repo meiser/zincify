@@ -14,7 +14,8 @@
 //= require jquery_ujs
 //= require jquery.ui.all
 //= require jquery.ui.datepicker-de
-//= require autocomplete-rails
+//= require jquery-ui-timepicker-addon
+//= require chosen.jquery
 // require_tree .
 
 
@@ -36,6 +37,8 @@ $(document).ready(function() {
 
   $("#datepicker").datepicker();
   $("#datepicker").datepicker( "option", "dateFormat", "DD, d MM, yy" );
+
+  $("#delivery_customer_id").chosen();
 
 });
 

@@ -29,10 +29,5 @@ class Customer < ActiveRecord::Base
    return true
   end
 
-
-  def name_with_address
-   self.address#self.name + " || " + self.address
-  end
-
 end
 

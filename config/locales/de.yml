@@ -1,5 +1,7 @@
 de:
  dashboard: Dashboard
+ delivery: Anlieferungen
+ arm: Aufrüststationen
  activerecord:
   attributes:
    user:
@@ -47,4 +49,11 @@ de:
    new: Weiteren Auftrag anlegen
    edit: Auftrag bearbeiten
   created_commission: Auftrag wurde erfolgreich angelegt
+ views:
+  pagination:
+   first: "<<"
+   last: ">>"
+   next: ">"
+   previous: "<"
+   truncate: "..."
 

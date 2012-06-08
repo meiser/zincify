@@ -5,8 +5,8 @@
   <%= link_to '#', :class => "ym-button" do %>
     <%= @delivery.customer.name %>
     <span style=""><%= @delivery.reference %></span>
-    <%= l @delivery.indate, :format => :long %> >> M
-    >> <%= l @delivery.outdate, :format => :long %>
+    <p>Anlieferung am: <%= l @delivery.indate, :format => :long %></br>
+    Fertigstellung bis: <%= l @delivery.outdate, :format => :long %></p>
   <% end %>
   </li>
 </ul>

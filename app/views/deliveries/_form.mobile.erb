@@ -2,24 +2,9 @@
   <%= content_for :messages do %>
     <%= model_messages(@delivery) %>
   <% end %>
-  <!--<% if @delivery.errors.any? %>
-         <ul>
-      <% @delivery.errors.full_messages.each do |msg| %>
-        <li><%= msg %></li>
-      <% end %>
-      </ul>
-  <% end %>-->
-
   <div class="ym-fbox-text">
     <%= f.label :customer_id %><br />
-    <%= f.hidden_field :customer_id %>
-
-
-    <%= autocomplete_field_tag("customer_name", "", autocomplete_customer_name_deliveries_path, :id_element => '#delivery_customer_id') %>
-    <% if controller.action_name == "edit" %>
-      <span><%= @delivery.customer.name %></span>
-    <% end %>
-
+    <%= f.collection_select( :customer_id, Customer.all, :id, :address, :include_blank => false) %>
   </div>
   <div class="ym-fbox-text">
     <%= f.label :reference %><br />
@@ -28,13 +13,13 @@
 
   <div class="ym-fbox-text">
     <%= f.label :indate %><br />
-    <%= f.datepicker :indate, :dateFormat => "yy-mm-dd" %>
+    <%= f.datepicker :indate, :dateFormat => "yy-mm-dd", :maxDate => 0 %>
     <%#= f.text_field :deadline, :id => "datepicker" %>
   </div>
 
   <div class="ym-fbox-text">
     <%= f.label :outdate %><br />
-    <%= f.datepicker :outdate, :dateFormat => "yy-mm-dd" %>
+    <%= f.datepicker :outdate, :dateFormat => "yy-mm-dd", :minDate => 0 %>
     <%#= f.text_field :deadline, :id => "datepicker" %>
   </div>
   <div class="ym-fbox-text">

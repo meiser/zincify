@@ -8,19 +8,22 @@
     <th></th>
   </tr>-->
 
+<%= paginate @deliveries %>
+
+
 <nav class="ym-vlist">
-<h6>Anlieferungen</h6>
+<h6>Aktuelle Anlieferungen</h6>
 
 
 <% unless @deliveries.empty? %>
-
 <ul>
 <% @deliveries.each do |delivery| %>
   <li>
   <%= link_to delivery_path(delivery), :class => "ym-button" do %>
-    <%= delivery.customer.name %>
-    <span style=""><%= delivery.commission %></span>
-    <%= l delivery.outdate, :format => :long %>
+    <h6>Auftrag <%= delivery.commission %> für <%= delivery.customer.address %></h6>
+
+    Anlieferung am :<%= l delivery.indate, :format => :long %></br>
+    Fertigstellung bis: <%= l delivery.outdate, :format => :long %>
     <!--<td><%= link_to 'Destroy', delivery, confirm: 'Are you sure?', method: :delete %></td>-->
   <% end %>
   </li>
@@ -28,11 +31,9 @@
 </ul>
 </nav>
 
-<%= paginate @deliveries %>
-
 <% end %>
 
-<%= content_for :footer do %>
+<%= content_for :col1 do %>
   <%= link_to t(".new"), new_delivery_path, :class => "ym-button ym-add" %>
 <% end %>
 

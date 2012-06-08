@@ -2,8 +2,9 @@ Zincify::Application.routes.draw do
 
   resources :deliveries do
    post :print, :on => :member
-   get :autocomplete_customer_name, :on => :collection
   end
+
+  match "makeready" => "application#arm", :as => :arm
 
   resources :commissions
 
@@ -11,7 +12,7 @@ Zincify::Application.routes.draw do
   match "dashboard" => "application#dashboard", :as => :dashboard
   resource :sessions, :only => [:new,:create, :destroy]
 
-  resources :users, :only => [:edit, :update]
+  resource :user, :only => [:edit, :update]
 
   resource :printer, :only => :update
 

@@ -1,9 +1,9 @@
 <h4>Einstellungen für <%= current_user.login %></h4>
-<%= form_for(@user, :html => {:class => "ym-form"}) do |f| %>
+<%= form_for(@user, :url => user_path, :html => {:class => "ym-form"}) do |f| %>
 
   <div class="ym-fbox-select">
     <%= f.label :default_printer, "Drucker" %>
-    <%= collection_select("user",:default_printer, @printers, :ident, :description, {:id => "baan_printer_list", :selected => current_user.preferences.default_printer || @printers.first.ident, :include_blank => 'Kein Ausdruck'}) %>
+    <%= collection_select("user",:default_printer, @printers, :ident, :description, {:id => "baan_printer_list", :selected => @user.preferences.default_printer || @printers.first.ident, :include_blank => 'Kein Ausdruck'}) %>
   </div>
 
   <div class="ym-fbox-button">
