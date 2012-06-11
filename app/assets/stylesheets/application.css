@@ -16,6 +16,7 @@
  *= require yaml/forms/gray-theme
  *= require jquery.ui.all
  *= require chosen
+ *= require formtastic
  *= require common
 */
 

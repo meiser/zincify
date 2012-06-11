@@ -8,13 +8,14 @@
     <th></th>
   </tr>-->
 
+<div style="margin-bottom: 1em;">
+<%= link_to t(".new"), new_delivery_path, :class => "ym-button ym-add" %>
+</div>
+
 <%= paginate @deliveries %>
 
 
 <nav class="ym-vlist">
-<h6>Aktuelle Anlieferungen</h6>
-
-
 <% unless @deliveries.empty? %>
 <ul>
 <% @deliveries.each do |delivery| %>
@@ -33,7 +34,6 @@
 
 <% end %>
 
-<%= content_for :col1 do %>
-  <%= link_to t(".new"), new_delivery_path, :class => "ym-button ym-add" %>
-<% end %>
+<%#= content_for :col2 do %>
+<%# end %>
 

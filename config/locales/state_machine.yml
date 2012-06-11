@@ -1,0 +1,9 @@
+de:
+ activerecord:
+  state_machines:
+   traverse:
+    states:
+     unbooked: frei
+     booked: gebucht
+     maintenance: Wartung
+

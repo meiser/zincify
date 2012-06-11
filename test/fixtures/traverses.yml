@@ -3,5 +3,6 @@
 fix_<%= i %>:
   name: Traverse <%= i %>
   remarks: Remark <%= i %>
+  state: unbooked
 <% end %>
 

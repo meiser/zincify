@@ -39,7 +39,12 @@ $(document).ready(function() {
   $("#datepicker").datepicker( "option", "dateFormat", "DD, d MM, yy" );
 
   $("#delivery_customer_id").chosen();
-  $("#traverse_name").chosen();
+  $("#traverse_name").chosen().change( function(e){
+   console.log("Do it");
+   //window.location = $(this).val();
+  });
+
+
 
 });
 

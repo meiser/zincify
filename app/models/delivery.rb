@@ -10,15 +10,33 @@ class Delivery < ActiveRecord::Base
 
   validates_presence_of :customer, :outdate
 
+
+
+
+
+
+
+
+
+  state_machine :initial => :captured do
+
+    event :close do
+     transition :captured => :closed
+    end
+
+  end
+
+
+
+
+
   private
 
   def set_commission
-   p "kommission wurde genommen"
    self.commission = Random.rand(1000000000...9999999999)
   end
 
   def set_indate
-    p "set_indate"
     if self.indate.nil?
      self.indate=Time.now
     end

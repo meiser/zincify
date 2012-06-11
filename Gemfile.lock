@@ -61,6 +61,8 @@ GEM
       yajl-ruby (>= 1.0.0)
     faye-websocket (0.4.5)
       eventmachine (>= 0.12.0)
+    formtastic (2.2.1)
+      actionpack (>= 3.0)
     gravatar_image_tag (1.1.2)
     hike (1.2.1)
     http_parser.rb (0.5.3)
@@ -151,6 +153,7 @@ PLATFORMS
 DEPENDENCIES
   coffee-rails (~> 3.2.1)
   faye
+  formtastic
   gravatar_image_tag
   jquery-rails
   jquery-ui-rails

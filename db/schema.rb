@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120608115304) do
+ActiveRecord::Schema.define(:version => 20120611131713) do
 
   create_table "commissions", :force => true do |t|
     t.string   "orno"
@@ -41,6 +41,7 @@ ActiveRecord::Schema.define(:version => 20120608115304) do
     t.text     "remarks"
     t.datetime "created_at",  :null => false
     t.datetime "updated_at",  :null => false
+    t.string   "state"
   end
 
   add_index "deliveries", ["commission"], :name => "index_deliveries_on_commission", :unique => true
@@ -65,6 +66,7 @@ ActiveRecord::Schema.define(:version => 20120608115304) do
   create_table "traverses", :force => true do |t|
     t.string   "name"
     t.text     "remarks"
+    t.string   "state"
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
   end

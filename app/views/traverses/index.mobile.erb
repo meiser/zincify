@@ -1,26 +1,30 @@
-<h1>Traversen</h1>
+<h1>Status Traversen</h1>
 
 <%= link_to 'Traverse befüllen', fill_traverses_path, :class => "ym-button" %>
 
+
+
+<% @grouped.sort.each do |state, traverses| %>
+  <p><%= state %>: <span><%= traverses.count %></span></p>
+<% end %>
+
+<!--
 <table>
   <tr>
-    <th>Name</th>
-    <th>Remarks</th>
-    <th></th>
-    <th></th>
-    <th></th>
+    <th>Traverse</th>
+    <th>Bemerkungen</th>
+    <th>Status</th>
   </tr>
+
 
 <% @traverses.each do |traverse| %>
   <tr>
     <td><%= traverse.name %></td>
     <td><%= traverse.remarks %></td>
-    <td><%= link_to 'Show', traverse %></td>
-    <td><%= link_to 'Edit', edit_traverse_path(traverse) %></td>
-    <td><%= link_to 'Destroy', traverse, confirm: 'Are you sure?', method: :delete %></td>
+    <td><%= traverse.human_state_name %><td>
   </tr>
 <% end %>
 </table>
-
+-->
 <br />
 

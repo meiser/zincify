@@ -1,10 +1,12 @@
-<%= form_for(Traverse.new) do |f| %>
-    <div class="ym-fbox-text">
-    <%= f.label :name %><br />
-    <%= f.collection_select(:name, Traverse.order("name asc"), :id, :name, :include_blank => false, :style => "width:400px;") %>
+<%= semantic_form_for(Traverse.new) do |f| %>
+
+     <%= f.inputs :name %>
   </div>
+  <div class="ym-fbox-select">
+    <%#= f.label :name %>
+    <%#= f.collection_select(:name, Delivery.order("commission asc"), :id, :commission,{:include_blank => false}, {:size => 2, :multiple => true }) %>
 
-
-
+    <%#= f.collection_select(:name, Traverse.order("name asc"), :id, :name,{:include_blank => false}, {:size => 10, :multiple => true }) %>
+  </div>
 <% end %>
 
