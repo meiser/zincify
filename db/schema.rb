@@ -11,7 +11,16 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120611131713) do
+ActiveRecord::Schema.define(:version => 20120613132010) do
+
+  create_table "bookings", :force => true do |t|
+    t.integer  "delivery_id"
+    t.integer  "traverse_id"
+    t.text     "remarks"
+    t.text     "pk"
+    t.datetime "created_at",  :null => false
+    t.datetime "updated_at",  :null => false
+  end
 
   create_table "commissions", :force => true do |t|
     t.string   "orno"
@@ -31,6 +40,22 @@ ActiveRecord::Schema.define(:version => 20120611131713) do
 
   add_index "customers", ["bpid"], :name => "index_customers_on_bpid"
   add_index "customers", ["name"], :name => "index_customers_on_name"
+
+  create_table "delayed_jobs", :force => true do |t|
+    t.integer  "priority",   :default => 0
+    t.integer  "attempts",   :default => 0
+    t.text     "handler"
+    t.text     "last_error"
+    t.datetime "run_at"
+    t.datetime "locked_at"
+    t.datetime "failed_at"
+    t.string   "locked_by"
+    t.string   "queue"
+    t.datetime "created_at",                :null => false
+    t.datetime "updated_at",                :null => false
+  end
+
+  add_index "delayed_jobs", ["priority", "run_at"], :name => "delayed_jobs_priority"
 
   create_table "deliveries", :force => true do |t|
     t.integer  "customer_id"

@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  deliver_id: 1
+  traverse_id: 1
+  remarks: MyText
+
+two:
+  deliver_id: 1
+  traverse_id: 1
+  remarks: MyText

@@ -8,6 +8,8 @@ Zincify::Application.routes.draw do
    post :print, :on => :member
   end
 
+  resources :bookings
+
   resources :commissions
 
   root :to => "application#start"

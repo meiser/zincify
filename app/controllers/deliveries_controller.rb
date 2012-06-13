@@ -43,6 +43,7 @@ class DeliveriesController < ApplicationController
 
     respond_to do |format|
       if @delivery.save
+        @delivery.delay.get_payload_data
         format.mobile { redirect_to deliveries_path, notice: t("deliveries.created") }
         format.json { render json: @delivery, status: :created, location: @delivery }
       else

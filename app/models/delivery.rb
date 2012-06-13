@@ -2,21 +2,17 @@ class Delivery < ActiveRecord::Base
 
   attr_accessible :customer_id, :indate,:outdate, :reference, :remarks
 
+
   belongs_to :customer
+  has_many :bookings
+  has_many :traverses, :through => :bookings
+
 
   before_create :set_commission
   before_create :set_indate
 
 
   validates_presence_of :customer, :outdate
-
-
-
-
-
-
-
-
 
   state_machine :initial => :captured do
 
@@ -27,10 +23,7 @@ class Delivery < ActiveRecord::Base
   end
 
 
-
-
-
-  private
+ private
 
   def set_commission
    self.commission = Random.rand(1000000000...9999999999)

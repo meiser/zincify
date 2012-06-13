@@ -1,7 +1,21 @@
 class Traverse < ActiveRecord::Base
   attr_accessible :name, :remarks
-
   attr_protected :state_event
+
+
+
+  has_many :bookings
+  has_many :deliveries, :through => :bookings
+
+
+
+
+
+
+
+
+
+
 
   state_machine :initial => :unbooked do
 

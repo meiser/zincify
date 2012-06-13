@@ -25,6 +25,11 @@ de:
     reference: Kundenreferenz
     indate: Anlieferung am
     outdate: Abholtermin
+   booking:
+    traverse_id: Traverse
+    delivery_id: Kommissionsnummer bzw. Bundnummer
+    remarks: Bemerkung
+    pk: Personalkennung
  helpers:
   submit:
    commission:
@@ -33,6 +38,9 @@ de:
    delivery:
     create: Anlieferung speichern
     update: Anlieferung aktualisieren
+   booking:
+    create: Traversenbuchung abschließen
+    update: Traversenbuchung aktualisieren
  deliveries:
   created: Anlieferung wurde angelegt
   updated: Anlieferung wurde aktualisiert
