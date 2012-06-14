@@ -3,7 +3,7 @@ class DeliveriesController < ApplicationController
   # GET /deliveries
   # GET /deliveries.json
   def index
-    p @deliveries = Delivery.order("outdate asc").page(params[:page]).per(10)
+    @deliveries = Delivery.order("outdate asc").page(params[:page]).per(10)
     respond_to do |format|
       format.html # index.html.erb
       format.json { render json: @deliveries }
@@ -43,7 +43,9 @@ class DeliveriesController < ApplicationController
 
     respond_to do |format|
       if @delivery.save
-        @delivery.delay.get_payload_data
+        if @delivery.customer.bpid == "280000001"
+          Delayed::Job.enqueue BundleDataJob.new(@delivery.reference)
+        end
         format.mobile { redirect_to deliveries_path, notice: t("deliveries.created") }
         format.json { render json: @delivery, status: :created, location: @delivery }
       else

@@ -42,6 +42,7 @@ gem 'formtastic'
 
 gem 'delayed_job'
 gem 'delayed_job_active_record'
+gem 'daemons'
 
 #gem "friendly_id", "~> 4.0.7"
 #gem 'net-http'
