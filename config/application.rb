@@ -66,7 +66,7 @@ module Zincify
     # Configure Rails Asynchronous Request Processing
 
     # Observers for Websocket functionality
-    config.active_record.observers = :commission_observer
+    config.active_record.observers = :commission_observer, :delivery_observer
 
   end
 end

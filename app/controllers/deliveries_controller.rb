@@ -3,7 +3,7 @@ class DeliveriesController < ApplicationController
   # GET /deliveries
   # GET /deliveries.json
   def index
-    @deliveries = Delivery.order("outdate asc").page(params[:page]).per(10)
+    @deliveries = Delivery.order("created_at desc").page(params[:page]).per(10)
     respond_to do |format|
       format.html # index.html.erb
       format.json { render json: @deliveries }
@@ -14,7 +14,6 @@ class DeliveriesController < ApplicationController
   # GET /deliveries/1.json
   def show
     @delivery = Delivery.find(params[:id])
-
     respond_to do |format|
       format.html # show.html.erb
       format.json { render json: @delivery }
@@ -25,6 +24,8 @@ class DeliveriesController < ApplicationController
   # GET /deliveries/new.json
   def new
     @delivery = Delivery.new
+    @delivery.deliver_references.build
+
     respond_to do |format|
       format.html # new.html.erb
       format.json { render json: @delivery }
@@ -43,9 +44,6 @@ class DeliveriesController < ApplicationController
 
     respond_to do |format|
       if @delivery.save
-        if @delivery.customer.bpid == "280000001"
-          Delayed::Job.enqueue BundleDataJob.new(@delivery.reference)
-        end
         format.mobile { redirect_to deliveries_path, notice: t("deliveries.created") }
         format.json { render json: @delivery, status: :created, location: @delivery }
       else
@@ -63,6 +61,7 @@ class DeliveriesController < ApplicationController
 
     respond_to do |format|
       if @delivery.update_attributes(params[:delivery])
+        #render :text => "mike"
         format.mobile { redirect_to @delivery, notice: t("deliveries.updated") }
         format.json { head :no_content }
       else

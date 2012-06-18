@@ -44,6 +44,8 @@ gem 'delayed_job'
 gem 'delayed_job_active_record'
 gem 'daemons'
 
+gem "nested_form"
+
 #gem "friendly_id", "~> 4.0.7"
 #gem 'net-http'
 # To use ActiveModel has_secure_password

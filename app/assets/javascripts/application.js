@@ -16,6 +16,7 @@
 //= require jquery.ui.datepicker-de
 //= require jquery-ui-timepicker-addon
 //= require chosen.jquery
+//= require jquery_nested_form
 // require_tree .
 
 

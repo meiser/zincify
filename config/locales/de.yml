@@ -25,6 +25,8 @@ de:
     reference: Kundenreferenz
     indate: Anlieferung am
     outdate: Abholtermin
+   deliver_reference:
+    name: Referenz
    booking:
     traverse_id: Traverse
     delivery_id: Kommissionsnummer bzw. Bundnummer

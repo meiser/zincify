@@ -1,12 +1,19 @@
 class Delivery < ActiveRecord::Base
 
-  attr_accessible :customer_id, :indate,:outdate, :reference, :remarks
+  attr_accessible :customer_id, :indate,:outdate, :reference, :remarks, :deliver_references_attributes
+
 
 
   belongs_to :customer
+
   has_many :bookings
+  has_many :deliver_references, :dependent => :destroy
   has_many :traverses, :through => :bookings
 
+
+
+
+  accepts_nested_attributes_for :deliver_references, :allow_destroy => true, :reject_if => proc { |attributes| attributes['name'].blank? }
 
   before_create :set_commission
   before_create :set_indate
