@@ -5,7 +5,7 @@ class BundleDataJob < Struct.new(:deliver_references)
    db = Informix.connect(ENV["INFORMIXSERVER"], ENV["INFORMIXUSER"], ENV["INFORMIXPWD"])
 
    deliver_references.each do |ref|
-
+    #ref.content=nil
     db.transaction do |db|
      db.foreach_hash("SELECT t_load, t_bund FROM ttibde914120 WHERE t_load=?", :params =>[ref.name]) do |r|
       unless ref.content.bundle

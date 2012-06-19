@@ -47,7 +47,6 @@ class DeliveriesController < ApplicationController
         format.mobile { redirect_to deliveries_path, notice: t("deliveries.created") }
         format.json { render json: @delivery, status: :created, location: @delivery }
       else
-
         format.mobile { render action: "new" }
         format.json { render json: @delivery.errors, status: :unprocessable_entity }
       end

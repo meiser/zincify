@@ -3,6 +3,11 @@ de:
  delivery: Anlieferungen
  traverse: Aufrüststationen
  activerecord:
+  models:
+   user: Benutzer
+   customer: Kunde
+   delivery: Anlieferung
+   deliver_reference: Anlieferreferenz
   attributes:
    user:
     login: Login
