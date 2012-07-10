@@ -26,6 +26,7 @@ gem 'jquery-ui-rails'
 gem 'net-ssh'
 gem 'net-ldap'
 gem 'ruby-informix'
+gem 'ibm_db'
 gem 'whenever', :require => false
 
 #gem 'mobylette'
