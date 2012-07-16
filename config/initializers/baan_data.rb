@@ -1,17 +1,11 @@
-require 'informix'
-
 begin
-  unless Printer.first
-  Rails.logger.info "Begin der Synchronisierung mit BAAN zur Ermittlung aller Drucker"
-  Printer.synchronize_with_baan
-  Rails.logger.info "Synchronisierung mit BAAN erfolgreich abgeschlossen"
- else
-   Rails.logger.info "Druckerinitialisierung mit BAAN nicht notwendig"
- end
+ Rails.logger.info "Begin der Synchronisierung mit BAAN zur Ermittlung aller Drucker"
+ Printer.synchronize_with_baan
+ Rails.logger.info "Synchronisierung Drucker mit BAAN erfolgreich abgeschlossen"
 
- unless Customer.first
-  Customer.synchronize_with_baan
- end
+ Rails.logger.info "Begin der Synchronisierung mit BAAN zur Ermittlung aller Kunden"
+ Customer.synchronize_with_baan
+ Rails.logger.info "Synchronisierung Kunden mit BAAN erfolgreich abgeschlossen"
 
 #rescue ActiveRecord::StatementInvalid => e
 # Rails.logger.error e.message

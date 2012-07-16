@@ -25,7 +25,11 @@ gem 'jquery-ui-rails'
 
 gem 'net-ssh'
 gem 'net-ldap'
-gem 'ruby-informix'
+
+gem 'rufus-scheduler'
+#gem 'ruby-informix'
+
+gem 'meiser-rails', :git => 'git://github.com/meiser/meiser-rails.git'
 gem 'ibm_db'
 gem 'whenever', :require => false
 

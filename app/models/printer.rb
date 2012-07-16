@@ -1,23 +1,15 @@
 class Printer < ActiveRecord::Base
+
+  include MeiserRails::Informix
+
   attr_accessible :description, :ident
 
-  def self.synchronizable?
-   begin
-     return true unless Informix.connect(ENV["INFORMIXSERVER"], ENV["INFORMIXUSER"], ENV["INFORMIXPWD"]).nil?
-   rescue
-    false
-   end
-  end
-
   def self.synchronize_with_baan
-   db = Informix.connect(ENV["INFORMIXSERVER"], ENV["INFORMIXUSER"], ENV["INFORMIXPWD"])
-   db.foreach_hash("select t_drbez, t_drcd from twhmei005120") do |r|
-    Printer.create(
-     :ident => r["t_drcd"].force_encoding("UTF-8").strip,
-     :description => r["t_drbez"].force_encoding("UTF-8").strip
-    )
+   foreach_baan("select t_drbez, t_drcd from twhmei005120") do |pr|
+    lp = Printer.find_or_initialize_by_ident(pr["t_drcd"].strip)
+    lp.description = pr["t_drbez"].strip
+    lp.save
    end
-   return true
   end
 
 end

@@ -1,3 +1,11 @@
+GIT
+  remote: git://github.com/meiser/meiser-rails.git
+  revision: d8916e77d6645d7806ad0993e717e9d29fc061f8
+  specs:
+    meiser-rails (0.0.1)
+      ibm_db (~> 2.5.10)
+      rails (>= 3.1.0)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -55,7 +63,7 @@ GEM
     em-socksify (0.2.0)
       eventmachine (>= 1.0.0.beta.4)
     erubis (2.7.0)
-    eventmachine (1.0.0.beta.4)
+    eventmachine (1.0.0.rc.4)
     execjs (1.4.0)
       multi_json (~> 1.0)
     faye (0.8.2)
@@ -65,25 +73,24 @@ GEM
       faye-websocket (>= 0.4.0)
       rack (>= 1.0.0)
       yajl-ruby (>= 1.0.0)
-    faye-websocket (0.4.5)
+    faye-websocket (0.4.6)
       eventmachine (>= 0.12.0)
     formtastic (2.2.1)
       actionpack (>= 3.0)
-    gravatar_image_tag (1.1.2)
+    gravatar_image_tag (1.1.3)
     hike (1.2.1)
     http_parser.rb (0.5.3)
     i18n (0.6.0)
     ibm_db (2.5.10)
       activerecord (>= 1.15.1)
-    journey (1.0.3)
+    journey (1.0.4)
     jquery-rails (2.0.2)
       railties (>= 3.2.0, < 5.0)
       thor (~> 0.14)
-    jquery-ui-rails (0.4.0)
+    jquery-ui-rails (1.0.0)
       jquery-rails
       railties (>= 3.1.0)
-    jquery_datepicker (0.3.4)
-    jruby-pageant (1.0.2)
+    jquery_datepicker (0.4)
     json (1.7.3)
     kaminari (0.13.0)
       actionpack (>= 3.0.0)
@@ -94,12 +101,11 @@ GEM
       i18n (>= 0.4.0)
       mime-types (~> 1.16)
       treetop (~> 1.4.8)
-    mime-types (1.18)
-    multi_json (1.3.5)
-    nested_form (0.2.1)
+    mime-types (1.19)
+    multi_json (1.3.6)
+    nested_form (0.2.2)
     net-ldap (0.3.1)
-    net-ssh (2.4.0)
-      jruby-pageant (>= 1.0.2)
+    net-ssh (2.5.2)
     polyglot (0.3.3)
     rack (1.4.1)
     rack-cache (1.2)
@@ -116,7 +122,7 @@ GEM
       activesupport (= 3.2.3)
       bundler (~> 1.0)
       railties (= 3.2.3)
-    rails-i18n (0.6.4)
+    rails-i18n (0.6.5)
       i18n (~> 0.5)
     railties (3.2.3)
       actionpack (= 3.2.3)
@@ -128,8 +134,9 @@ GEM
     rake (0.9.2.2)
     rdoc (3.12)
       json (~> 1.4)
-    ruby-informix (0.8.0)
-    sass (3.1.18)
+    rufus-scheduler (2.0.17)
+      tzinfo (>= 0.3.23)
+    sass (3.1.20)
     sass-rails (3.2.5)
       railties (~> 3.2.0)
       sass (>= 3.1.10)
@@ -148,9 +155,9 @@ GEM
       polyglot
       polyglot (>= 0.3.1)
     tzinfo (0.3.33)
-    uglifier (1.2.4)
+    uglifier (1.2.6)
       execjs (>= 0.3.0)
-      multi_json (>= 1.0.2)
+      multi_json (~> 1.3)
     whenever (0.7.3)
       activesupport (>= 2.3.4)
       chronic (~> 0.6.3)
@@ -172,12 +179,13 @@ DEPENDENCIES
   jquery-ui-rails
   jquery_datepicker
   kaminari
+  meiser-rails!
   nested_form
   net-ldap
   net-ssh
   rails (= 3.2.3)
   rails-i18n
-  ruby-informix
+  rufus-scheduler
   sass-rails (~> 3.2.3)
   sqlite3
   state_machine
