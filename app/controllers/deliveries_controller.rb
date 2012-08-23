@@ -83,24 +83,24 @@ class DeliveriesController < ApplicationController
   end
 
    def print
-    @delivery = Delivery.find(params[:id])
- zpl_code3 = <<END_OF_STRING
- <?xml version="1.0" standalone="no" ?>
-<!DOCTYPE labels SYSTEM "label.dtd">
-<labels _FORMAT="E:TESTZEBR.ZPL">
-<label>
-<variable name="commission">#{@delivery.commission}</variable>
-<variable name="annahme">#{l @delivery.indate, :format => :long}</variable>
-<variable name="abgabe">#{l(@delivery.outdate,:format => :long)}</variable>
-<variable name="customer">#{@delivery.customer.name}</variable>
-</label>
-</labels>
-END_OF_STRING
+#    @delivery = Delivery.find(params[:id])
+#zpl_code3 = <<END_OF_STRING
+# <?xml version="1.0" standalone="no" ?>
+#<!DOCTYPE labels SYSTEM "label.dtd">
+#<labels _FORMAT="E:TESTZEBR.ZPL">
+#<label>
+#<variable name="commission">#{@delivery.commission}</variable>
+#<variable name="annahme">#{l @delivery.indate, :format => :long}</variable>
+#<variable name="abgabe">#{l(@delivery.outdate,:format => :long)}</variable>
+#<variable name="customer">#{@delivery.customer.name}</variable>
+#</label>
+#</labels>
+#END_OF_STRING
 
-    Socket.tcp('150.101.5.99','9100'){|sock|
-      sock.print zpl_code3
-      sock.close_write
-    }
+#    Socket.tcp('150.101.5.99','9100'){|sock|
+#      sock.print zpl_code3
+#      sock.close_write
+#    }
     render :js => "alert('Fertig');"
   end
 

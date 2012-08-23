@@ -31,4 +31,5 @@ capybara-*.html
 rerun.txt
 pickle-email-*.html
 /config/ldap.yml
+/config/database.yml
 /config/initializers/faye_config.rb
