@@ -4,4 +4,4 @@
 # If you change this key, all old signed cookies will become invalid!
 # Make sure the secret is at least 30 characters and all random,
 # no regular words or you'll be exposed to dictionary attacks.
-Zincify::Application.config.secret_token = '1cb1d923b02122297490c649da6bd226b26738c25bd66902186dd3ea27a92670e3ee55da2c36a37b76469f2f36c23be1b5df28e0d629abab6d68cd9af550a0b3'
+Zincify::Application.config.secret_token = '87b08586ceebefbf0847961532d8202974e7f4ccaaad0e7547273c34c4d7aa01f5ce6d488a3f76e65b4ff05e7c880f0dfaa35587ba9082b5031b7229612f4a34'
