@@ -83,7 +83,8 @@ class DeliveriesController < ApplicationController
   end
 
    def print
-#    @delivery = Delivery.find(params[:id])
+    @delivery = Delivery.find(params[:id])
+    p @delivery
 #zpl_code3 = <<END_OF_STRING
 # <?xml version="1.0" standalone="no" ?>
 #<!DOCTYPE labels SYSTEM "label.dtd">
@@ -101,6 +102,17 @@ class DeliveriesController < ApplicationController
 #      sock.print zpl_code3
 #      sock.close_write
 #    }
+
+    file_name = SecureRandom.hex(10)
+    local_file_dir = Rails.root.join("public","etiketten")
+    local_file =  local_file_dir.join("#{file_name}.ctg")
+
+    FileUtils.mkpath(local_file_dir)
+    File.open(local_file, 'w') do |f|
+        f.puts("0009|commission.btw|#{@delivery.commission}|#{@delivery.customer.name}|#{@delivery.indate}|#{@delivery.outdate}|#{@delivery.remarks}")
+    end
+
+
     render :js => "alert('Fertig');"
   end
 
