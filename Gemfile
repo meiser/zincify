@@ -27,7 +27,6 @@ gem 'net-ssh'
 gem 'net-ldap'
 
 gem 'rufus-scheduler'
-#gem 'ruby-informix'
 
 gem 'meiser-rails', :git => 'git://github.com/meiser/meiser-rails.git'
 gem 'ibm_db'
