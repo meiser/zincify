@@ -2,6 +2,11 @@ class DeliveriesController < ApplicationController
 
   # GET /deliveries
   # GET /deliveries.json
+
+
+  before_filter :get_printer
+
+
   def index
     @deliveries = Delivery.order("created_at desc").page(params[:page]).per(10)
     respond_to do |format|
@@ -109,12 +114,21 @@ class DeliveriesController < ApplicationController
 
     FileUtils.mkpath(local_file_dir)
     File.open(local_file, 'w') do |f|
-        f.puts("0009|commission.btw|#{@delivery.commission}|#{@delivery.customer.name}|#{@delivery.indate}|#{@delivery.outdate}|#{@delivery.remarks}")
+        f.puts("#{current_user.preferences.default_printer}|commission.btw|#{@delivery.commission}|#{@delivery.customer.name}|#{l(@delivery.indate, :format => :long)}|#{l(@delivery.outdate, :format => :long)}|#{@delivery.remarks}")
     end
 
 
     render :js => "alert('Fertig');"
   end
+
+  private
+
+
+  def get_printer
+    @printers = Printer.all
+  end
+
+
 
 end
 

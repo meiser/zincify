@@ -10,13 +10,15 @@ Zincify::Application.routes.draw do
 
   resources :bookings
 
-  resources :commissions
+  #resources :commissions
 
   root :to => "application#start"
   match "dashboard" => "application#dashboard", :as => :dashboard
   resource :sessions, :only => [:new,:create, :destroy]
 
-  resource :user, :only => [:edit, :update]
+  resource :user, :only => [:edit, :update] do
+    post :printer
+  end
 
   resource :printer, :only => :update
 
