@@ -113,9 +113,20 @@ class DeliveriesController < ApplicationController
     local_file =  local_file_dir.join("#{file_name}.ctg")
 
     FileUtils.mkpath(local_file_dir)
-    File.open(local_file, 'w') do |f|
-        f.puts("#{current_user.preferences.default_printer}|commission.btw|#{@delivery.commission}|#{@delivery.customer.name}|#{l(@delivery.indate, :format => :long)}|#{l(@delivery.outdate, :format => :long)}|#{@delivery.remarks}")
+    temp = Tempfile.new(file_name)
+
+    #p temp.path
+    #p local_file.to_s
+    begin
+      temp.write("#{current_user.preferences.default_printer}|commission.btw|#{@delivery.commission}|#{@delivery.customer.name}|#{l(@delivery.indate, :format => :long)}|#{l(@delivery.outdate, :format => :long)}|#{@delivery.remarks}")
+    ensure
+      temp.close
+      FileUtils.cp temp.path, local_file.to_s
+      temp.unlink
     end
+    #File.create(local_file, 'w') do |f|
+       #f.puts("#{current_user.preferences.default_printer}|commission.btw|#{@delivery.commission}|#{@delivery.customer.name}|#{l(@delivery.indate, :format => :long)}|#{l(@delivery.outdate, :format => :long)}|#{@delivery.remarks}")
+    #end
 
 
     render :js => "alert('Fertig');"
