@@ -89,45 +89,21 @@ class DeliveriesController < ApplicationController
 
    def print
     @delivery = Delivery.find(params[:id])
-    p @delivery
-#zpl_code3 = <<END_OF_STRING
-# <?xml version="1.0" standalone="no" ?>
-#<!DOCTYPE labels SYSTEM "label.dtd">
-#<labels _FORMAT="E:TESTZEBR.ZPL">
-#<label>
-#<variable name="commission">#{@delivery.commission}</variable>
-#<variable name="annahme">#{l @delivery.indate, :format => :long}</variable>
-#<variable name="abgabe">#{l(@delivery.outdate,:format => :long)}</variable>
-#<variable name="customer">#{@delivery.customer.name}</variable>
-#</label>
-#</labels>
-#END_OF_STRING
 
-#    Socket.tcp('150.101.5.99','9100'){|sock|
-#      sock.print zpl_code3
-#      sock.close_write
-#    }
-
-    file_name = SecureRandom.hex(10)
-    local_file_dir = Rails.root.join("public","etiketten")
-    local_file =  local_file_dir.join("#{file_name}.ctg")
-
-    FileUtils.mkpath(local_file_dir)
-    temp = Tempfile.new(file_name)
-
-    #p temp.path
-    #p local_file.to_s
     begin
-      temp.write("#{current_user.preferences.default_printer}|commission.btw|#{@delivery.commission}|#{@delivery.customer.name}|#{l(@delivery.indate, :format => :long)}|#{l(@delivery.outdate, :format => :long)}|#{@delivery.remarks}")
-    ensure
-      temp.close
-      FileUtils.cp temp.path, local_file.to_s
-      temp.unlink
-    end
-    #File.create(local_file, 'w') do |f|
-       #f.puts("#{current_user.preferences.default_printer}|commission.btw|#{@delivery.commission}|#{@delivery.customer.name}|#{l(@delivery.indate, :format => :long)}|#{l(@delivery.outdate, :format => :long)}|#{@delivery.remarks}")
-    #end
+     file_name = SecureRandom.hex(10)
+     local_file_dir = Rails.root.join("public","etiketten")
+     local_file =  local_file_dir.join("#{file_name}.ctg")
+     FileUtils.mkpath(local_file_dir)
+     temp = Tempfile.new(file_name)
+     temp.write("#{current_user.preferences.default_printer}|commission.btw|#{@delivery.commission}|#{@delivery.customer.name}|#{l(@delivery.indate)}|#{l(@delivery.outdate)}|#{@delivery.remarks}")
 
+    ensure
+     temp.close
+     FileUtils.cp temp.path, local_file.to_s
+     temp.unlink
+
+    end
 
     render :js => "alert('Fertig');"
   end
