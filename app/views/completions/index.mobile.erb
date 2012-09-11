@@ -1,0 +1,28 @@
+<h6>Fertigmeldungen Bund/Kommission</h6>
+
+<table>
+    <tr>
+     <th><%= t('activerecord.attributes.completion.ref') %></th>
+    <th><%= t('activerecord.attributes.completion.user') %></th>
+    <th><%= t('activerecord.attributes.completion.weight') %></th>
+    <th></th>
+    <th></th>
+    <th></th>
+  </tr>
+
+<% @completions.each do |completion| %>
+  <tr>
+    <td><%= completion.ref %></td>
+    <td><%= completion.user.login %></td>
+    <td><%= completion.weight %></td>
+    <td><%= link_to 'Show', completion %></td>
+    <td><%= link_to 'Edit', edit_completion_path(completion) %></td>
+    <td><%= link_to 'Destroy', completion, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'Neue Fertigmeldung', new_completion_path %>
+

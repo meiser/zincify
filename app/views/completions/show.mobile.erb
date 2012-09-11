@@ -1,0 +1,19 @@
+<p>
+  <b>Delivery reference:</b>
+  <%= @completion.ref %>
+</p>
+
+<p>
+  <b>User:</b>
+  <%= @completion.user_id %>
+</p>
+
+<p>
+  <b>Weight:</b>
+  <%= @completion.weight %>
+</p>
+
+
+<%= link_to 'Edit', edit_completion_path(@completion) %> |
+<%= link_to 'Back', completions_path %>
+

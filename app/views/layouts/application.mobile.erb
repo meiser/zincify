@@ -67,7 +67,9 @@
 			                  <div class="ym-cbox">
                         <%= link_to(t("dashboard"), dashboard_path, :class => "ym-button") %>
                         <%= link_to t("delivery"), deliveries_path, :class => "ym-button" %>
-                        <%= link_to(t("traverse"), bookings_path, :class => "ym-button") %>
+                        <%= link_to(t("completion"), completions_path, :class => "ym-button") %>
+
+                        <%#= link_to(t("traverse"), bookings_path, :class => "ym-button") %>
 
                         <%= yield :footer %>
 

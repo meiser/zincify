@@ -1,10 +1,12 @@
 de:
  dashboard: Dashboard
  delivery: Anlieferungen
+ completion: Fertigmeldung Bund/Kommission
  traverse: Aufrüststationen
  activerecord:
   models:
    user: Benutzer
+   completion: Fertigmeldung
    customer: Kunde
    delivery: Anlieferung
    deliver_reference: Anlieferreferenz
@@ -20,6 +22,12 @@ de:
     appointment: Kundentermin
     created_at: Eingangsdatum
     updated_at: letzte Änderung
+   completion:
+    ref: Referenz Anlieferung
+    user: Anwender
+    weight: verzinktes Gewicht
+    created_at: Fertiggemeldet am
+    updated_at: Bearbeitet am
    customer:
     name: Kunde
    delivery:

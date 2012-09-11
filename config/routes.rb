@@ -1,5 +1,7 @@
 Zincify::Application.routes.draw do
 
+  resources :completions
+
   resources :traverses do
    get :fill, :on => :collection
   end

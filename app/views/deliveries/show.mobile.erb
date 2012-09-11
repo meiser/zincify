@@ -2,12 +2,19 @@
 <h6>Anlieferung mit Kommissionsnummer <%= @delivery.commission %></h6>
 <ul>
   <li>
-  <%= link_to '#', :class => "ym-button" do %>
+  <%#= link_to '#', :class => "ym-button" do %>
     <%= @delivery.customer.name %>
     <span style=""><%= @delivery.reference %></span>
     <p>Anlieferung am: <%= l @delivery.indate, :format => :long %></br>
     Fertigstellung bis: <%= l @delivery.outdate, :format => :long %></p>
-  <% end %>
+  <%# end %>
+
+    <h6>Referenzen</h6>
+    <p>
+    <% @delivery.deliver_references.each do |ref| %>
+      <%= ref.name %>
+    <% end %>
+    </p>
   </li>
 </ul>
 </nav>
@@ -30,10 +37,8 @@
 
 <%= link_to 'Anlieferung bearbeiten', edit_delivery_path(@delivery), :class => "ym-button" %>
 <%= link_to 'Etikett drucken', print_delivery_path(@delivery), :class => "ym-button", :remote => true, :method => :post %>
-
-
-
-<%= content_for :footer do %>
- <%= link_to "Anlieferungen", deliveries_path, :class => "ym-button" %>
-<% end %>
+<%= link_to 'Anlieferung löschen', @delivery, method: :delete, :class => "ym-button", :data => { confirm: 'Are you sure?' } %>
+<%#= content_for :footer do %>
+ <%#= link_to "Anlieferungen", deliveries_path, :class => "ym-button" %>
+<%# end %>
 

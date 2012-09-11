@@ -50,6 +50,14 @@ $(document).ready(function() {
   });
 
 
+    // Fertigmeldung
+    $('#completion_weight').focus(function() {
+        console.log("Feld Gewicht");
+        $(this).val(Math.floor(Math.random() * 2000));
+        $("#new_completion").submit();
+    });
+
+
 
 });
 

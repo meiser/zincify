@@ -28,7 +28,10 @@ gem 'net-ldap'
 
 gem 'rufus-scheduler'
 
+
 gem 'meiser-rails', :git => 'git://github.com/meiser/meiser-rails.git'
+
+#gem 'meiser-rails', :path => '../meiser-rails'
 gem 'ibm_db'
 gem 'whenever', :require => false
 
@@ -51,7 +54,7 @@ gem 'daemons'
 gem "nested_form"
 
 #gem "friendly_id", "~> 4.0.7"
-#gem 'net-http'
+#gem 'net-http'prepared_update
 # To use ActiveModel has_secure_password
 # gem 'bcrypt-ruby', '~> 3.0.0'
 

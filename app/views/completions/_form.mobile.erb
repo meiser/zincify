@@ -1,0 +1,22 @@
+<%= form_for(@completion,:html => {:class => "ym-form linearize-form"}) do |f| %>
+  <%= content_for :messages do %>
+    <%= model_messages(@completion) %>
+  <% end %>
+
+  <div class="ym-fbox-text">
+    <%= f.label :ref  %>
+    <%= f.text_field :ref, :autofocus => true %>
+  </div>
+  <div class="ym-fbox-text">
+    <%= f.label :user%>
+    <%= f.text_field :user, :disabled => true, :value => current_user.login %>
+  </div>
+  <div class="ym-fbox-text">
+    <%= f.label :weight %>
+    <%= f.text_field :weight %>
+  </div>
+  <div class="ym-fbox-button">
+    <%= f.submit %>
+  </div>
+<% end %>
+

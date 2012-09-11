@@ -96,7 +96,7 @@ class DeliveriesController < ApplicationController
      local_file =  local_file_dir.join("#{file_name}.ctg")
      FileUtils.mkpath(local_file_dir)
      temp = Tempfile.new(file_name)
-     temp.write("#{current_user.preferences.default_printer}|commission.btw|#{@delivery.commission}|#{@delivery.customer.name}|#{l(@delivery.indate)}|#{l(@delivery.outdate)}|#{@delivery.remarks}")
+     temp.write("#{current_user.preferences.default_printer}|commission.btw|#{@delivery.commission}|#{@delivery.customer.name}|#{@delivery.customer.address}|#{l(@delivery.indate)}|#{l(@delivery.outdate)}|#{@delivery.remarks}")
 
     ensure
      temp.close
