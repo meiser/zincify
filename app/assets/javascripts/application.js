@@ -39,7 +39,7 @@ $(document).ready(function() {
   $("#datepicker").datepicker();
   $("#datepicker").datepicker( "option", "dateFormat", "DD, d MM, yy" );
 
-  $("#delivery_customer_id,,#booking_traverse_id,#booking_delivery_id").chosen({
+  $("#delivery_customer_id,#booking_traverse_id,#booking_delivery_id").chosen({
     no_results_text: "Keine Einträge in der Datenbank"
 
   });
@@ -52,7 +52,6 @@ $(document).ready(function() {
 
     // Fertigmeldung
     $('#completion_weight').focus(function() {
-        console.log("Feld Gewicht");
         $(this).val(Math.floor(Math.random() * 2000));
         $("#new_completion").submit();
     });
