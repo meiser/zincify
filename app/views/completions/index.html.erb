@@ -1,0 +1,26 @@
+<h6>Fertigmeldungen Bund/Kommission</h6>
+
+<div class="paginator", style="margin: 1em;">
+  <%= paginate @completions, :remote => true %>
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th><%= t('activerecord.attributes.completion.ref') %></th>
+      <th><%= t('activerecord.attributes.completion.user') %></th>
+      <th><%= t('activerecord.attributes.completion.weight') %></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody id="completions">
+    <%= render @completions %>
+  </tbody>
+</table>
+
+<br />
+
+<%= link_to 'Neue Fertigmeldung', new_completion_path %>
+

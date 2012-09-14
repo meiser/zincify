@@ -25,26 +25,14 @@
 <div style="margin-bottom: 1em;">
 <%= link_to t(".new"), new_delivery_path, :class => "ym-button ym-add" %>
 
-<%= paginate @deliveries %>
-
+<div class="paginator", style="margin: 1em;">
+  <%= paginate @deliveries, :remote => true %>
+</div>
 
 <nav class="ym-vlist">
 <% unless @deliveries.empty? %>
-<ul>
-<% @deliveries.each do |delivery| %>
-  <li>
-  <%= link_to delivery_path(delivery), :class => "ym-button" do %>
-    <h6>Auftrag <%= delivery.commission %> für <%= delivery.customer.address %></h6>
-
-    Anlieferung am :<%= l delivery.indate, :format => :long %></br>
-    Fertigstellung bis: <%= l delivery.outdate, :format => :long %>
-    <span style="float:right"><%= time_ago_in_words(delivery.created_at) %></span>
-    <%= link_to 'Etikett drucken', print_delivery_path(delivery), :class => "ym-button", :remote => true, :method => :post %>
-
-    <!--<td><%= link_to 'Destroy', delivery, confirm: 'Are you sure?', method: :delete %></td>-->
-  <% end %>
-  </li>
-<% end %>
+<ul id="deliveries">
+<%= render @deliveries %>
 </ul>
 </nav>
 

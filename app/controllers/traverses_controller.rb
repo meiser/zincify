@@ -5,7 +5,7 @@ class TraversesController < ApplicationController
     @traverses = Traverse.find(:all)
     @grouped = @traverses.group_by{|t| t.human_state_name}
     respond_to do |format|
-      format.mobile # index.html.erb
+      format.html # index.html.erb
       format.json { render json: @traverses }
     end
   end
@@ -16,7 +16,7 @@ class TraversesController < ApplicationController
     @traverse = Traverse.find(params[:id])
 
     respond_to do |format|
-      format.mobile # show.html.erb
+      format.html # show.html.erb
       format.json { render json: @traverse }
     end
   end
@@ -27,7 +27,7 @@ class TraversesController < ApplicationController
     @traverse = Traverse.new
 
     respond_to do |format|
-      format.mobile # new.html.erb
+      format.html # new.html.erb
       format.json { render json: @traverse }
     end
   end
@@ -44,10 +44,10 @@ class TraversesController < ApplicationController
 
     respond_to do |format|
       if @traverse.save
-        format.mobile { redirect_to @traverse, notice: 'Traverse was successfully created.' }
+        format.html { redirect_to @traverse, notice: 'Traverse was successfully created.' }
         format.json { render json: @traverse, status: :created, location: @traverse }
       else
-        format.mobile { render action: "new" }
+        format.html { render action: "new" }
         format.json { render json: @traverse.errors, status: :unprocessable_entity }
       end
     end
@@ -60,10 +60,10 @@ class TraversesController < ApplicationController
 
     respond_to do |format|
       if @traverse.update_attributes(params[:traverse])
-        format.mobile { redirect_to @traverse, notice: 'Traverse was successfully updated.' }
+        format.html { redirect_to @traverse, notice: 'Traverse was successfully updated.' }
         format.json { head :no_content }
       else
-        format.mobile { render action: "edit" }
+        format.html { render action: "edit" }
         format.json { render json: @traverse.errors, status: :unprocessable_entity }
       end
     end
@@ -76,7 +76,7 @@ class TraversesController < ApplicationController
     @traverse.destroy
 
     respond_to do |format|
-      format.mobile { redirect_to traverses_url }
+      format.html { redirect_to traverses_url }
       format.json { head :no_content }
     end
   end

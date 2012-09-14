@@ -11,7 +11,6 @@ class ApplicationController < ActionController::Base
   helper_method :current_user
 
   before_filter :authenticate_user!, :except => :start
-  before_filter :set_mobile
 
   def start
    if session[:user_id]
@@ -26,12 +25,6 @@ class ApplicationController < ActionController::Base
 
 
   private
-
-
-  def set_mobile
-   request.format = "mobile" if request.format == "html"
-  end
-
 
   def current_user
     @current_user ||= User.find_by_id(session[:user_id]) if session[:user_id]

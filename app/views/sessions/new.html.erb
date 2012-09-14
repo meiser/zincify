@@ -1,15 +1,17 @@
-<h1>Login</h1>
-
-<%= form_for(@user, :url => sessions_path, :html => {"data-ajax" => false}) do |f| %>
-
+<h4>Anmelden</h4>
+<%= form_for(@user, :url => sessions_path,:html => {:class => "ym-form"}) do |f| %>
+  <div class="ym-fbox-text">
   <%= f.label :login_or_email %>
   <%= f.text_field :login_or_email %>
+  </div>
 
-
+  <div class="ym-fbox-text">
   <%= f.label :password %>
   <%= f.password_field :password %>
+  </div>
 
-  <%= f.submit "OK" %>
-
+  <div class="ym-fbox-button">
+    <%= f.submit "OK" %>
+  </div>
 <% end %>
 

@@ -2,10 +2,11 @@ class CompletionsController < ApplicationController
   # GET /completions
   # GET /completions.json
   def index
-    @completions = Completion.all
+    @completions = Completion.order("created_at desc").page(params[:page]).per(3)
 
     respond_to do |format|
       format.html # index.html.erb
+      format.js
       format.json { render json: @completions }
     end
   end
@@ -49,14 +50,14 @@ class CompletionsController < ApplicationController
 
     respond_to do |format|
       if @completion.save
-        format.mobile {
+        format.html {
           Delayed::Job.enqueue BaanCompletionJob.new(@completion.ref, @completion.weight,DateTime.now,current_user.login)
           flash[:notice] = "Fertigmeldung #{@completion.ref} wurde angelegt."
           redirect_to new_completion_path
         }
         format.json { render json: @completion, status: :created, location: @completion }
       else
-        format.mobile { render action: "new" }
+        format.html { render action: "new" }
 
         format.json { render json: @completion.errors, status: :unprocessable_entity }
       end
@@ -86,7 +87,7 @@ class CompletionsController < ApplicationController
     @completion.destroy
 
     respond_to do |format|
-      format.mobile { redirect_to completions_url }
+      format.html { redirect_to completions_url }
       format.json { head :no_content }
     end
   end

@@ -3,13 +3,13 @@ class DeliveriesController < ApplicationController
   # GET /deliveries
   # GET /deliveries.json
 
-
   before_filter :get_printer
 
 
   def index
-    @deliveries = Delivery.order("created_at desc").page(params[:page]).per(10)
+    @deliveries = Delivery.order("created_at desc").page(params[:page]).per(3)
     respond_to do |format|
+      format.js
       format.html # index.html.erb
       format.json { render json: @deliveries }
     end
@@ -49,10 +49,10 @@ class DeliveriesController < ApplicationController
 
     respond_to do |format|
       if @delivery.save
-        format.mobile { redirect_to deliveries_path, notice: t("deliveries.created") }
+        format.html { redirect_to deliveries_path, notice: t("deliveries.created") }
         format.json { render json: @delivery, status: :created, location: @delivery }
       else
-        format.mobile { render action: "new" }
+        format.html { render action: "new" }
         format.json { render json: @delivery.errors, status: :unprocessable_entity }
       end
     end
@@ -66,10 +66,10 @@ class DeliveriesController < ApplicationController
     respond_to do |format|
       if @delivery.update_attributes(params[:delivery])
         #render :text => "mike"
-        format.mobile { redirect_to @delivery, notice: t("deliveries.updated") }
+        format.html { redirect_to @delivery, notice: t("deliveries.updated") }
         format.json { head :no_content }
       else
-        format.mobile { render action: "edit" }
+        format.html { render action: "edit" }
         format.json { render json: @delivery.errors, status: :unprocessable_entity }
       end
     end
@@ -82,7 +82,7 @@ class DeliveriesController < ApplicationController
     @delivery.destroy
 
     respond_to do |format|
-      format.mobile { redirect_to deliveries_url }
+      format.html { redirect_to deliveries_url }
       format.json { head :no_content }
     end
   end
