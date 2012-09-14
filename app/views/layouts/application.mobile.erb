@@ -9,9 +9,9 @@
       <%= stylesheet_link_tag "application", :media => "all" %>
       <!-- stylesheets -->
       <!--[if lte IE 7]>
-        <%= stylesheet_link_tag "yaml/core/iehacks.min", :media => "all" %>
+        <%#= stylesheet_link_tag "yaml/core/iehacks.min", :media => "all" %>
       <![endif]-->
-      <%= javascript_include_tag "application", params[:controller], FAYE_JS %>
+      <%= javascript_include_tag "application" %><%#, params[:controller], FAYE_JS %>
       <%= yield :head %>
     </head>
     <body>
