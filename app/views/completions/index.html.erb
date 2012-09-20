@@ -1,5 +1,7 @@
 <h6>Fertigmeldungen Bund/Kommission</h6>
 
+<%= link_to 'Neue Fertigmeldung', new_completion_path, :class => "ym-button ym-add" %>
+
 <div class="paginator", style="margin: 1em;">
   <%= paginate @completions, :remote => true %>
 </div>
@@ -10,9 +12,9 @@
       <th><%= t('activerecord.attributes.completion.ref') %></th>
       <th><%= t('activerecord.attributes.completion.user') %></th>
       <th><%= t('activerecord.attributes.completion.weight') %></th>
-      <th></th>
-      <th></th>
-      <th></th>
+      <th><%= t('activerecord.attributes.completion.created_at') %></th>
+      <!--<th></th>
+      <th></th>-->
     </tr>
   </thead>
   <tbody id="completions">
@@ -20,7 +22,7 @@
   </tbody>
 </table>
 
-<br />
-
-<%= link_to 'Neue Fertigmeldung', new_completion_path %>
+<div class="paginator", style="margin: 1em;">
+  <%= paginate @completions, :remote => true %>
+</div>
 

@@ -2,8 +2,9 @@
     <td><%= completion.ref %></td>
     <td><%= completion.user.login %></td>
     <td><%= completion.weight %></td>
-    <td><%= link_to 'Show', completion %></td>
+    <td><%= l(completion.created_at, :format => :short) %></td>
+    <!--<td><%= link_to 'Show', completion %></td>
     <td><%= link_to 'Edit', edit_completion_path(completion) %></td>
-    <td><%= link_to 'Destroy', completion, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+    <td><%= link_to 'Destroy', completion, method: :delete, data: { confirm: 'Are you sure?' } %></td>-->
 </tr>
 

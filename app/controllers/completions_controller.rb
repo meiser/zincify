@@ -2,7 +2,7 @@ class CompletionsController < ApplicationController
   # GET /completions
   # GET /completions.json
   def index
-    @completions = Completion.order("created_at desc").page(params[:page]).per(3)
+    @completions = Completion.order("created_at desc").page(params[:page]).per(5)
 
     respond_to do |format|
       format.html # index.html.erb

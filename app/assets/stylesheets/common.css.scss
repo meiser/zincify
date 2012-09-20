@@ -150,8 +150,9 @@ a.ym-button:before{
 /*KAMINARI*/
 
 .pagination{
-    margin-top:1em;
+    margin:1em;
     text-align:center;
+    font-size:200%;
 }
 
 .pagination span{
@@ -159,10 +160,10 @@ a.ym-button:before{
 }
 
 .pagination span a{
-    padding: 0.5em;
+    padding: 0em;
 }
 
 .pagination span a:hover{
-    background-color: #043A67;
+    //background-color: #043A67;
 }
 
