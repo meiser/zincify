@@ -70,3 +70,10 @@ gem "nested_form"
 # To use debugger
 # gem 'ruby-debug19', :require => 'ruby-debug'
 
+
+# SUPPORT SQL_SERVER
+
+#gem 'ruby-odbc'
+gem 'tiny_tds'
+gem 'activerecord-sqlserver-adapter'
+
