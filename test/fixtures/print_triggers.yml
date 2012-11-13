@@ -1,0 +1,13 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  printer: MyString
+  label: MyString
+  data: MyText
+  printed: 1
+
+two:
+  printer: MyString
+  label: MyString
+  data: MyText
+  printed: 1

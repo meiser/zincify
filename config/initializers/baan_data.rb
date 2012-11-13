@@ -1,4 +1,4 @@
-begin
+﻿begin
  Rails.logger.info "Begin der Synchronisierung mit BAAN zur Ermittlung aller Drucker"
  Printer.synchronize_with_baan
  Rails.logger.info "Synchronisierung Drucker mit BAAN erfolgreich abgeschlossen"
@@ -6,6 +6,10 @@ begin
  Rails.logger.info "Begin der Synchronisierung mit BAAN zur Ermittlung aller Kunden"
  Customer.synchronize_with_baan
  Rails.logger.info "Synchronisierung Kunden mit BAAN erfolgreich abgeschlossen"
+ 
+ Rails.logger.info "Begin der Synchronisierung mit BAAN zur Ermittlung der Adresscodes Barempfänger"
+ CashPayer.synchronize_with_baan
+ Rails.logger.info "Synchronisierung mit BAAN zur Ermittlung der Adresscodes Barempfänger erfolgreich abgeschlossen"
 
 #rescue ActiveRecord::StatementInvalid => e
 # Rails.logger.error e.message

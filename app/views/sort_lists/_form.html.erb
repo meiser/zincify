@@ -1,0 +1,17 @@
+<%= form_for(@sort_list, :html => {:class => "ym-form linearize-form"}) do |f| %>
+  <%= content_for :messages do %>
+	<%= model_messages(@sort_list) %>
+  <% end %>
+
+  <div class="ym-fbox-text">
+    <%= f.label :number %>
+    <%= f.number_field :number %>
+  </div>
+  <div class="ym-fbox-text">
+    <%= f.label :description %>
+    <%= f.text_field :description %>
+  </div>
+  <div class="ym-fbox-button">
+    <%= f.submit %>
+  </div>
+<% end %>

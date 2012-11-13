@@ -1,5 +1,7 @@
 Zincify::Application.routes.draw do
 
+  resources :sort_lists
+
   resources :completions
 
   resources :traverses do

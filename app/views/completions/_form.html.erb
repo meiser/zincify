@@ -4,6 +4,11 @@
   <% end %>
 
   <div class="ym-fbox-text">
+    <%= f.label :sort_list_id %>
+    <%= f.collection_select( :sort_list_id, SortList.all, :id, :desc_with_number, :include_blank => false) %>
+  </div>
+  
+  <div class="ym-fbox-text">
     <%= f.label :ref  %>
     <%= f.text_field :ref, :autofocus => true, :value => "" %>
   </div>
@@ -12,8 +17,16 @@
     <%= f.text_field :user, :disabled => true, :value => current_user.login %>
   </div>
   <div class="ym-fbox-text">
-    <%= f.label :weight %>
-    <%= f.text_field :weight %>
+    <%= f.label :weight_brutto %>
+    <%= f.text_field :weight_brutto %>
+  </div>
+  <div class="ym-fbox-text">
+    <%= f.label :weight_netto %>
+    <%= f.text_field :weight_netto %>
+  </div>
+  <div class="ym-fbox-text">
+    <%= f.label :weight_tara %>
+    <%= f.text_field :weight_tara %>
   </div>
   <div class="ym-fbox-button">
     <%= f.submit %>

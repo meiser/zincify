@@ -1,0 +1,1 @@
+﻿<tr><td><%= sort_list.number %></td><td><%= sort_list.description %></td><td><%= l(sort_list.created_at, :format => :long) %></td><td><%= link_to 'Bearbeiten', edit_sort_list_path(sort_list) %></td><td><%= link_to 'Löschen', sort_list, method: :delete, data: { confirm: 'Are you sure?' } %></td></tr>

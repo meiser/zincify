@@ -4,10 +4,10 @@ class DeliveriesController < ApplicationController
   # GET /deliveries.json
 
   before_filter :get_printer
-
+  before_filter :get_customer_from_bpid, :only => [:create,:update]
 
   def index
-    @deliveries = Delivery.order("created_at desc").page(params[:page]).per(3)
+    @deliveries = Delivery.order("created_at desc").limit(50).page(params[:page]).per(3)
     respond_to do |format|
       format.js
       format.html # index.html.erb
@@ -29,6 +29,8 @@ class DeliveriesController < ApplicationController
   # GET /deliveries/new.json
   def new
     @delivery = Delivery.new
+	@delivery.indate = Time.now.strftime("%d.%m.%Y")
+	@delivery.outdate = (@delivery.indate+1.days).strftime("%d.%m.%Y")
     @delivery.deliver_references.build
 
     respond_to do |format|
@@ -40,16 +42,17 @@ class DeliveriesController < ApplicationController
   # GET /deliveries/1/edit
   def edit
     @delivery = Delivery.find(params[:id])
+	@delivery.customer_bpid= @delivery.customer.bpid
   end
 
   # POST /deliveries
   # POST /deliveries.json
   def create
-    @delivery = Delivery.new(params[:delivery])
-
-    respond_to do |format|
+	@delivery = Delivery.new(params[:delivery])
+	
+	respond_to do |format|
       if @delivery.save
-        format.html { redirect_to deliveries_path, notice: t("deliveries.created") }
+        format.html { redirect_to @delivery, notice: t("deliveries.created") }
         format.json { render json: @delivery, status: :created, location: @delivery }
       else
         format.html { render action: "new" }
@@ -62,7 +65,7 @@ class DeliveriesController < ApplicationController
   # PUT /deliveries/1.json
   def update
     @delivery = Delivery.find(params[:id])
-
+	
     respond_to do |format|
       if @delivery.update_attributes(params[:delivery])
         #render :text => "mike"
@@ -89,28 +92,24 @@ class DeliveriesController < ApplicationController
 
    def print
     @delivery = Delivery.find(params[:id])
-
-    begin
-     file_name = SecureRandom.hex(10)
-     local_file_dir = Rails.root.join("public","etiketten")
-     local_file =  local_file_dir.join("#{file_name}.ctg")
-     FileUtils.mkpath(local_file_dir)
-     temp = Tempfile.new(file_name)
-     temp.write("#{current_user.preferences.default_printer}|commission.btw|#{@delivery.commission}|#{@delivery.customer.name}|#{@delivery.customer.address}|#{l(@delivery.indate)}|#{l(@delivery.outdate)}|#{@delivery.remarks}")
-
-    ensure
-     temp.close
-     FileUtils.cp temp.path, local_file.to_s
-     temp.unlink
-
-    end
-
-    render :js => "alert('Fertig');"
+    t = PrintTrigger.new
+	t.printer = current_user.preferences.default_printer
+	t.label = "commission.btw"
+	t.data = "#{@delivery.commission}|#{@delivery.customer.name}|#{@delivery.cash_payer? ? [@delivery.customer.name.upcase,@delivery.cash_payer.search_string].join(": ") : [@delivery.customer.name,@delivery.customer.address].join(" ")}|#{l(@delivery.indate)}|#{l(@delivery.outdate)}|#{@delivery.remarks}"
+	t.save
+	
+	render :js => "alert('Fertig');"
   end
 
   private
 
 
+  def get_customer_from_bpid
+	c = Customer.find_by_bpid(params[:delivery].delete :customer_bpid)
+	params[:delivery][:cash_payer_id]=nil if c.bpid != "280000142"
+	params[:delivery][:customer] = c
+  end
+  
   def get_printer
     @printers = Printer.all
   end

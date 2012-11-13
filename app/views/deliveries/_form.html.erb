@@ -1,3 +1,12 @@
+
+<%#= content_for :head do %>
+
+<%#= javascript_tag do %>
+	
+<%# end %>
+
+<%# end %>
+
 <%= nested_form_for(@delivery,:html => {:class => "ym-form linearize-form"}) do |f| %>
   <%= content_for :messages do %>
     <%= model_messages(@delivery) %>
@@ -7,19 +16,24 @@
 
   <div class="ym-fbox-text">
     <%= f.label :customer_id %>
-    <%= f.collection_select( :customer_id, Customer.all, :id, :address, :include_blank => false) %>
+    <%= f.collection_select( :customer_bpid, Customer.all, :bpid, :search_string, {:include_blank => false}) %>
   </div>
-
+  
+  <div class="ym-fbox-text">
+   <%= f.label :cash_payer_id %>
+   <%= f.collection_select( :cash_payer_id, CashPayer.all, :id, :search_string, {:include_blank => false}) %>
+  </div>
+  
     <%= f.fields_for :deliver_references do |builder| -%>
         <div class="ym-fbox-text">
           <%= builder.label :name %>
           <%= builder.text_field :name %>
-          <%= builder.link_to_remove "Referenz entfernen", :class => "ym-button ym-delete" %>
+          <%= builder.link_to_remove "Lieferschein entfernen", :class => "ym-button ym-delete" %>
         </div>
     <% end -%>
 
   <!--<div class="ym-fbox-text">-->
-    <%= f.link_to_add "weitere Referenz", :deliver_references, :class => "ym-button ym-add", :style => "margin-left:14px; margin-bottom: 1em;" %>
+    <%= f.link_to_add "weiterer Lieferschein", :deliver_references, :class => "ym-button ym-add", :style => "margin-left:14px; margin-bottom: 1em;" %>
   <!--</div>-->
 
 </div>
@@ -28,13 +42,15 @@
 <div class="ym-g50 ym-gl">
 
   <div class="ym-fbox-text">
-    <%= f.label :indate %><br />
-    <%= f.datepicker :indate, :dateFormat => "yy-mm-dd", :maxDate => 0 %>
+    <%= f.label :indate %>
+	<input type="date" id="delivery_indate" name="delivery[indate]" value="<%= @delivery.indate.strftime("%Y-%m-%d") %>" />
+    <!--<%= f.datepicker :indate, :dateFormat => "dd.mm.yy", :maxDate => 0 %>-->
   </div>
 
   <div class="ym-fbox-text">
     <%= f.label :outdate %>
-    <%= f.datepicker :outdate, :dateFormat => "yy-mm-dd", :minDate => 0 %>
+	<input type="date" id="delivery_outdate" name="delivery[outdate]" value="<%= @delivery.outdate.strftime("%Y-%m-%d") %>" />
+    <!--<%= f.datepicker :outdate, :dateFormat => "dd.mm.yy", :minDate => 0 %>-->
   </div>
   <div class="ym-fbox-text">
     <%= f.label :remarks %>

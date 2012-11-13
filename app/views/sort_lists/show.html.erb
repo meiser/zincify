@@ -1,0 +1,13 @@
+<p>
+  <b>No:</b>
+  <%= @sort_list.number %>
+</p>
+
+<p>
+  <b>Description:</b>
+  <%= @sort_list.description %>
+</p>
+
+
+<%= link_to 'Edit', edit_sort_list_path(@sort_list) %> |
+<%= link_to 'Back', sort_lists_path %>

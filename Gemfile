@@ -1,4 +1,4 @@
-source 'https://rubygems.org'
+source 'http://rubygems.org'
 
 gem 'rails', '3.2.8'
 gem 'thin'
@@ -77,3 +77,4 @@ gem "nested_form"
 gem 'tiny_tds'
 gem 'activerecord-sqlserver-adapter'
 
+gem 'rack-prettify', :git => 'git://github.com/logicaltext/rack-prettify.git'

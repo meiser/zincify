@@ -21,7 +21,7 @@
 
 
 if (typeof history.pushState == "undefined") {
-    alert("PushState not supported by Browser");// pushState is supported!
+    //alert("PushState not supported by Browser");// pushState is supported!
 }
 
 $(document).ready(function() {
@@ -36,24 +36,51 @@ $(document).ready(function() {
   .bind("ajax:loading", toggleLoading)
   .bind("ajax:complete", toggleLoading);
 
+  
   $("#datepicker").datepicker();
-  $("#datepicker").datepicker( "option", "dateFormat", "DD, d MM, yy" );
+  //$("#datepicker").datepicker( "option", "dateFormat", "DD, d MM, yy" );
 
-  $("#delivery_customer_id,#booking_traverse_id,#booking_delivery_id").chosen({
+  $("#delivery_customer_bpid,#booking_traverse_id,#booking_delivery_id,#completion_sort_list_id").chosen({
     no_results_text: "Keine Einträge in der Datenbank"
 
   });
-
-  $("#traverse_name").chosen().change( function(e){
-   console.log("Do it");
-   //window.location = $(this).val();
+  //$("#delivery_cash_payer").chosen({
+ //	no_results_text: "Keine Einträge in der Datenbank"
+//});
+	
+  $("#delivery_cash_payer_id").bind('cash_payer_selected',function(e){
+	console.log("Barzahler wurde ausgewählt");
+	$(this).chosen();
+	$(this).attr('disabled', false);
+	$(this).trigger("liszt:updated");
+  });
+  
+  $("#delivery_cash_payer_id").bind('cash_payer_not_selected',function(e){
+	console.log("Barzahler nicht mehr ausgewählt");
+	$("#delivery_cash_payer_id").attr('disabled', true);
+	$("#delivery_cash_payer_id").trigger("liszt:updated");
+	
+	//$("#delivery_cash_payer_id").nextAll().remove();
+  });
+  
+  $("#delivery_customer_bpid").change( function(e){
+   if ($(this).val()==280000142){
+	$("#delivery_cash_payer_id").trigger('cash_payer_selected');
+   } else {
+	$("#delivery_cash_payer_id").trigger('cash_payer_not_selected');
+   };
   });
 
+  $("#delivery_customer_bpid").trigger("change");
+  
 
-    // Fertigmeldung
+  // Fertigmeldung
     $('#completion_weight').focus(function() {
         $(this).val(Math.floor(Math.random() * 2000));
-        $("#new_completion").submit();
+    //    if(confirm("Sind die Daten korrekt")){
+	//		$("#new_completion").submit();
+	//	}
+	//$("#new_completion").submit();
     });
 
 

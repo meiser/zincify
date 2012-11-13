@@ -1,15 +1,25 @@
-de:
+﻿de:
  dashboard: Dashboard
  delivery: Anlieferungen
  completion: Fertigmeldung Bund/Kommission
  traverse: Aufrüststationen
  activerecord:
+  errors:
+   models:
+    delivery:
+     attributes:
+      outdate:
+       outdate_bigger_than_indate: liegt vor dem Eingangsdatum der Anlieferung
+      deliver_references:
+       at_least_one:  müssen vergeben werden (mindestens 1x) 
   models:
    user: Benutzer
+   cash_payer: Barzahler
    completion: Fertigmeldung
    customer: Kunde
    delivery: Anlieferung
    deliver_reference: Anlieferreferenz
+   sort_list: Sortenverzeichnis
   attributes:
    user:
     login: Login
@@ -23,28 +33,38 @@ de:
     created_at: Eingangsdatum
     updated_at: letzte Änderung
    completion:
-    ref: Referenz Anlieferung
+    ref: Barcode Etikett
     user: Anwender
-    weight: verzinktes Gewicht
+    sort_list_id: Kategorie
+    weight_brutto: verzinktes Bruttogewicht
+    weight_netto: verzinktes Nettogewicht
+    weight_tara: Tara
     created_at: Fertiggemeldet am
     updated_at: Bearbeitet am
    customer:
     name: Kunde
    delivery:
     customer_id: Kunde
+    customer_bpid: Kunde
+    cash_payer_id: Barzahler
     commission: Kommissionsnummer
     remarks: Anmerkungen
     created_at: Lieferschein erstellt
-    reference: Kundenreferenz
+    reference: Referenz
     indate: Anlieferung am
     outdate: Abholtermin
-   deliver_reference:
-    name: Referenz
+    deliver_references: Lieferscheine
+   deliver_references:
+    name: Lieferscheinnummer
    booking:
     traverse_id: Traverse
     delivery_id: Kommissionsnummer bzw. Bundnummer
     remarks: Bemerkung
     pk: Personalkennung
+   sort_list:
+    description: Bezeichnung
+    created_at: Erstellt am
+    number: Nummer
  helpers:
   submit:
    commission:
@@ -74,9 +94,9 @@ de:
   created_commission: Auftrag wurde erfolgreich angelegt
  views:
   pagination:
-   first: "<<"
-   last: ">>"
-   next: ">"
-   previous: "<"
+   first: "&lt;&lt;"
+   last: "&gt;&gt;"
+   next: "&gt;"
+   previous: "&lt;"
    truncate: "..."
 

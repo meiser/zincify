@@ -1,85 +1,64 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-    <head>
-      <title>Verzinkerei Plauen</title>
-      <%= csrf_meta_tags %>
-      <meta charset="utf-8"/>
-      <meta name="description" content=""/>
-      <meta name="author" content="Stephan Keller"/>
-      <%= stylesheet_link_tag "application", :media => "all" %>
-      <!-- stylesheets -->
-      <!--[if lte IE 7]>
+  <head>
+    <meta name="generator" content="zincify" />
+    <title>Verzinkerei Plauen</title><%= csrf_meta_tags %>
+    <meta charset="utf-8" />
+    <meta name="description" content="" />
+    <meta name="author" content="Stephan Keller" /><%= stylesheet_link_tag "application", :media => "all" %>
+    <!-- stylesheets -->
+    <!--[if lte IE 7]>
         <%#= stylesheet_link_tag "yaml/core/iehacks.min", :media => "all" %>
       <![endif]-->
-      <%= javascript_include_tag "application" %><%#, params[:controller], FAYE_JS %>
-      <%= yield :head %>
-    </head>
-    <body>
-
+    <%= javascript_include_tag "application" %><%#, params[:controller], FAYE_JS %><%= yield :head %>
+  </head>
+  <body>
     <div id="message_container">
       <div id="message_box">
-        <%= yaml_messages(flash) -%>
-        <%= yield :messages %>
+        <%= yaml_messages(flash) -%><%= yield :messages %>
       </div>
     </div>
-
     <div class="wrap">
       <header>
-	    <div class="ym-wrapper">
-		    <div class="ym-wbox">
-	         <%= link_to root_path, :id =>"logo" do %>
-            <%= image_tag "meiser.gif", :class =>"logo", :style => "margin-left: 10px" %>
-           <% end %>
-           <%= render "user_status" %>
+        <div class="ym-wrapper">
+          <div class="ym-wbox">
+            <%= link_to root_path, :id =>"logo" do %><%= image_tag "meiser.gif", :class =>"logo", :style => "margin-left: 10px" %><% end %><%= render "user_status" %>
+          </div>
         </div>
-	    </div>
-      </header>
-      <%#= render "menu" if user_signed_in? %>
+      </header><%#= render "menu" if user_signed_in? %>
       <div id="main">
         <div class="ym-wrapper">
-        <div class="ym-wbox">
-
-          <div class="ym-column">
-            <div class="ym-col1">
-              <div class="ym-cbox">
-                <%= yield :col1 %>
+          <div class="ym-wbox">
+            <div class="ym-column">
+              <div class="ym-col1">
+                <div class="ym-cbox">
+                  <%= yield :col1 %>
+                </div>
               </div>
-            </div>
-            <div class="ym-col2">
-              <div class="ym-cbox">
-                <%= yield :col2 %>
+              <div class="ym-col2">
+                <div class="ym-cbox">
+                  <%= yield :col2 %>
+                </div>
               </div>
-            </div>
-            <div class="ym-col3">
-              <div class="ym-cbox">
-                <%= yield %>
+              <div class="ym-col3">
+                <div class="ym-cbox">
+                  <%= yield %>
+                </div>
               </div>
             </div>
           </div>
+        </div>
       </div>
     </div>
-    </div>
+    <footer>
+      <div class="ym-wrapper">
+        <div class="ym-wbox">
+          <div class="ym-cbox">
+            <%= link_to(t("dashboard"), dashboard_path, :class => "ym-button") %><%= link_to t("delivery"), deliveries_path, :class => "ym-button" %><%= link_to(t("completion"), completions_path, :class => "ym-button") %><%#= link_to(t("traverse"), bookings_path, :class => "ym-button") %><%= yield :footer %>
+            <!--<p>© Meiser <%= Time.now.year %> &ndash; Layout based on <a href="http://www.yaml.de">YAML</a></p>-->
+          </div>
+        </div>
       </div>
-  </div>
-   <footer>
-	    <div class="ym-wrapper">
-		    <div class="ym-wbox">
-			                  <div class="ym-cbox">
-                        <%= link_to(t("dashboard"), dashboard_path, :class => "ym-button") %>
-                        <%= link_to t("delivery"), deliveries_path, :class => "ym-button" %>
-                        <%= link_to(t("completion"), completions_path, :class => "ym-button") %>
-
-                        <%#= link_to(t("traverse"), bookings_path, :class => "ym-button") %>
-
-                        <%= yield :footer %>
-
-                          <!--<p>© Meiser <%= Time.now.year %> &ndash; Layout based on <a href="http://www.yaml.de">YAML</a></p>-->
-
-                        </div>
-		    </div>
-	    </div>
     </footer>
-
-   </body>
+  </body>
 </html>
-

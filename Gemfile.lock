@@ -1,13 +1,21 @@
 GIT
+  remote: git://github.com/logicaltext/rack-prettify.git
+  revision: 19eb631c03a5b81eb8ab8cf94c2e5b41e6da3cb9
+  specs:
+    rack-prettify (0.0.1)
+      nokogiri (>= 1.4.2)
+      rack
+
+GIT
   remote: git://github.com/meiser/meiser-rails.git
-  revision: d8916e77d6645d7806ad0993e717e9d29fc061f8
+  revision: 5b41003b6aacedbae655f2cf3e3b9b9f127ede2a
   specs:
     meiser-rails (0.0.1)
       ibm_db (~> 2.5.10)
       rails (>= 3.1.0)
 
 GEM
-  remote: https://rubygems.org/
+  remote: http://rubygems.org/
   specs:
     actionmailer (3.2.8)
       actionpack (= 3.2.8)
@@ -38,9 +46,9 @@ GEM
     activesupport (3.2.8)
       i18n (~> 0.6)
       multi_json (~> 1.0)
-    addressable (2.2.8)
+    addressable (2.3.2)
     arel (3.0.2)
-    builder (3.0.0)
+    builder (3.0.3)
     chronic (0.6.7)
     coffee-rails (3.2.2)
       coffee-script (>= 2.2.0)
@@ -50,25 +58,26 @@ GEM
       execjs
     coffee-script-source (1.3.3)
     cookiejar (0.3.0)
-    daemons (1.1.8)
+    daemons (1.1.9)
     delayed_job (3.0.3)
       activesupport (~> 3.0)
     delayed_job_active_record (0.3.2)
       activerecord (> 2.1.0)
       delayed_job (~> 3.0.0)
-    em-http-request (1.0.2)
+    em-http-request (1.0.3)
       addressable (>= 2.2.3)
       cookiejar
       em-socksify
       eventmachine (>= 1.0.0.beta.4)
       http_parser.rb (>= 0.5.3)
-    em-socksify (0.2.0)
+    em-socksify (0.2.1)
       eventmachine (>= 1.0.0.beta.4)
     erubis (2.7.0)
-    eventmachine (1.0.0.rc.4)
+    eventmachine (1.0.0)
+    eventmachine (1.0.0-x86-mingw32)
     execjs (1.4.0)
       multi_json (~> 1.0)
-    faye (0.8.2)
+    faye (0.8.3)
       cookiejar (>= 0.3.0)
       em-http-request (>= 0.3.0)
       eventmachine (>= 0.12.0)
@@ -82,22 +91,25 @@ GEM
     gravatar_image_tag (1.1.3)
     hike (1.2.1)
     http_parser.rb (0.5.3)
-    i18n (0.6.0)
+    http_parser.rb (0.5.3-x86-mingw32)
+    i18n (0.6.1)
     ibm_db (2.5.10)
       activerecord (>= 1.15.1)
+    ibm_db (2.5.10-x86-mingw32)
+      activerecord (>= 1.15.1)
     journey (1.0.4)
-    jquery-rails (2.0.2)
-      railties (>= 3.2.0, < 5.0)
+    jquery-rails (2.1.2)
+      railties (>= 3.1.0, < 5.0)
       thor (~> 0.14)
-    jquery-ui-rails (1.0.0)
+    jquery-ui-rails (2.0.0)
       jquery-rails
       railties (>= 3.1.0)
     jquery_datepicker (0.4)
+    jruby-pageant (1.1.1)
     json (1.7.5)
-    kaminari (0.13.0)
+    kaminari (0.14.1)
       actionpack (>= 3.0.0)
       activesupport (>= 3.0.0)
-      railties (>= 3.0.0)
     libv8 (3.3.10.4)
     mail (2.4.4)
       i18n (>= 0.4.0)
@@ -105,9 +117,12 @@ GEM
       treetop (~> 1.4.8)
     mime-types (1.19)
     multi_json (1.3.6)
-    nested_form (0.2.2)
+    nested_form (0.2.3)
     net-ldap (0.3.1)
-    net-ssh (2.5.2)
+    net-ssh (2.6.0)
+      jruby-pageant (>= 1.1.1)
+    nokogiri (1.5.5)
+    nokogiri (1.5.5-x86-mingw32)
     polyglot (0.3.3)
     rack (1.4.1)
     rack-cache (1.2)
@@ -124,7 +139,7 @@ GEM
       activesupport (= 3.2.8)
       bundler (~> 1.0)
       railties (= 3.2.8)
-    rails-i18n (0.6.5)
+    rails-i18n (0.6.6)
       i18n (~> 0.5)
     railties (3.2.8)
       actionpack (= 3.2.8)
@@ -138,7 +153,7 @@ GEM
       json (~> 1.4)
     rufus-scheduler (2.0.17)
       tzinfo (>= 0.3.23)
-    sass (3.1.20)
+    sass (3.2.1)
     sass-rails (3.2.5)
       railties (~> 3.2.0)
       sass (>= 3.1.10)
@@ -148,30 +163,34 @@ GEM
       rack (~> 1.0)
       tilt (~> 1.1, != 1.3.0)
     sqlite3 (1.3.6)
+    sqlite3 (1.3.6-x86-mingw32)
     state_machine (1.1.2)
-    therubyracer (0.10.1)
+    therubyracer (0.10.2)
       libv8 (~> 3.3.10)
-    thin (1.4.1)
+    thin (1.5.0)
       daemons (>= 1.0.9)
       eventmachine (>= 0.12.6)
       rack (>= 1.0.0)
     thor (0.16.0)
     tilt (1.3.3)
     tiny_tds (0.5.1)
+    tiny_tds (0.5.1-x86-mingw32)
     treetop (1.4.10)
       polyglot
       polyglot (>= 0.3.1)
     tzinfo (0.3.33)
-    uglifier (1.2.6)
+    uglifier (1.3.0)
       execjs (>= 0.3.0)
-      multi_json (~> 1.3)
+      multi_json (~> 1.0, >= 1.0.2)
     whenever (0.7.3)
       activesupport (>= 2.3.4)
       chronic (~> 0.6.3)
     yajl-ruby (1.1.0)
+    yajl-ruby (1.1.0-x86-mingw32)
 
 PLATFORMS
   ruby
+  x86-mingw32
 
 DEPENDENCIES
   activerecord-sqlserver-adapter
@@ -191,6 +210,7 @@ DEPENDENCIES
   nested_form
   net-ldap
   net-ssh
+  rack-prettify!
   rails (= 3.2.8)
   rails-i18n
   rufus-scheduler

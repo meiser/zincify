@@ -1,4 +1,5 @@
-class CompletionsController < ApplicationController
+﻿class CompletionsController < ApplicationController
+  
   # GET /completions
   # GET /completions.json
   def index
@@ -51,13 +52,13 @@ class CompletionsController < ApplicationController
     respond_to do |format|
       if @completion.save
         format.html {
-          Delayed::Job.enqueue BaanCompletionJob.new(@completion.ref, @completion.weight,DateTime.now,current_user.login)
+          Delayed::Job.enqueue BaanCompletionJob.new(@completion.ref, @completion.weight_netto,DateTime.now,current_user.login)
           flash[:notice] = "Fertigmeldung #{@completion.ref} wurde angelegt."
           redirect_to new_completion_path
         }
         format.json { render json: @completion, status: :created, location: @completion }
       else
-        format.html { render action: "new" }
+        format.html { render :action => :new }
 
         format.json { render json: @completion.errors, status: :unprocessable_entity }
       end
