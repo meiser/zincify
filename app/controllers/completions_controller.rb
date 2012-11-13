@@ -46,9 +46,6 @@
     @completion = Completion.new(params[:completion])
     @completion.user = current_user
 
-
-
-
     respond_to do |format|
       if @completion.save
         format.html {

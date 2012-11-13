@@ -1,39 +1,26 @@
-<nav class="ym-vlist">
+
 <h6>Anlieferung mit Kommissionsnummer <%= @delivery.commission %></h6>
-<ul>
-  <li>
-  <%#= link_to '#', :class => "ym-button" do %>
-    <%= @delivery.customer.name %>
-    <span style=""><%= @delivery.reference %></span>
-    <p>Anlieferung am: <%= l @delivery.indate, :format => :long %></br>
-    Fertigstellung bis: <%= l @delivery.outdate, :format => :long %></p>
-  <%# end %>
 
+    <% if @delivery.cash_payer? %>
+		<%= @delivery.customer.name %>
+		<%= @delivery.cash_payer.name %>
+		<%= @delivery.cash_payer.address %>
+    <% else %>
+		<%= @delivery.customer.name %>
+		<%= @delivery.customer.address %>
+	<% end %>
+
+	<ul>
+		<li>Anlieferung am: <%= l @delivery.indate, :format => :long %></li>
+		<li>Fertigstellung bis: <%= l @delivery.outdate, :format => :long %></li>
+	</ul>
+	
     <h6>Referenzen</h6>
-    <p>
+    <ol>
     <% @delivery.deliver_references.each do |ref| %>
-      <%= ref.name %>
+      <li><%= ref.name %></li>
     <% end %>
-    </p>
-  </li>
-</ul>
-</nav>
-<!--
-<p>
-<%= t('activerecord.attributes.customer.name') %>
-<%= @delivery.customer.name %>
-</p>
-
-<p>
-  <%= t('activerecord.attributes.delivery.reference') %>
-  <%= @delivery.reference %>
-</p>
-
-<p>
-  <%= t('activerecord.attributes.delivery.deadline') %>
-  <%= l @delivery.indate, :format => :long %>
-</p>-->
-
+    </ol>
 
 <%= link_to 'Anlieferung bearbeiten', edit_delivery_path(@delivery), :class => "ym-button" %>
 <%= link_to 'Etikett drucken', print_delivery_path(@delivery), :class => "ym-button", :remote => true, :method => :post %>
