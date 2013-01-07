@@ -77,6 +77,7 @@ class DeliveriesController < ApplicationController
       end
     end
   end
+  
 
   # DELETE /deliveries/1
   # DELETE /deliveries/1.json
@@ -89,8 +90,16 @@ class DeliveriesController < ApplicationController
       format.json { head :no_content }
     end
   end
+  
+  
+  
+  def received
+	Delivery.find(:all,)
+  
+  end
+  
 
-   def print
+  def print
     @delivery = Delivery.find(params[:id])
     t = PrintTrigger.new
 	t.printer = current_user.preferences.default_printer

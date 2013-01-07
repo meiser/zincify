@@ -42,6 +42,21 @@
   # POST /completions
   # POST /completions.json
   def create
+   
+   #begin
+    s =TCPSocket.new("150.101.123.45",8000)
+	s.puts '<FP>'
+	line = s.gets
+	File.open(Rails.root.join('waage.txt'), 'a+') do |f|
+	 f.puts line
+	end
+	weight_regex = /(\d+)(?!.*\d)/
+	weight=line.match(weight_regex)
+	
+	p weight.to_s.to_i
+   #rescue
+   
+   #end
 
     @completion = Completion.new(params[:completion])
     @completion.user = current_user
@@ -49,7 +64,6 @@
     respond_to do |format|
       if @completion.save
         format.html {
-          Delayed::Job.enqueue BaanCompletionJob.new(@completion.ref, @completion.weight_netto,DateTime.now,current_user.login)
           flash[:notice] = "Fertigmeldung #{@completion.ref} wurde angelegt."
           redirect_to new_completion_path
         }

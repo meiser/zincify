@@ -1,7 +1,7 @@
 class Commission < ActiveRecord::Base
-  attr_accessible :appointment, :orno, :reference
+  attr_accessible :uid
 
-  before_create :set_uuid, :set_date
+  #before_create :set_uuid, :set_date
 
 
 

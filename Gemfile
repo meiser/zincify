@@ -1,6 +1,6 @@
 source 'http://rubygems.org'
 
-gem 'rails', '3.2.8'
+gem 'rails', '3.2.10'
 gem 'thin'
 # Bundle edge Rails instead:
 # gem 'rails', :git => 'git://github.com/rails/rails.git'
@@ -30,12 +30,14 @@ gem 'rufus-scheduler'
 
 
 gem 'meiser-rails', :git => 'git://github.com/meiser/meiser-rails.git'
+gem 'meiserauth', :path => '../meiserauth'
 
 #gem 'meiser-rails', :path => '../meiser-rails'
 gem 'ibm_db'
-gem 'whenever', :require => false
+#gem 'whenever', :require => false
 
 #gem 'mobylette'
+
 gem 'gravatar_image_tag'
 gem 'rails-i18n'
 
