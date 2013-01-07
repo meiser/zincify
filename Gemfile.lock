@@ -156,8 +156,6 @@ GEM
     rdoc (3.12)
       json (~> 1.4)
     ref (1.0.2)
-    rufus-scheduler (2.0.17)
-      tzinfo (>= 0.3.23)
     sass (3.2.5)
     sass-rails (3.2.5)
       railties (~> 3.2.0)
@@ -218,7 +216,6 @@ DEPENDENCIES
   rack-prettify!
   rails (= 3.2.10)
   rails-i18n
-  rufus-scheduler
   sass-rails (~> 3.2.3)
   sqlite3
   state_machine

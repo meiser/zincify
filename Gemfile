@@ -7,7 +7,6 @@ gem 'thin'
 
 gem 'sqlite3'
 
-
 # Gems used only for assets and not required
 # in production environments by default.
 group :assets do
@@ -26,17 +25,11 @@ gem 'jquery-ui-rails'
 gem 'net-ssh'
 gem 'net-ldap'
 
-gem 'rufus-scheduler'
-
-
 gem 'meiser-rails', :git => 'git://github.com/meiser/meiser-rails.git'
 gem 'meiserauth', :path => '../meiserauth'
 
 #gem 'meiser-rails', :path => '../meiser-rails'
 gem 'ibm_db'
-#gem 'whenever', :require => false
-
-#gem 'mobylette'
 
 gem 'gravatar_image_tag'
 gem 'rails-i18n'
@@ -55,8 +48,6 @@ gem 'daemons'
 
 gem "nested_form"
 
-#gem "friendly_id", "~> 4.0.7"
-#gem 'net-http'prepared_update
 # To use ActiveModel has_secure_password
 # gem 'bcrypt-ruby', '~> 3.0.0'
 
@@ -74,9 +65,8 @@ gem "nested_form"
 
 
 # SUPPORT SQL_SERVER
-
-#gem 'ruby-odbc'
 gem 'tiny_tds'
 gem 'activerecord-sqlserver-adapter'
 
+# CODE CLEANING
 gem 'rack-prettify', :git => 'git://github.com/logicaltext/rack-prettify.git'
