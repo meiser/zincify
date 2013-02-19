@@ -18,7 +18,7 @@
    completion: Fertigmeldung
    customer: Kunde
    delivery: Anlieferung
-   deliver_reference: Anlieferreferenz
+   deliver_reference: Anlieferreferenz (Lieferschein u.a.)
    sort_list: Sortenverzeichnis
   attributes:
    user:

@@ -56,7 +56,7 @@ module Zincify
     config.active_record.whitelist_attributes = true
 
 	# Activated oberserver classes
-	config.active_record.observers = :grid_completion_observer
+	config.active_record.observers = [:delivery_observer, :grid_completion_observer]
 	
     # Enable the asset pipeline
     config.assets.enabled = true

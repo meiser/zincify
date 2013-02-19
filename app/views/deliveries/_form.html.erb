@@ -26,7 +26,7 @@
   
     <%= f.fields_for :deliver_references do |builder| -%>
         <div class="ym-fbox-text">
-          <%= builder.label :name %>
+          <%= builder.label "Lieferschein" %>
           <%= builder.text_field :name %>
           <%= builder.link_to_remove "Lieferschein entfernen", :class => "ym-button ym-delete" %>
         </div>

@@ -1,15 +1,11 @@
 class DeliveryObserver < ActiveRecord::Observer
 
  def after_create(record)
-  if record.customer.bpid == "280000001"
-   Delayed::Job.enqueue BundleDataJob.new(record.deliver_references)
-  end
+	Delayed::Job.enqueue BundleDataJob.new(record.deliver_references) if record.customer.bpid == "280000001"
  end
 
  def after_update(record)
-  if record.customer.bpid == "280000001"
-   Delayed::Job.enqueue BundleDataJob.new(record.deliver_references)
-  end
+	Delayed::Job.enqueue BundleDataJob.new(record.deliver_references) if record.customer.bpid == "280000001"
  end
 
 end
