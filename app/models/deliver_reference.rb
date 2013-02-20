@@ -5,9 +5,7 @@ class DeliverReference < ActiveRecord::Base
 
   serialize :content, OpenStruct
 
-  validates :name, :uniqueness => {:case_sensitive => false, :scope => :delivery_id}
-
-
-
+  validates_uniqueness_of :name, :case_sensitive => true, :scope => :delivery_id
+  
 end
 

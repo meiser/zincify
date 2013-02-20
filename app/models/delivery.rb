@@ -8,7 +8,7 @@ class Delivery < ActiveRecord::Base
   belongs_to :cash_payer
   belongs_to :customer
 
-  has_one :commission
+  #has_one :commission
   has_many :bookings
   has_many :deliver_references, :dependent => :destroy
   has_many :traverses, :through => :bookings
@@ -57,7 +57,7 @@ class Delivery < ActiveRecord::Base
   end
   
   def set_commission
-   #self.commission = Random.rand(1000000000...9999999999)
+   self.commission = Random.rand(1000000000...9999999999).to_s
   end
 
   def set_indate

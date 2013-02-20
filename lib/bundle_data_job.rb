@@ -1,11 +1,7 @@
-class BundleDataJob < Struct.new(:bundle_id, :date_of_scan)
+class BundleDataJob < Struct.new(:load)
 
 
   def perform
-
-   p art = bundle_id[0,3]
-   p load = bundle_id[3,9]
-   p bund = bundle_id[12,3]
 
    #BaanTest
    #LOAD 001110613
@@ -32,11 +28,26 @@ class BundleDataJob < Struct.new(:bundle_id, :date_of_scan)
    # p e
    #end and ttisfc001120.t_prdt = 2011-11-11 12:00:00.000000
 
-   Meiser.foreach_baan("SELECT FIRST 10 ttisfc001120.t_pdno FROM ttisfc001120 inner join ttczwf001120 on  ttisfc001120.t_mitm = ttczwf001120.t_item where ttczwf001120.t_hstv=6 and ttisfc001120.t_osta=5 order by ttisfc001120.t_prdt ASC") do |e|
-   p e
+   
+   Meiser.foreach_baan("SELECT MAX(ttibde914120.t_bund) AS count FROM ttibde914120 WHERE t_load = ?",[load]) do |bund|
+	p bund
    end
 
-
+   i = 0
+   Meiser.foreach_baan("SELECT ttibde914120.t_pdno, ttibde914120.t_dqua FROM ttibde914120 WHERE t_load = ? and t_dqua>0",[load]) do |bund|
+	p bund
+	i=i+1
+   end
+   
+   p i
+   
+   
+   p "Gesamtgewicht"
+   Meiser.foreach_baan("SELECT SUM(ttibde915120.t_wght) AS weight FROM ttibde915120 WHERE t_load = ?",[load]) do |bund|
+	p bund
+   end
+   
+   
   end
 
 
