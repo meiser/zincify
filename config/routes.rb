@@ -1,5 +1,7 @@
 Zincify::Application.routes.draw do
 
+  devise_for :users
+
   resources :sort_lists
 
   resources :completions

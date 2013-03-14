@@ -12,12 +12,12 @@
   <%= javascript_tag do %>
     $(document).ready(function(){
       //alert('Handler for .change() called.');
-      $('select#printer_id').change(function() {
-        alert($(this).val());
-        $.post("<%= printer_user_path%>", function(data) {
-          alert(data);
-        });
-      });
+      //$('select#printer_id').change(function() {
+      //  alert($(this).val());
+      //  $.post("<%#= printer_user_path%>", function(data) {
+      //    alert(data);
+      //  });
+      //});
     });
   <% end %>
 <% end %>

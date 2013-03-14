@@ -4,9 +4,9 @@
  <%= link_to edit_user_path, :class => "profile" do %>
   <%= gravatar_image_tag(current_user.email.downcase, :alt => current_user.login, :style => "text-decoration:none; vertical-align:middle")%>
  <% end %>
- <%= link_to "#{current_user.login} abmelden", meiserauth.session_path, :method => :delete, :class => "ym-button ym-delete" %>
+ <%= link_to "#{current_user.login} abmelden", destroy_user_session_path, :method => :delete, :class => "ym-button ym-delete" %>
 <% else %>
- <%= link_to "Einloggen", meiserauth.new_session_path, :class => "ym-button ym-next" %>
+ <%= link_to "Einloggen", new_user_session_path, :class => "ym-button ym-next" %>
 <% end %>
  
 </aside>

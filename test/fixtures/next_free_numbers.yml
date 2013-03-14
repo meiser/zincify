@@ -1,7 +1,11 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
 
 one:
-  login: MyString
+  no: MyString
+  description: MyText
+  fifo: 1
 
 two:
-  login: MyString
+  no: MyString
+  description: MyText
+  fifo: 1

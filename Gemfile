@@ -26,13 +26,14 @@ gem 'net-ssh'
 gem 'net-ldap'
 
 gem 'meiser-rails', :git => 'git://github.com/meiser/meiser-rails.git'
-gem 'meiserauth', :path => '../meiserauth'
 
 #gem 'meiser-rails', :path => '../meiser-rails'
 gem 'ibm_db'
 
 gem 'gravatar_image_tag'
 gem 'rails-i18n'
+
+gem 'linguistics'
 
 gem 'faye'
 
@@ -46,7 +47,7 @@ gem 'delayed_job'
 gem 'delayed_job_active_record'
 gem 'daemons'
 
-gem "nested_form"
+gem 'nested_form'
 
 # To use ActiveModel has_secure_password
 # gem 'bcrypt-ruby', '~> 3.0.0'
@@ -70,3 +71,9 @@ gem 'activerecord-sqlserver-adapter'
 
 # CODE CLEANING
 gem 'rack-prettify', :git => 'git://github.com/logicaltext/rack-prettify.git'
+
+
+# Authentification
+gem 'devise'
+gem 'devise-i18n', :git => 'git://github.com/tigrish/devise-i18n.git'
+gem 'devise_ldap_authenticatable', :git => 'git://github.com/cschiewek/devise_ldap_authenticatable.git'

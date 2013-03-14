@@ -1,20 +1,21 @@
 class ApplicationController < ActionController::Base
+  rescue_from DeviseLdapAuthenticatable::LdapException do |exception|
+    render :text => exception, :status => 500
+  end
 
   protect_from_forgery
 
-  include Meiserauth::ActionViewHelper
+
 
   before_filter :authenticate_user!, :except => :start
 
   def start
-   if session[:user_id]
-    redirect_to :dashboard
-   end
+  
   end
 
 
   def dashboard
-   redirect_to :start unless session[:user_id]
+  
   end
 
   #def default_url_options

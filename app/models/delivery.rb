@@ -22,8 +22,9 @@ class Delivery < ActiveRecord::Base
   #after_initialize :set_delivery_date
 
   validates_presence_of :customer, :indate, :outdate
-  validate :outdate_bigger_than_indate
+  validate :outdate_after_indate
   
+  validates :commission, :uniqueness => { :case_sensitive => false }
   
   #validate :validate_deliver_references
   
@@ -34,14 +35,14 @@ class Delivery < ActiveRecord::Base
   #  end
 
   #end
-
+  
   def cash_payer?
    self.customer.bpid=="280000142" ? true : false
   end
   
   private
  
-  def outdate_bigger_than_indate
+  def outdate_after_indate
    if self.outdate < self.indate
     errors.add(:outdate, :outdate_bigger_than_indate)
    end
@@ -57,7 +58,7 @@ class Delivery < ActiveRecord::Base
   end
   
   def set_commission
-   self.commission = Random.rand(1000000000...9999999999).to_s
+   self.commission = self.customer.bpid=="280000001" ? NextFreeNumber.generate("Meiser") : NextFreeNumber.generate("Lohnkunden")
   end
 
   def set_indate

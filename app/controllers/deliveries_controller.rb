@@ -68,8 +68,7 @@ class DeliveriesController < ApplicationController
 	
     respond_to do |format|
       if @delivery.update_attributes(params[:delivery])
-        #render :text => "mike"
-        format.html { redirect_to @delivery, notice: t("deliveries.updated") }
+		format.html { redirect_to @delivery, notice: t("deliveries.updated") }
         format.json { head :no_content }
       else
         format.html { render action: "edit" }

@@ -1,4 +1,7 @@
 ﻿de:
+ authentification:
+  login:
+   header: Anmeldung
  dashboard: Dashboard
  delivery: Anlieferungen
  completion: Fertigmeldung Bund/Kommission
