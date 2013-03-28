@@ -1,0 +1,36 @@
+
+<%#= content_for :head do %>
+
+<%#= javascript_tag do %>
+	
+<%# end %>
+
+<%# end %>
+
+<%= form_for(@next_free_number,:html => {:class => "ym-form linearize-form"}) do |f| %>
+  <%= content_for :messages do %>
+    <%= model_messages(@next_free_number) %>
+  <% end %>
+
+  <div class="ym-fbox-text">
+    <%= f.label :name %>
+    <%= f.text_field :name %>
+  </div>
+  
+  <div class="ym-fbox-text">
+    <%= f.label :description %>
+    <%= f.text_field :description %>
+  </div>
+  
+  <div class="ym-fbox-text">
+    <%= f.label :fifo %>
+    <%= f.number_field :fifo %>
+  </div>
+  
+
+  <div class="ym-fbox-button">
+    <%= f.submit %>
+  </div>
+
+<% end %>
+

@@ -99,7 +99,7 @@ ActiveRecord::Schema.define(:version => 20130314102914) do
   add_index "deliveries", ["commission"], :name => "index_deliveries_on_commission", :unique => true
 
   create_table "next_free_numbers", :force => true do |t|
-    t.string   "no"
+    t.string   "name"
     t.text     "description"
     t.integer  "fifo"
     t.text     "content"

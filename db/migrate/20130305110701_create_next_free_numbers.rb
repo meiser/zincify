@@ -1,7 +1,7 @@
 class CreateNextFreeNumbers < ActiveRecord::Migration
   def change
     create_table :next_free_numbers do |t|
-      t.string :no
+      t.string :name
       t.text :description
       t.integer :fifo
 	  t.text :content

@@ -1,0 +1,28 @@
+<%#= netzke :dynamic_tab_panel %>
+
+<%= netzke :cashpayer, :class_name => 'Netzke::Basepack::Grid', :model => 'CashPayer', :context_menu => false %>
+<%= netzke :delivery, :class_name => 'Netzke::Basepack::Grid', :model => 'Delivery', :context_menu => false %>
+<%= netzke :customer, :class_name => 'Netzke::Basepack::Grid', :model => 'Customer', :context_menu => false %>
+
+<%#= netzke :commission, :class_name => 'Netzke::Basepack::Grid', :model => 'Commission', :context_menu => false %>
+
+
+
+<%#= netzke :users, :class_name => 'Netzke::Basepack::Grid', :model => 'CashPayer', :context_menu => false %>
+
+
+<%#= netzke :form_panel, :model => "NextFreeNumber", :record_id => NextFreeNumber.first.id %>
+
+
+<%#= netzke :dynamic_tab_panel, :items => [{
+  :class_name => "Netzke::Basepack::Grid", :model => "Customer"
+},
+{
+  :class_name => "Netzke::Basepack::Grid", :model => "CashPayer"
+},
+{
+  :class_name => "Netzke::Basepack::Grid", :model => "Delivery"
+},
+{
+  :class_name => "Netzke::Basepack::Grid", :model => "Commission"
+}] %>

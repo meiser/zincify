@@ -5,11 +5,14 @@
     <title>Verzinkerei Plauen</title><%= csrf_meta_tags %>
     <meta charset="utf-8" />
     <meta name="description" content="" />
-    <meta name="author" content="Stephan Keller" /><%= stylesheet_link_tag "application", :media => "all" %>
+    <meta name="author" content="Stephan Keller" />
+		<%= stylesheet_link_tag "application", :media => "all" %>
     <!-- stylesheets -->
     <!--[if lte IE 7]>
         <%#= stylesheet_link_tag "yaml/core/iehacks.min", :media => "all" %>
       <![endif]-->
+	  
+	  <%= load_netzke %>
     <%= javascript_include_tag "application" %><%#, params[:controller], FAYE_JS %><%= yield :head %>
   </head>
   <body>

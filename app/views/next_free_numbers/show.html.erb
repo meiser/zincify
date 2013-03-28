@@ -1,0 +1,27 @@
+<div style="margin-bottom: 1em;">
+<%= link_to t(".new"), new_next_free_number_path, :class => "ym-button ym-add" %>
+
+<div class="paginator", style="margin: 1em;">
+  <%= paginate @next_free_numbers, :remote => true %>
+</div>
+
+<nav class="ym-vlist">
+<% unless @next_free_numbers.empty? %>
+<ul id="next_free_numbers">
+<%= render @next_free_numbers %>
+</ul>
+</nav>
+
+<% end %>
+
+<%#= content_for :col2 do %>
+<%# end %>
+
+
+<%= link_to 'Nummernkreis bearbeiten', edit_delivery_path(@delivery), :class => "ym-button" %>
+<%= link_to 'Etikett drucken', print_delivery_path(@delivery), :class => "ym-button", :remote => true, :method => :post %>
+<%= link_to 'Anlieferung löschen', @delivery, method: :delete, :class => "ym-button", :data => { confirm: 'Are you sure?' } %>
+<%#= content_for :footer do %>
+ <%#= link_to "Anlieferungen", deliveries_path, :class => "ym-button" %>
+<%# end %>
+

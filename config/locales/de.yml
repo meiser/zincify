@@ -23,6 +23,7 @@
    delivery: Anlieferung
    deliver_reference: Anlieferreferenz (Lieferschein u.a.)
    sort_list: Sortenverzeichnis
+   next_free_number: "Nächste freie Nummer"
   attributes:
    user:
     login: Login
@@ -68,6 +69,10 @@
     description: Bezeichnung
     created_at: Erstellt am
     number: Nummer
+   next_free_number:
+    name: Nummernkreis
+    description: Bezeichnung
+    fifo: Erste freie Nummer 
  helpers:
   submit:
    commission:
@@ -95,6 +100,9 @@
    new: Weiteren Auftrag anlegen
    edit: Auftrag bearbeiten
   created_commission: Auftrag wurde erfolgreich angelegt
+ next_free_numbers:
+  index:
+   new: Neue erste freie Nummer anlegen
  views:
   pagination:
    first: "&lt;&lt;"

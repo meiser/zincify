@@ -5,7 +5,7 @@ class ApplicationController < ActionController::Base
 
   protect_from_forgery
 
-
+  layout "netzke"
 
   before_filter :authenticate_user!, :except => :start
 
@@ -18,6 +18,10 @@ class ApplicationController < ActionController::Base
   
   end
 
+  def sencha
+  
+  end
+  
   #def default_url_options
   #  {:locale => I18n.locale, :debug => true }.merge(super)
   #end

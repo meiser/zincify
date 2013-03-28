@@ -23,6 +23,21 @@ GIT
       rails (>= 3.1.0)
 
 GIT
+  remote: git://github.com/netzke/netzke-basepack.git
+  revision: 57205af850ec9cc198a95e5e42c7c11707d1d9ae
+  specs:
+    netzke-basepack (0.8.2)
+      netzke-core (~> 0.8.2)
+
+GIT
+  remote: git://github.com/netzke/netzke-core.git
+  revision: c468b27220e313f44aaa1d0f0896609fef149e27
+  specs:
+    netzke-core (0.8.2)
+      execjs
+      uglifier
+
+GIT
   remote: git://github.com/tigrish/devise-i18n.git
   revision: 3d72ecc66c2de91b6ab5d32b1a49ab40679dbc9b
   specs:
@@ -236,6 +251,8 @@ DEPENDENCIES
   nested_form
   net-ldap
   net-ssh
+  netzke-basepack!
+  netzke-core!
   rack-prettify!
   rails (= 3.2.12)
   rails-i18n

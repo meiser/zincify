@@ -77,3 +77,8 @@ gem 'rack-prettify', :git => 'git://github.com/logicaltext/rack-prettify.git'
 gem 'devise'
 gem 'devise-i18n', :git => 'git://github.com/tigrish/devise-i18n.git'
 gem 'devise_ldap_authenticatable', :git => 'git://github.com/cschiewek/devise_ldap_authenticatable.git'
+
+gem 'netzke-core', :git => "git://github.com/netzke/netzke-core.git"
+gem 'netzke-basepack', :git => "git://github.com/netzke/netzke-basepack.git"
+
+
