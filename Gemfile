@@ -29,7 +29,7 @@ gem 'meiser-rails', :git => 'git://github.com/meiser/meiser-rails.git'
 
 #gem 'meiser-rails', :path => '../meiser-rails'
 gem 'ibm_db'
-
+gem 'validates_timeliness', '~> 3.0'
 gem 'gravatar_image_tag'
 gem 'rails-i18n'
 
@@ -46,8 +46,10 @@ gem 'formtastic'
 gem 'delayed_job'
 gem 'delayed_job_active_record'
 gem 'daemons'
+gem 'validates_timeliness', '~> 3.0'
 
 gem 'nested_form'
+gem 'extr'
 
 # To use ActiveModel has_secure_password
 # gem 'bcrypt-ruby', '~> 3.0.0'

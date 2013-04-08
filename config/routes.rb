@@ -2,8 +2,6 @@ Zincify::Application.routes.draw do
   
   netzke
 
-  root :to => "application#sencha"
-  
   devise_for :users
 
   resources :sort_lists
@@ -26,7 +24,7 @@ Zincify::Application.routes.draw do
   resources :next_free_numbers
   
   root :to => "application#start"
-  match "dashboard" => "application#dashboard", :as => :dashboard
+  match "zincify" => "application#sencha", :as => :sencha
 
   resource :user, :only => [:edit, :update] do
     post :printer

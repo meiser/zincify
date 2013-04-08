@@ -1,0 +1,4 @@
+Rails:
+ DeliveriesController:
+  methods:
+   print: 1

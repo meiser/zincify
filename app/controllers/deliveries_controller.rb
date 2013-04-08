@@ -2,6 +2,9 @@ class DeliveriesController < ApplicationController
 
   # GET /deliveries
   # GET /deliveries.json
+  
+  
+  respond_to :json, :only => :print
 
   before_filter :get_printer
   before_filter :get_customer_from_bpid, :only => [:create,:update]
@@ -99,14 +102,22 @@ class DeliveriesController < ApplicationController
   
 
   def print
-    @delivery = Delivery.find(params[:id])
+	@delivery = Delivery.find(params[:data].first[:id])
     t = PrintTrigger.new
 	t.printer = current_user.preferences.default_printer
 	t.label = "commission.btw"
 	t.data = "#{@delivery.commission}|#{@delivery.customer.name}|#{@delivery.cash_payer? ? [@delivery.customer.name.upcase,@delivery.cash_payer.search_string].join(": ") : [@delivery.customer.name,@delivery.customer.address].join(" ")}|#{l(@delivery.indate)}|#{l(@delivery.outdate)}|#{@delivery.remarks}"
 	t.save
 	
-	render :js => "alert('Fertig');"
+	data={
+		:title => 'Etikett drucken',
+		:message => 'Druckauftrag erfolgreich erstellt',
+		:success => true
+	}
+
+	puts @data.to_json
+	
+	render :json => data
   end
 
   private

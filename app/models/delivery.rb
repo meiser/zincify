@@ -1,13 +1,14 @@
 class Delivery < ActiveRecord::Base
-
-  attr_accessible :customer, :customer_bpid, :cash_payer, :cash_payer_id, :indate, :outdate, :reference, :remarks, :deliver_references_attributes
+  
+  attr_accessible :customer, :customer_id, :customer_bpid, :cash_payer, :cash_payer_id, :indate, :outdate, :reference, :remarks, :deliver_references_attributes
 
   attr_accessor :customer_bpid
-
 
   belongs_to :cash_payer
   belongs_to :customer
 
+  default_scope order("indate DESC")
+  
   #has_one :commission
   has_many :bookings
   has_many :deliver_references, :dependent => :destroy
@@ -17,14 +18,17 @@ class Delivery < ActiveRecord::Base
 
   before_create :set_commission
   
-
-  
   #after_initialize :set_delivery_date
 
-  validates_presence_of :customer, :indate, :outdate
-  validate :outdate_after_indate
+  validates :customer, :presence => true
   
-  validates :commission, :uniqueness => { :case_sensitive => false }
+  validates_presence_of :indate, :outdate
+  
+  validates_datetime :outdate, :after => :indate
+
+  #validate :outdate_after_indate
+  
+  #validates :commission, :uniqueness => { :case_sensitive => false }
   
   #validate :validate_deliver_references
   
@@ -36,17 +40,16 @@ class Delivery < ActiveRecord::Base
 
   #end
   
+  def full_name
+   "(#{self.bpid}) #{self.name}"
+  end
+  
   def cash_payer?
    self.customer.bpid=="280000142" ? true : false
   end
   
-  private
  
-  def outdate_after_indate
-   if self.outdate < self.indate
-    errors.add(:outdate, :outdate_bigger_than_indate)
-   end
-  end
+  private
  
   def validate_deliver_references
    errors.add(:deliver_references, :at_least_one) if self.deliver_references.count >= 0
@@ -58,7 +61,8 @@ class Delivery < ActiveRecord::Base
   end
   
   def set_commission
-   self.commission = self.customer.bpid=="280000001" ? NextFreeNumber.generate("Meiser") : NextFreeNumber.generate("Lohnkunden")
+   self.commission = SecureRandom.hex(10)
+   self.commission = self.customer.bpid=="280000001" ? NextFreeNumber.generate("Meiser") : NextFreeNumber.generate("Meiser")
   end
 
   def set_indate

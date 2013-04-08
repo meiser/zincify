@@ -1,4 +1,33 @@
 ﻿de:
+ time:
+  formats:
+   short: "%d.%m.%Y"
+ delivery_grid:
+   actions:
+    print_card:
+     text: Etikett drucken
+     tooltip: Druckt ein Etikett für alle selektierten Anlieferungen
+ netzke:
+  basepack:
+   grid:
+    deleted_n_records: "%{n} Datensätze wurden gelöscht"
+    deleted_records: "Datensatz gelöscht"
+    cannot_delete: "Datensatz kann nicht gelöscht werden"
+  formats:
+   date: d.m.Y
+   datetime: d.m.Y H:i:s
+   time: H:i:s
+  titles:
+   all_deliveries: Alle Anlieferungen
+   meiser_deliveries: Anlieferungen Meiser Vogtland OHG
+   customer_deliveries: Anlieferungen Lohnkunden
+   cash_payer_deliveries: Anlieferungen Barzahler
+   new_delivery: Neue Anlieferung anlegen
+   new_meiser_delivery: Neue Anlieferung Meiser anlegen
+   new_customer_delivery: Neue Anlieferung Lohnkunden anlegen
+   new_cash_payer_delivery: Neue Anlieferung Barzahler anlegen
+   edit_delivery: Anlieferung bearbeiten
+    
  authentification:
   login:
    header: Anmeldung
@@ -48,12 +77,22 @@
    customer:
     name: Kunde
    delivery:
+    customer: Kunde
+    customer_name: Kunde
+    customer__name: Kunde
+    customer__search_string: Kunde
+    cash_payer__name: Barzahler
+    cash_payer__search_string: Barzahler
+    cash_payer__address: Adresse
     customer_id: Kunde
     customer_bpid: Kunde
+    customer__bpid: BPID
+    customer_name: Kunde
     cash_payer_id: Barzahler
     commission: Kommissionsnummer
     remarks: Anmerkungen
-    created_at: Lieferschein erstellt
+    created_at: Erstellungsdatum
+    updated_at: Aktualisiert am
     reference: Referenz
     indate: Anlieferung am
     outdate: Abholtermin

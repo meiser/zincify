@@ -5,9 +5,7 @@ class ApplicationController < ActionController::Base
 
   protect_from_forgery
 
-  layout "netzke"
-
-  before_filter :authenticate_user!, :except => :start
+  before_filter :authenticate_user!, :except => [:start]
 
   def start
   
@@ -19,7 +17,6 @@ class ApplicationController < ActionController::Base
   end
 
   def sencha
-  
   end
   
   #def default_url_options

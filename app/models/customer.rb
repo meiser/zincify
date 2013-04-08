@@ -3,6 +3,8 @@ class Customer < ActiveRecord::Base
   include MeiserRails::Informix
 
   attr_accessible :address, :name
+  
+  has_many :deliveries
 
   def search_string
    [self.name, self.address, self.bpid].join(" ")
