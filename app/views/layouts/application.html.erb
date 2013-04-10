@@ -1,13 +1,29 @@
-<html>
+﻿<html>
   <head>
     <meta name="generator" content="zincify" />
     <title>Verzinkerei Plauen</title>
 	<%= csrf_meta_tags %>
     <meta charset="utf-8" />
-    <%= load_netzke theme: "all-gray" %>
-	<%= ext_direct_provider %>
+	<%#= stylesheet_link_tag "application", :media => "all" %>
+	<%#= javascript_include_tag "application" %>
+    <% if current_user %>
+		<%= load_netzke theme: "all-gray"  %>
+		<%= ext_direct_provider %>
+	<% end %>
   </head>
   <body>
-   <%= yield %>
+    <!--<%= yaml_messages(flash) -%><%= yield :messages %>
+	<%= link_to root_path, :id =>"logo" do %>
+		<%= image_tag "meiser.gif", :class =>"logo" %>
+		<div class="user_status">
+			<%= render "user_status" %>
+		</div>
+	<% end %>
+	<div>
+		<ul class="vlist">
+			<%= link_to t("delivery"), deliveries_path %>
+		</ul>
+	</div>-->
+	 <%= yield %>
   </body>
 </html>

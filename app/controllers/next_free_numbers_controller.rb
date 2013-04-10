@@ -1,10 +1,8 @@
 class NextFreeNumbersController < ApplicationController
 
  def index
-	@next_free_numbers = NextFreeNumber.order("created_at desc").limit(50).page(params[:page]).per(10)
 	respond_to do |format|
-		format.html # index.html.erb
-		format.json { render json: @next_free_numbers }
+		format.html
 	end
  end
  

@@ -22,6 +22,7 @@
    meiser_deliveries: Anlieferungen Meiser Vogtland OHG
    customer_deliveries: Anlieferungen Lohnkunden
    cash_payer_deliveries: Anlieferungen Barzahler
+   next_free_numbers: Belegnummernkreise
    new_delivery: Neue Anlieferung anlegen
    new_meiser_delivery: Neue Anlieferung Meiser anlegen
    new_customer_delivery: Neue Anlieferung Lohnkunden anlegen

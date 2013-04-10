@@ -10,11 +10,8 @@ class DeliveriesController < ApplicationController
   before_filter :get_customer_from_bpid, :only => [:create,:update]
 
   def index
-    @deliveries = Delivery.order("created_at desc").limit(50).page(params[:page]).per(3)
     respond_to do |format|
-      format.js
-      format.html # index.html.erb
-      format.json { render json: @deliveries }
+	  format.html
     end
   end
 

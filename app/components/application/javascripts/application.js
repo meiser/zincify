@@ -1,0 +1,5 @@
+{
+  initComponent: function() {
+    this.callParent();
+  }
+}

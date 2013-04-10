@@ -1,6 +1,6 @@
 source 'http://rubygems.org'
 
-gem 'rails', '3.2.12'
+gem 'rails', '3.2.13'
 gem 'thin'
 # Bundle edge Rails instead:
 # gem 'rails', :git => 'git://github.com/rails/rails.git'
@@ -22,12 +22,10 @@ end
 gem 'jquery-rails'
 gem 'jquery-ui-rails'
 
-gem 'net-ssh'
 gem 'net-ldap'
 
 gem 'meiser-rails', :git => 'git://github.com/meiser/meiser-rails.git'
 
-#gem 'meiser-rails', :path => '../meiser-rails'
 gem 'ibm_db'
 gem 'validates_timeliness', '~> 3.0'
 gem 'gravatar_image_tag'
@@ -35,52 +33,22 @@ gem 'rails-i18n'
 
 gem 'linguistics'
 
-gem 'faye'
-
-gem 'jquery_datepicker'
-gem 'kaminari'
-gem 'state_machine'
-gem 'formtastic'
-
-
 gem 'delayed_job'
 gem 'delayed_job_active_record'
 gem 'daemons'
 gem 'validates_timeliness', '~> 3.0'
 
-gem 'nested_form'
-gem 'extr'
-
-# To use ActiveModel has_secure_password
-# gem 'bcrypt-ruby', '~> 3.0.0'
-
-# To use Jbuilder templates for JSON
-# gem 'jbuilder'
-
-# Use unicorn as the app server
-# gem 'unicorn'
-
-# Deploy with Capistrano
-# gem 'capistrano'
-
-# To use debugger
-# gem 'ruby-debug19', :require => 'ruby-debug'
-
-
 # SUPPORT SQL_SERVER
 gem 'tiny_tds'
 gem 'activerecord-sqlserver-adapter'
-
-# CODE CLEANING
-gem 'rack-prettify', :git => 'git://github.com/logicaltext/rack-prettify.git'
-
 
 # Authentification
 gem 'devise'
 gem 'devise-i18n', :git => 'git://github.com/tigrish/devise-i18n.git'
 gem 'devise_ldap_authenticatable', :git => 'git://github.com/cschiewek/devise_ldap_authenticatable.git'
 
+# Sencha
 gem 'netzke-core', :git => "git://github.com/netzke/netzke-core.git"
 gem 'netzke-basepack', :git => "git://github.com/netzke/netzke-basepack.git"
-
+gem 'extr'
 

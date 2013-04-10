@@ -1,19 +1,5 @@
-<div style="margin-bottom: 1em;">
-<%= link_to t(".new"), new_next_free_number_path, :class => "ym-button ym-add" %>
-
-<div class="paginator", style="margin: 1em;">
-  <%= paginate @next_free_numbers, :remote => true %>
-</div>
-
-<nav class="ym-vlist">
-<% unless @next_free_numbers.empty? %>
-<ul id="next_free_numbers">
-<%= render @next_free_numbers %>
-</ul>
-</nav>
-
-<% end %>
-
-<%#= content_for :col2 do %>
-<%# end %>
-
+<%= netzke :next_free_numbers, 
+	:class_name => "Netzke::Basepack::Grid",
+	:model => "NextFreeNumber",
+	:height => 400,
+	:title => "A" %> <%#t(".netzke.basepack.titles.next_free_numbers") %>

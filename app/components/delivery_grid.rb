@@ -25,7 +25,9 @@ class DeliveryGrid < Netzke::Basepack::Grid
 					Ext.Msg.show({
 					  title: r.title,
 					  width: 300,
-					  msg: r.message
+					  msg: r.message,
+					  buttons: Ext.Msg.OK,
+					  icon: Ext.MessageBox.INFO,
 					});
 				} else {
 					alert(r.success);
@@ -44,6 +46,8 @@ class DeliveryGrid < Netzke::Basepack::Grid
 	c.enable_edit_in_form = true
 	c.enable_edit_inline = false
 	c.force_fit = true
+	c.bbar = [:print_card]
+	c.tbar = [:print_card]
 	c.prohibit_edit = true
 	c.columns = [
 		{

@@ -1,5 +1,69 @@
 class CashPayerDeliveryGrid < DeliveryGrid
 
+
+  def configure(c)
+	c.columns = [
+		{
+			:name => :commission,
+			:width => 200,
+			:read_only => true,
+			:filterable => false,
+			:sortable => false,
+		},
+		{
+			:name => :customer__bpid,
+			:read_only => true,
+			:filterable => false,
+			:sortable => false,
+			:width => 50
+		},
+		{
+			:name => :customer__search_string,
+			:width => 200,
+			:filterable => false,
+			:sortable => false
+		},
+		{
+			:name => :cash_payer__search_string,
+			:width => 200,
+			:filterable => false,
+			:sortable => false
+		},
+		{
+			:name => :indate,
+			:width => 100,
+			:filterable => false,
+			:sortable => false
+		},
+		{
+			:name => :outdate,
+			:width => 100,
+			:filterable => false,
+			:sortable => false
+		},
+		{
+			:name => :remarks,
+			:width => 300,
+			:filterable => false,
+			:sortable => false,
+			:getter => lambda{|r| CGI::escapeHTML(r.remarks)}
+		},
+		{
+			:name => :created_at,
+			:width => 200,
+			:filterable => false,
+			:sortable => false
+		},
+		{
+			:name => :updated_at,
+			:width => 200,
+			:filterable => false,
+			:sortable => false
+		}
+	]
+	super(c)
+  end
+  
   component :add_window do |c|
    super(c)
    c.title = I18n.t("netzke.titles.new_cash_payer_delivery")
@@ -66,9 +130,18 @@ class CashPayerDeliveryGrid < DeliveryGrid
 		}
    ]
   end
-  
-  def columns
-	super - [:state, :reference, :cash_payer_name]
-  end
 
+  def columns
+	[
+		:commission,
+		:customer__bpid,
+		:customer__search_string,
+		:cash_payer__search_string,
+		:indate,
+		:outdate,
+		:created_at,
+		:updated_at	
+	]
+  end
+  
 end

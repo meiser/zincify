@@ -14,15 +14,11 @@ class DeliveryPanel < Netzke::Basepack::TabPanel
       }
     JS
   end
-
+  
   def configure(c)
-    super
-	c.prevent_header = true
+    super(c)
 	c.active_tab = 2
-	#c.items = [ :all_deliveries, :meiser_deliveries, :customer_deliveries ]
-    c.layout = :fit
-	c.autoHeight = true
-	c.minHeight = 800
+	c.minHeight = 600
 	c.items = [:all_deliveries, :meiser_deliveries, :customer_deliveries, :cash_payer_deliveries]
   end
   
@@ -33,7 +29,6 @@ class DeliveryPanel < Netzke::Basepack::TabPanel
    c.enable_context_menu = false
    c.enable_column_filters = false
    c.enable_edit_inline = false
-   c.bbar = [:print_card]
    c.context_menu = nil
    c.menu = nil
    c.actions = []
