@@ -6,7 +6,13 @@ class Application < Netzke::Basepack::Viewport
   js_configure do |c|
     c.layout = :border
     c.padding = 0
-	c.mixin
+	c.init_component = <<-JS
+      function(){
+        // Call parent
+		this.callParent();
+		alert("Call window");
+      }
+    JS
   end
 
   def configure(c)
@@ -30,7 +36,7 @@ class Application < Netzke::Basepack::Viewport
    c.region = :center
   end
   
-  
+ 
   
   action :about do |c|
     c.icon = :information

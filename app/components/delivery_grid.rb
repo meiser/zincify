@@ -27,7 +27,7 @@ class DeliveryGrid < Netzke::Basepack::Grid
 					  width: 300,
 					  msg: r.message,
 					  buttons: Ext.Msg.OK,
-					  icon: Ext.MessageBox.INFO,
+					  icon: Ext.MessageBox.INFO
 					});
 				} else {
 					alert(r.success);

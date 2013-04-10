@@ -6,24 +6,10 @@
     <meta charset="utf-8" />
 	<%#= stylesheet_link_tag "application", :media => "all" %>
 	<%#= javascript_include_tag "application" %>
-    <% if current_user %>
-		<%= load_netzke theme: "all-gray"  %>
-		<%= ext_direct_provider %>
-	<% end %>
+	<%= load_netzke theme: "all-gray"  %>
+	<%= ext_direct_provider %>
   </head>
   <body>
-    <!--<%= yaml_messages(flash) -%><%= yield :messages %>
-	<%= link_to root_path, :id =>"logo" do %>
-		<%= image_tag "meiser.gif", :class =>"logo" %>
-		<div class="user_status">
-			<%= render "user_status" %>
-		</div>
-	<% end %>
-	<div>
-		<ul class="vlist">
-			<%= link_to t("delivery"), deliveries_path %>
-		</ul>
-	</div>-->
 	 <%= yield %>
   </body>
 </html>

@@ -5,19 +5,19 @@ class ApplicationController < ActionController::Base
 
   protect_from_forgery
 
-  before_filter :authenticate_user!, :except => [:start]
+  #before_filter :authenticate_user!#, :except => [:start]
   
+  
+  before_filter :authenticate_netzke! 
+     
   def start
   
   end
 
-
-  def dashboard
-  
-  end
-
-  def sencha
-  end
+ 
+  def authenticate_netzke! 
+    authenticate_user! if self.class.to_s != "NetzkeController" 
+  end 
   
   #def default_url_options
   #  {:locale => I18n.locale, :debug => true }.merge(super)
