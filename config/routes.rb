@@ -1,5 +1,9 @@
 Zincify::Application.routes.draw do
   
+  #devise_scope :user do
+#	root :to => "devise/sessions#new"
+ # end
+  
   root :to => "application#start"
   
   netzke

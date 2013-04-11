@@ -10,7 +10,7 @@ class Application < Netzke::Basepack::Viewport
       function(){
         // Call parent
 		this.callParent();
-		alert("Call window");
+		//alert("Call window");
       }
     JS
   end
@@ -20,7 +20,7 @@ class Application < Netzke::Basepack::Viewport
 		{
 			region: :north,
 			tbar: [
-				{html: HEADER_HTML}, :about, :sign_out, :sign_in
+				{html: HEADER_HTML},# :about, :sign_out, :sign_in
 			]
 		},
 		:zincify_tab_panel
