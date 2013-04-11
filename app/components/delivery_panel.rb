@@ -31,6 +31,8 @@ class DeliveryPanel < Netzke::Basepack::TabPanel
    c.enable_edit_inline = false
    c.context_menu = nil
    c.menu = nil
+   c.tbar = [:print_card]
+   c.bbar = [:print_card]
    c.actions = []
   end
   

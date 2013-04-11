@@ -90,7 +90,7 @@
     customer__bpid: BPID
     customer_name: Kunde
     cash_payer_id: Barzahler
-    commission: Auftragsnummer
+    commission: Anliefernummer
     remarks: Anmerkungen
     created_at: Erstellungsdatum
     updated_at: Aktualisiert am

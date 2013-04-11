@@ -46,7 +46,6 @@ class DeliveryGrid < Netzke::Basepack::Grid
 	c.enable_edit_in_form = true
 	c.enable_edit_inline = false
 	c.force_fit = true
-	c.bbar = [:print_card]
 	c.tbar = [:print_card]
 	c.prohibit_edit = true
 	c.columns = [
@@ -54,14 +53,14 @@ class DeliveryGrid < Netzke::Basepack::Grid
 			:name => :commission,
 			:width => 200,
 			:read_only => true,
-			:filterable => false,
-			:sortable => false,
+			:filterable => true,
+			:sortable => true,
 		},
 		{
 			:name => :customer__bpid,
 			:read_only => true,
-			:filterable => false,
-			:sortable => false
+			:filterable => true,
+			:sortable => true
 		},
 		{
 			:name => :customer__search_string,
@@ -72,33 +71,33 @@ class DeliveryGrid < Netzke::Basepack::Grid
 		{
 			:name => :indate,
 			:width => 100,
-			:filterable => false,
-			:sortable => false
+			:filterable => true,
+			:sortable => true
 		},
 		{
 			:name => :outdate,
 			:width => 100,
-			:filterable => false,
-			:sortable => false
+			:filterable => true,
+			:sortable => true
 		},
 		{
 			:name => :remarks,
 			:width => 300,
-			:filterable => false,
-			:sortable => false,
+			:filterable => true,
+			:sortable => true,
 			:getter => lambda{|r| CGI::escapeHTML(r.remarks)}
 		},
 		{
 			:name => :created_at,
 			:width => 200,
-			:filterable => false,
-			:sortable => false
+			:filterable => true,
+			:sortable => true
 		},
 		{
 			:name => :updated_at,
 			:width => 200,
-			:filterable => false,
-			:sortable => false
+			:filterable => true,
+			:sortable => true
 		}
 	]
 	super(c)
