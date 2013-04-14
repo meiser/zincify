@@ -1,4 +1,10 @@
 Rails:
- DeliveriesController:
+ MeiserDeliveriesController:
+  methods:
+   print: 1
+ CustomerDeliveriesController:
+  methods:
+   print: 1
+ CashPayerDeliveriesController:
   methods:
    print: 1

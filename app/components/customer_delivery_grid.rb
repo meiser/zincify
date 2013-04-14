@@ -1,12 +1,35 @@
 class CustomerDeliveryGrid < DeliveryGrid
 
+  js_configure do |c|
+	c.on_print_card = <<-JS
+      function(){
+		grid = this;
+		Ext.iterate(this.getSelectionModel().getSelection(),function(key,value){
+			Rails.CustomerDeliveriesController.print({"id": key.data.id}, function(r,e){
+				if (r.success == true){
+					Ext.Msg.show({
+					  title: r.title,
+					  width: 300,
+					  msg: r.message,
+					  buttons: Ext.Msg.OK,
+					  icon: Ext.MessageBox.INFO
+					});
+				} else {
+					alert(r.success);
+				}
+			});
+		});
+		
+      }
+    JS
+  end
+
   component :add_window do |c|
    super(c)
    c.title = I18n.t("netzke.titles.new_customer_delivery")
    c.form_config.items = [
 		{
-			:name => :customer__search_string,
-			:scope => "bpid <> 280000001 and bpid <> 280000142"
+			:name => :customer__search_string
 		},
 		{
 			:name => :indate,
@@ -55,8 +78,8 @@ class CustomerDeliveryGrid < DeliveryGrid
    ]
   end
   
-  def columns
-	super - [:state, :reference, :cash_payer_name]
-  end
+  #def columns
+	#super - [:state, :reference, :cash_payer_name]
+  #end
 
 end

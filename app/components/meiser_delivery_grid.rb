@@ -1,17 +1,79 @@
 class MeiserDeliveryGrid < DeliveryGrid
 
+  js_configure do |c|
+	c.on_print_card = <<-JS
+      function(){
+		grid = this;
+		Ext.iterate(this.getSelectionModel().getSelection(),function(key,value){
+			Rails.MeiserDeliveriesController.print({"id": key.data.id}, function(r,e){
+				if (r.success == true){
+					Ext.Msg.show({
+					  title: r.title,
+					  width: 300,
+					  msg: r.message,
+					  buttons: Ext.Msg.OK,
+					  icon: Ext.MessageBox.INFO
+					});
+				} else {
+					alert(r.success);
+				}
+			});
+		});
+		
+      }
+    JS
+  end
+
+  def configure(c)
+  	super(c)
+    c.model = "MeiserDelivery"
+	c.columns = [
+		{
+			:name => :commission,
+			:width => 200,
+			:read_only => true,
+			:filterable => true,
+			:sortable => true,
+		},
+		{
+			:name => :indate,
+			:width => 100,
+			:filterable => true,
+			:sortable => true
+		},
+		{
+			:name => :outdate,
+			:width => 100,
+			:filterable => true,
+			:sortable => true
+		},
+		{
+			:name => :remarks,
+			:width => 300,
+			:filterable => true,
+			:sortable => true,
+			:getter => lambda{|r| CGI::escapeHTML(r.remarks || "")}
+		},
+		{
+			:name => :created_at,
+			:width => 200,
+			:filterable => true,
+			:sortable => true
+		},
+		{
+			:name => :updated_at,
+			:width => 200,
+			:filterable => true,
+			:sortable => true
+		}
+	]
+  end
+  
+
   component :add_window do |c|
    super(c)
    c.title = I18n.t("netzke.titles.new_meiser_delivery")
-   d=Delivery.new
-   #d.customer = Customer.where(:bpid => 280000001)
-   #d.customer_id = 1
-   c.form_config.record = d
    c.form_config.items = [
-		#{
-		#	:name => :customer__name,
-		#	:scope => lambda{|r| r.where(:bpid => 280000001)}
-		#},
 		{
 			:name => :indate,
 			:width => 100,
@@ -35,14 +97,6 @@ class MeiserDeliveryGrid < DeliveryGrid
    c.title = I18n.t("netzke.titles.edit_delivery")
    c.form_config.items = [
 		{
-			:name => :commission,
-			:disabled => true
-		},
-		{
-			:name => :customer__name,
-			:disabled => true
-		},
-		{
 			:name => :indate,
 			:width => 100,
 			:getter => lambda{|r| r.indate.strftime("%d.%m.%Y")}# I18n.l(r.indate, :format => :short)}
@@ -59,8 +113,9 @@ class MeiserDeliveryGrid < DeliveryGrid
    ]
   end
   
-  def columns
-	super - [:state, :reference, :cash_payer_name]
-  end
+  #def columns
+#	super
+#	#super - [:state, :reference, :cash_payer_name]
+ # end
 
 end

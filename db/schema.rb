@@ -11,16 +11,19 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130314102914) do
+ActiveRecord::Schema.define(:version => 20130414161802) do
 
-  create_table "bookings", :force => true do |t|
-    t.integer  "delivery_id"
-    t.integer  "traverse_id"
+  create_table "cash_payer_deliveries", :force => true do |t|
+    t.string   "commission"
+    t.date     "indate"
+    t.date     "outdate"
     t.text     "remarks"
-    t.text     "pk"
-    t.datetime "created_at",  :null => false
-    t.datetime "updated_at",  :null => false
+    t.integer  "cash_payer_id"
+    t.datetime "created_at",    :null => false
+    t.datetime "updated_at",    :null => false
   end
+
+  add_index "cash_payer_deliveries", ["commission"], :name => "index_cash_payer_deliveries_on_commission", :unique => true
 
   create_table "cash_payers", :force => true do |t|
     t.string   "addresscode"
@@ -30,23 +33,17 @@ ActiveRecord::Schema.define(:version => 20130314102914) do
     t.datetime "updated_at",  :null => false
   end
 
-  create_table "commissions", :force => true do |t|
-    t.string   "uid"
-    t.integer  "delivery_id"
+  create_table "customer_deliveries", :force => true do |t|
+    t.string   "commission"
+    t.date     "indate"
+    t.date     "outdate"
+    t.text     "remarks"
+    t.integer  "customer_id"
     t.datetime "created_at",  :null => false
     t.datetime "updated_at",  :null => false
   end
 
-  create_table "completions", :force => true do |t|
-    t.string   "ref"
-    t.integer  "user_id"
-    t.integer  "sort_list_id"
-    t.decimal  "weight_netto",  :precision => 8, :scale => 2
-    t.decimal  "weight_brutto", :precision => 8, :scale => 2
-    t.decimal  "weight_tara",   :precision => 8, :scale => 2
-    t.datetime "created_at",                                  :null => false
-    t.datetime "updated_at",                                  :null => false
-  end
+  add_index "customer_deliveries", ["commission"], :name => "index_customer_deliveries_on_commission", :unique => true
 
   create_table "customers", :force => true do |t|
     t.string   "bpid"
@@ -83,28 +80,27 @@ ActiveRecord::Schema.define(:version => 20130314102914) do
     t.datetime "updated_at",  :null => false
   end
 
-  create_table "deliveries", :force => true do |t|
-    t.integer  "customer_id"
-    t.integer  "cash_payer_id"
+  create_table "meiser_deliveries", :force => true do |t|
     t.string   "commission"
-    t.string   "reference"
     t.date     "indate"
     t.date     "outdate"
     t.text     "remarks"
-    t.datetime "created_at",    :null => false
-    t.datetime "updated_at",    :null => false
-    t.string   "state"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
   end
 
-  add_index "deliveries", ["commission"], :name => "index_deliveries_on_commission", :unique => true
+  add_index "meiser_deliveries", ["commission"], :name => "index_meiser_deliveries_on_commission", :unique => true
 
   create_table "next_free_numbers", :force => true do |t|
     t.string   "name"
-    t.text     "description"
-    t.integer  "fifo"
-    t.text     "content"
-    t.datetime "created_at",  :null => false
-    t.datetime "updated_at",  :null => false
+    t.string   "prefix"
+    t.integer  "next_id"
+    t.boolean  "year_prefix"
+    t.boolean  "month_prefix"
+    t.boolean  "day_prefix"
+    t.integer  "length"
+    t.datetime "created_at",   :null => false
+    t.datetime "updated_at",   :null => false
   end
 
   create_table "print_triggers", :force => true do |t|
@@ -138,14 +134,6 @@ ActiveRecord::Schema.define(:version => 20130314102914) do
     t.string   "description"
     t.datetime "created_at",  :null => false
     t.datetime "updated_at",  :null => false
-  end
-
-  create_table "traverses", :force => true do |t|
-    t.string   "name"
-    t.text     "remarks"
-    t.string   "state"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
   end
 
   create_table "users", :force => true do |t|

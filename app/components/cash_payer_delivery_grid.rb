@@ -1,5 +1,28 @@
 class CashPayerDeliveryGrid < DeliveryGrid
-
+  
+  js_configure do |c|
+	c.on_print_card = <<-JS
+      function(){
+		grid = this;
+		Ext.iterate(this.getSelectionModel().getSelection(),function(key,value){
+			Rails.CashPayerDeliveriesController.print({"id": key.data.id}, function(r,e){
+				if (r.success == true){
+					Ext.Msg.show({
+					  title: r.title,
+					  width: 300,
+					  msg: r.message,
+					  buttons: Ext.Msg.OK,
+					  icon: Ext.MessageBox.INFO
+					});
+				} else {
+					alert(r.success);
+				}
+			});
+		});
+		
+      }
+    JS
+  end
 
   def configure(c)
 	c.columns = [
@@ -9,19 +32,6 @@ class CashPayerDeliveryGrid < DeliveryGrid
 			:read_only => true,
 			:filterable => false,
 			:sortable => false,
-		},
-		{
-			:name => :customer__bpid,
-			:read_only => true,
-			:filterable => false,
-			:sortable => false,
-			:width => 50
-		},
-		{
-			:name => :customer__search_string,
-			:width => 200,
-			:filterable => false,
-			:sortable => false
 		},
 		{
 			:name => :cash_payer__search_string,
@@ -103,10 +113,6 @@ class CashPayerDeliveryGrid < DeliveryGrid
 			:disabled => true
 		},
 		{
-			:name => :customer__search_string,
-			:disabled => true
-		},
-		{
 			:name => :cash_payer__name,
 			:disabled => true
 		},
@@ -134,11 +140,10 @@ class CashPayerDeliveryGrid < DeliveryGrid
   def columns
 	[
 		:commission,
-		:customer__bpid,
-		:customer__search_string,
 		:cash_payer__search_string,
 		:indate,
 		:outdate,
+		:remarks,
 		:created_at,
 		:updated_at	
 	]

@@ -1,5 +1,7 @@
 class DeliveryGrid < Netzke::Basepack::Grid
 
+  PRINT_CONTROLLER = "CustomerDeliveriesController"
+
   js_configure do |c|
 	c.init_component = <<-JS
       function(){
@@ -20,7 +22,7 @@ class DeliveryGrid < Netzke::Basepack::Grid
       function(){
 		grid = this;
 		Ext.iterate(this.getSelectionModel().getSelection(),function(key,value){
-			Rails.DeliveriesController.print({"id": key.data.id}, function(r,e){
+			Rails.MeiserDeliveriesController.print({"id": key.data.id}, function(r,e){
 				if (r.success == true){
 					Ext.Msg.show({
 					  title: r.title,
@@ -41,7 +43,7 @@ class DeliveryGrid < Netzke::Basepack::Grid
 
   def configure(c)
 	c.prevent_header = true
-    c.model = "Delivery"
+    c.model = "CustomerDelivery"
 	c.enable_column_filters = false
 	c.enable_edit_in_form = true
 	c.enable_edit_inline = false
@@ -85,7 +87,7 @@ class DeliveryGrid < Netzke::Basepack::Grid
 			:width => 300,
 			:filterable => true,
 			:sortable => true,
-			:getter => lambda{|r| CGI::escapeHTML(r.remarks)}
+			:getter => lambda{|r| CGI::escapeHTML(r.remarks || "")}
 		},
 		{
 			:name => :created_at,

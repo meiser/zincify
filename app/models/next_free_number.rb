@@ -1,5 +1,5 @@
 class NextFreeNumber < ActiveRecord::Base
-  attr_accessible :name, :description, :fifo
+  attr_accessible :name, :description, :length, :prefix, :year_prefix, :month_prefix, :day_prefix
 
   validates :name, :uniqueness => true
   #validates :fifo, :numericality => { :only_integer => true }
@@ -12,17 +12,17 @@ class NextFreeNumber < ActiveRecord::Base
   def self.generate name
 	self.transaction do
 		nfn = self.where(:name => name).lock(true).first
-		returned_fifo = nfn.fifo
-		nfn.fifo +=1
+		returned_id = nfn.next_id
+		nfn.next_id +=1
 		nfn.save
-		return "%09d" % returned_fifo
+		return "#{nfn.prefix}%0#{nfn.length-nfn.prefix.length}d" % returned_id
 	end
   end
   
   private
   
   def set_number
-	self.fifo = 0 unless self.fifo
+	self.next_id = 1 unless self.next_id
   end
   
   
