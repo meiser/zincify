@@ -38,6 +38,9 @@ Zincify::Application.routes.draw do
   #end
 
   #resource :printer, :only => :update
+  
+  
+  match "admin" => "application#admin"
 
 end
 

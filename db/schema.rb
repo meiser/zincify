@@ -15,6 +15,8 @@ ActiveRecord::Schema.define(:version => 20130414161802) do
 
   create_table "cash_payer_deliveries", :force => true do |t|
     t.string   "commission"
+    t.string   "custom_name"
+    t.string   "tag"
     t.date     "indate"
     t.date     "outdate"
     t.text     "remarks"
@@ -35,6 +37,7 @@ ActiveRecord::Schema.define(:version => 20130414161802) do
 
   create_table "customer_deliveries", :force => true do |t|
     t.string   "commission"
+    t.string   "tag"
     t.date     "indate"
     t.date     "outdate"
     t.text     "remarks"

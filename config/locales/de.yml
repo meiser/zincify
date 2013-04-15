@@ -93,6 +93,7 @@
     customer__bpid: BPID
     customer__search_string: Kunde
     customer_id: Kunde
+    tag: Nummer Blechmarke
     commission: Anliefernummer
     remarks: Anmerkungen
     created_at: Erstellungsdatum
@@ -106,6 +107,8 @@
     cash_payer__search_string: Barzahler
     cash_payer__address: Adresse
     cash_payer_id: Barzahler
+    custom_name: Barzahlername
+    tag: Nummer Blechmarke
     commission: Anliefernummer
     remarks: Anmerkungen
     created_at: Erstellungsdatum

@@ -23,6 +23,69 @@ class CustomerDeliveryGrid < DeliveryGrid
       }
     JS
   end
+  
+  def configure(c)
+   super(c)
+   c.columns = [
+		{
+			:name => :commission,
+			:width => 200,
+			:read_only => true,
+			:filterable => true,
+			:sortable => true,
+		},
+		{
+			:name => :customer__bpid,
+			:read_only => true,
+			:filterable => true,
+			:sortable => true
+		},
+		{
+			:name => :customer__search_string,
+			:width => 400,
+			:filterable => false,
+			:sortable => false
+		},
+		{
+			:name => :tag,
+			:width =>200,
+			:filterable => true,
+			:sortable => true
+		},
+		{
+			:name => :indate,
+			:width => 100,
+			:filterable => true,
+			:sortable => true
+		},
+		{
+			:name => :outdate,
+			:width => 100,
+			:filterable => true,
+			:sortable => true
+		},
+		{
+			:name => :remarks,
+			:width => 300,
+			:filterable => true,
+			:sortable => true,
+			:getter => lambda{|r| CGI::escapeHTML(r.remarks || "")}
+		},
+		{
+			:name => :created_at,
+			:width => 200,
+			:filterable => true,
+			:sortable => true
+		},
+		{
+			:name => :updated_at,
+			:width => 200,
+			:filterable => true,
+			:sortable => true
+		}
+	]
+  end
+  
 
   component :add_window do |c|
    super(c)
@@ -30,6 +93,9 @@ class CustomerDeliveryGrid < DeliveryGrid
    c.form_config.items = [
 		{
 			:name => :customer__search_string
+		},
+		{
+			:name => :tag
 		},
 		{
 			:name => :indate,
@@ -56,6 +122,9 @@ class CustomerDeliveryGrid < DeliveryGrid
 		{
 			:name => :commission,
 			:disabled => true
+		},
+		{
+			:name => :tag
 		},
 		{
 			:name => :customer__search_string,

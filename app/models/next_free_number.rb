@@ -1,13 +1,13 @@
 class NextFreeNumber < ActiveRecord::Base
   attr_accessible :name, :description, :length, :prefix, :year_prefix, :month_prefix, :day_prefix
 
-  validates :name, :uniqueness => true
   #validates :fifo, :numericality => { :only_integer => true }
-  
-  serialize :content, OpenStruct
   
   before_save :set_number
   
+  validates :length , :presence => true, :numericality => { :only_integer => true }
+  validates :prefix, :presence => true, :uniqueness => true
+  validates :name, :presence => true, :uniqueness => true
   
   def self.generate name
 	self.transaction do

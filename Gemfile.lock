@@ -35,12 +35,6 @@ GIT
   specs:
     devise-i18n (0.8.2)
 
-PATH
-  remote: ../extr
-  specs:
-    extr (1.0.2)
-      rails (> 3.0)
-
 GEM
   remote: http://rubygems.org/
   specs:
@@ -100,6 +94,8 @@ GEM
     eventmachine (1.0.3-x86-mingw32)
     execjs (1.4.0)
       multi_json (~> 1.0)
+    extr (1.0.2)
+      rails (> 3.0)
     gravatar_image_tag (1.1.3)
     hike (1.2.2)
     i18n (0.6.1)
@@ -205,7 +201,7 @@ DEPENDENCIES
   devise
   devise-i18n!
   devise_ldap_authenticatable!
-  extr!
+  extr
   gravatar_image_tag
   ibm_db
   jquery-rails
