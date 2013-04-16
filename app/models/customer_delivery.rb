@@ -3,7 +3,7 @@ class CustomerDelivery < ActiveRecord::Base
 
   attr_accessible :customer_id, :tag, :indate, :outdate, :remarks
 
-  default_scope order("indate DESC")
+  default_scope order("created_at DESC")
 
   validates_presence_of :indate, :outdate
   validates_datetime :outdate, :after => :indate

@@ -50,8 +50,8 @@ sortlist = SortList.create(
 	]
 )
 
-NextFreeNumber.create([
-		{no: "Meiser", description: 'Kommissionsnummer Meiser', :fifo => 30000},
-		{nno: "Lohnkunden", description: 'Kommissionsnummer Lohnkunden', :fifo => 30000}
-	]
-)
+#NextFreeNumber.create([
+#		{no: "Meiser", description: 'Kommissionsnummer Meiser', :fifo => 30000},
+#		{nno: "Lohnkunden", description: 'Kommissionsnummer Lohnkunden', :fifo => 30000}
+#	]
+#)
