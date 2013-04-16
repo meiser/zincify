@@ -6,9 +6,9 @@ class CashPayerDeliveriesController < ApplicationController
   	@cash_payer_delivery =CashPayerDelivery.find(params[:data].first[:id])
     t = PrintTrigger.new
   	t.printer = "0001"
-  	t.label = "commission.btw"
+  	t.label = "cash_payer.btw"
 	if @cash_payer_delivery.custom_name.present?
-		t.data = "#{@cash_payer_delivery.commission}|BARZAHLUNG BEI ABHOLUNG: #{@cash_payer_delivery.custom_name}|BARZAHLUNG BEI ABHOLUNG: #{@cash_payer_delivery.custom_name}|#{l(@cash_payer_delivery.indate)}|#{l(@cash_payer_delivery.outdate)}|#{@cash_payer_delivery.remarks}|#{@cash_payer_delivery.tag}"
+		t.data = "#{@cash_payer_delivery.commission}|#{@cash_payer_delivery.custom_name}|#{@cash_payer_delivery.custom_name}|#{l(@cash_payer_delivery.indate)}|#{l(@cash_payer_delivery.outdate)}|#{@cash_payer_delivery.remarks}|#{@cash_payer_delivery.tag}"
   	else
 		t.data = "#{@cash_payer_delivery.commission}|#{@cash_payer_delivery.cash_payer.name}|#{[@cash_payer_delivery.cash_payer.name, @cash_payer_delivery.cash_payer.address].join(": ")}|#{l(@cash_payer_delivery.indate)}|#{l(@cash_payer_delivery.outdate)}|#{@cash_payer_delivery.remarks}|#{@cash_payer_delivery.tag}"
   	end
