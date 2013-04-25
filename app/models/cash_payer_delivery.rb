@@ -3,7 +3,7 @@ class CashPayerDelivery < ActiveRecord::Base
 
   attr_accessible :cash_payer_id, :custom_name, :tag, :indate, :outdate, :remarks
 
-  default_scope order("created_at DESC")
+  default_scope order("#{self.table_name}.created_at DESC")
 
   validates_presence_of :indate, :outdate
   validates_datetime :outdate, :after => :indate

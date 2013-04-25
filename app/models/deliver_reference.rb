@@ -1,9 +1,9 @@
 class DeliverReference < ActiveRecord::Base
   attr_accessible :name
 
-  belongs_to :delivery
+  #belongs_to :meiser_delivery
 
-  serialize :content, OpenStruct
+  #serialize :content, OpenStruct
 
   validates_uniqueness_of :name, :case_sensitive => true, :scope => :delivery_id
   

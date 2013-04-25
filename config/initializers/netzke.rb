@@ -5,3 +5,8 @@ Netzke::Core.setup do |config|
   # feedback delay
    config.js_feedback_delay = 5000
  end
+ 
+ unless Rails.env.production?
+  ENV["VZPL_USER"] = 'test'
+  ENV["VZPL_PASSWORD"] = 'test'
+end

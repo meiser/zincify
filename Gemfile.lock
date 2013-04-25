@@ -1,10 +1,10 @@
 GIT
   remote: git://github.com/cschiewek/devise_ldap_authenticatable.git
-  revision: 6bb386b05fbbf8ffa9c59930882426de91333e73
+  revision: 172b6b10d7a0374f211d3f608990beb38052c47e
   specs:
     devise_ldap_authenticatable (0.7.0)
       devise (~> 2.0)
-      net-ldap (~> 0.2)
+      net-ldap (~> 0.3.1)
 
 GIT
   remote: git://github.com/meiser/meiser-rails.git
@@ -15,35 +15,27 @@ GIT
       rails (>= 3.1.0)
 
 GIT
-  remote: git://github.com/netzke/netzke-basepack.git
-  revision: 83243f3eb16f7db40d234a0a6c6277e20cccb5e4
+  remote: git://github.com/rails-sqlserver/activerecord-sqlserver-adapter.git
+  revision: 00d3dbbc945e188636821ff7242f155362325977
   specs:
-    netzke-basepack (0.8.3)
-      netzke-core (~> 0.8.2)
-
-GIT
-  remote: git://github.com/netzke/netzke-core.git
-  revision: 4b7df4e88e412dfd65b088b586a7ffad9d655ace
-  specs:
-    netzke-core (0.8.4)
-      execjs
-      uglifier
+    activerecord-sqlserver-adapter (3.2.10)
+      activerecord (~> 3.2.0)
 
 GIT
   remote: git://github.com/tigrish/devise-i18n.git
-  revision: 7fc06dda6d4f0339e4aa128ccf58f02ee326349f
+  revision: 8a911bfff58a29e4a193df326c87d099eb1ab74a
   specs:
-    devise-i18n (0.8.2)
+    devise-i18n (0.8.3)
 
 GEM
   remote: http://rubygems.org/
   specs:
-    actionmailer (3.2.13)
-      actionpack (= 3.2.13)
-      mail (~> 2.5.3)
-    actionpack (3.2.13)
-      activemodel (= 3.2.13)
-      activesupport (= 3.2.13)
+    actionmailer (3.2.12)
+      actionpack (= 3.2.12)
+      mail (~> 2.4.4)
+    actionpack (3.2.12)
+      activemodel (= 3.2.12)
+      activesupport (= 3.2.12)
       builder (~> 3.0.0)
       erubis (~> 2.7.0)
       journey (~> 1.0.4)
@@ -51,21 +43,19 @@ GEM
       rack-cache (~> 1.2)
       rack-test (~> 0.6.1)
       sprockets (~> 2.2.1)
-    activemodel (3.2.13)
-      activesupport (= 3.2.13)
+    activemodel (3.2.12)
+      activesupport (= 3.2.12)
       builder (~> 3.0.0)
-    activerecord (3.2.13)
-      activemodel (= 3.2.13)
-      activesupport (= 3.2.13)
+    activerecord (3.2.12)
+      activemodel (= 3.2.12)
+      activesupport (= 3.2.12)
       arel (~> 3.0.2)
       tzinfo (~> 0.3.29)
-    activerecord-sqlserver-adapter (3.2.10)
-      activerecord (~> 3.2.0)
-    activeresource (3.2.13)
-      activemodel (= 3.2.13)
-      activesupport (= 3.2.13)
-    activesupport (3.2.13)
-      i18n (= 0.6.1)
+    activeresource (3.2.12)
+      activemodel (= 3.2.12)
+      activesupport (= 3.2.12)
+    activesupport (3.2.12)
+      i18n (~> 0.6)
       multi_json (~> 1.0)
     arel (3.0.2)
     bcrypt-ruby (3.0.1)
@@ -98,7 +88,7 @@ GEM
       rails (> 3.0)
     gravatar_image_tag (1.1.3)
     hike (1.2.2)
-    i18n (0.6.1)
+    i18n (0.6.4)
     ibm_db (2.5.11)
       activerecord (>= 1.15.1)
     ibm_db (2.5.11-x86-mingw32)
@@ -115,13 +105,18 @@ GEM
     linguistics (2.0.2)
       loggability (~> 0.5)
     loggability (0.6.0)
-    mail (2.5.3)
+    mail (2.4.4)
       i18n (>= 0.4.0)
       mime-types (~> 1.16)
       treetop (~> 1.4.8)
-    mime-types (1.22)
+    mime-types (1.23)
     multi_json (1.7.2)
     net-ldap (0.3.1)
+    netzke-basepack (0.8.2)
+      netzke-core (~> 0.8.2)
+    netzke-core (0.8.2)
+      execjs
+      uglifier
     orm_adapter (0.4.0)
     polyglot (0.3.3)
     rack (1.4.5)
@@ -131,19 +126,19 @@ GEM
       rack
     rack-test (0.6.2)
       rack (>= 1.0)
-    rails (3.2.13)
-      actionmailer (= 3.2.13)
-      actionpack (= 3.2.13)
-      activerecord (= 3.2.13)
-      activeresource (= 3.2.13)
-      activesupport (= 3.2.13)
+    rails (3.2.12)
+      actionmailer (= 3.2.12)
+      actionpack (= 3.2.12)
+      activerecord (= 3.2.12)
+      activeresource (= 3.2.12)
+      activesupport (= 3.2.12)
       bundler (~> 1.0)
-      railties (= 3.2.13)
+      railties (= 3.2.12)
     rails-i18n (0.7.3)
       i18n (~> 0.5)
-    railties (3.2.13)
-      actionpack (= 3.2.13)
-      activesupport (= 3.2.13)
+    railties (3.2.12)
+      actionpack (= 3.2.12)
+      activesupport (= 3.2.12)
       rack-ssl (~> 1.3.2)
       rake (>= 0.8.7)
       rdoc (~> 3.4)
@@ -152,7 +147,7 @@ GEM
     rdoc (3.12.2)
       json (~> 1.4)
     ref (1.0.4)
-    sass (3.2.7)
+    sass (3.2.8)
     sass-rails (3.2.6)
       railties (~> 3.2.0)
       sass (>= 3.1.10)
@@ -193,7 +188,7 @@ PLATFORMS
   x86-mingw32
 
 DEPENDENCIES
-  activerecord-sqlserver-adapter
+  activerecord-sqlserver-adapter!
   coffee-rails (~> 3.2.1)
   daemons
   delayed_job
@@ -209,9 +204,9 @@ DEPENDENCIES
   linguistics
   meiser-rails!
   net-ldap
-  netzke-basepack!
-  netzke-core!
-  rails (= 3.2.13)
+  netzke-basepack (= 0.8.2)
+  netzke-core (= 0.8.2)
+  rails (= 3.2.12)
   rails-i18n
   sass-rails (~> 3.2.3)
   sqlite3

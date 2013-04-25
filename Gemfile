@@ -1,6 +1,6 @@
 source 'http://rubygems.org'
 
-gem 'rails', '3.2.13'
+gem 'rails', '3.2.12'
 gem 'thin'
 # Bundle edge Rails instead:
 # gem 'rails', :git => 'git://github.com/rails/rails.git'
@@ -40,7 +40,7 @@ gem 'validates_timeliness', '~> 3.0'
 
 # SUPPORT SQL_SERVER
 gem 'tiny_tds'
-gem 'activerecord-sqlserver-adapter'
+gem 'activerecord-sqlserver-adapter', :git => 'git://github.com/rails-sqlserver/activerecord-sqlserver-adapter.git'
 
 # Authentification
 gem 'devise'
@@ -48,7 +48,7 @@ gem 'devise-i18n', :git => 'git://github.com/tigrish/devise-i18n.git'
 gem 'devise_ldap_authenticatable', :git => 'git://github.com/cschiewek/devise_ldap_authenticatable.git'
 
 # Sencha
-gem 'netzke-core', :git => "git://github.com/netzke/netzke-core.git"
-gem 'netzke-basepack', :git => "git://github.com/netzke/netzke-basepack.git"
+gem 'netzke-core', '0.8.2'#, :git => "git://github.com/netzke/netzke-core.git"
+gem 'netzke-basepack', '0.8.2'#, :git => "git://github.com/netzke/netzke-basepack.git"
 gem 'extr'#, :path => "../extr"
 

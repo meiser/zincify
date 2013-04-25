@@ -9,11 +9,12 @@ class ApplicationController < ActionController::Base
   
   
   #before_filter :authenticate_netzke!
-  
-  
+    
   http_basic_authenticate_with :name => ENV["VZPL_USER"], 
     :password => ENV["VZPL_PASSWORD"],
     :realm => "Bitte geben Sie die Zugangsdaten an"
+  
+  
   
      
   def start

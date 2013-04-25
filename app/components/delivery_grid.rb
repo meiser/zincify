@@ -1,7 +1,5 @@
 class DeliveryGrid < Netzke::Basepack::Grid
 
-  PRINT_CONTROLLER = "CustomerDeliveriesController"
-
   js_configure do |c|
 	c.init_component = <<-JS
       function(){
