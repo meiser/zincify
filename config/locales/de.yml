@@ -22,6 +22,7 @@
    meiser_deliveries: Anlieferungen Meiser Vogtland OHG
    customer_deliveries: Anlieferungen Lohnkunden
    cash_payer_deliveries: Anlieferungen Barzahler
+   deliver_references: Lieferscheine
    next_free_numbers: Belegnummernkreise
    new_delivery: Neue Anlieferung anlegen
    new_meiser_delivery: Neue Anlieferung Meiser anlegen
@@ -137,8 +138,10 @@
     indate: Anlieferung am
     outdate: Abholtermin
     deliver_references: Lieferscheine
-   deliver_references:
-    name: Lieferscheinnummer
+   deliver_reference:
+    name: Barcode Lieferschein
+    created_at: Scandatum
+    updated_at: Aktualisiert am
    booking:
     traverse_id: Traverse
     delivery_id: Kommissionsnummer bzw. Bundnummer

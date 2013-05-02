@@ -37,8 +37,10 @@ class DeliveryPanel < Netzke::Basepack::TabPanel
   #end
   
   component :meiser_deliveries do |c|
-   c.klass = MeiserDeliveryGrid
-   c.model = "MeiserDelivery"
+   c.klass = MeiserAndReferences
+   
+   #c.klass = MeiserDeliveryGrid
+   #c.model = "MeiserDelivery"
    c.title = I18n.t("netzke.titles.meiser_deliveries")
   end
   

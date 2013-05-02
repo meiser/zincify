@@ -8,11 +8,12 @@ class MeiserDelivery < ActiveRecord::Base
 
   before_create :set_commission
 
+  has_many :deliver_references, :dependent => :destroy, :foreign_key => "delivery_id"
 
   private
 
   def set_commission
-   self.commission = self.commission = SecureRandom.hex(10)#NextFreeNumber.generate("Meiser")
+   self.commission = self.commission = NextFreeNumber.generate("Meiser")
   end
 
 end
