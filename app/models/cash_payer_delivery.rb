@@ -14,7 +14,7 @@ class CashPayerDelivery < ActiveRecord::Base
   belongs_to :cash_payer
 
   validates :cash_payer, :presence => true, :if => Proc.new{|r| r.custom_name.blank? }
-  validates :custom_name, :presence => true, :if => Proc.new{|r| r.cash_payer.addresscode == '280800004' }
+  #validates :custom_name, :presence => true, :if => Proc.new{|r| r.cash_payer.addresscode == '280800004' }
   validates :tag, :presence => true
   
   
