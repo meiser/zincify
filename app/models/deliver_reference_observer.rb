@@ -13,24 +13,5 @@ class DeliverReferenceObserver < ActiveRecord::Observer
   p "AN BAAN MELDEN DELETE"
  end
  
- 
- #inputfield.invisible("tibde915.wght")
- #firma = get.compnr()
-	#
-	#on case firma
-	#case 110:
-#		|disable.fields("tibde915.wght")
-#		inputfield.invisible("tibde915.wght")
-#		inputfield.invisible("tibde915.verzink")#
-#		inputfield.invisible("tibde915.bund"#)
-#		|disable.fields("tibde915.verzink")
-#		disable.fields("tibde915.bund")
-#		
-#		disable.commands("waage")
-#		disable.commands("waagetest")
-#		break
-#	endcase
-
-#extern 		long 		kennziffer, firma, anzet
 end
 
