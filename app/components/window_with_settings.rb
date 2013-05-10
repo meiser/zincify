@@ -29,46 +29,32 @@ class WindowWithSettings < Netzke::Basepack::Window
   	c.columns = [
   		{
 			:name => :name,
-			:width => 200,
-			:filterable => true,
-			:sortable => true,
+			:width => 200
 		},
 		{
 			:name => :prefix,
-			:width => 100,
-			:filterable => true,
-			:sortable => true,
+			:width => 100
 		},
 		{
 			:name => :next_id,
 			:width => 200,
-			:read_only => true,
-			:filterable => true,
-			:sortable => true,
+			:read_only => true
 		},
 		{
 			:name => :length,
-			:width => 200,
-			:filterable => true,
-			:sortable => true,
+			:width => 200
 		},
 		{
 			:name => :year_prefix,
-			:width => 100,
-			:filterable => true,
-			:sortable => true,
+			:width => 100
 		},
 		{
 			:name => :month_prefix,
-			:width => 100,
-			:filterable => true,
-			:sortable => true,
+			:width => 100
 		},
 		{
 			:name => :day_prefix,
-			:width => 100,
-			:filterable => true,
-			:sortable => true,
+			:width => 100
 		}
 
 

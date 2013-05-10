@@ -60,7 +60,6 @@ class MeiserAndReferences < Netzke::Base
     c.klass = Netzke::Basepack::Grid
 	c.model = "DeliverReference"
 	c.title = I18n.t("netzke.titles.deliver_references")
-    c.data_store = {auto_load: false}
     c.scope = {:delivery_id => component_session[:selected_meiser_delivery_id]}
     c.strong_default_attrs = {:delivery_id => component_session[:selected_meiser_delivery_id]}
 	
@@ -68,22 +67,16 @@ class MeiserAndReferences < Netzke::Base
 		{
 			:name => :name,
 			:width => 400,
-			:read_only => false,
-			:filterable => false,
-			:sortable => false,
+			:read_only => false
 		},
 		{
 			:name => :created_at,
 			:width => 100,
-			:filterable => false,
-			:sortable => false,
 			:read_only => true
 		},
 		{
 			:name => :updated_at,
 			:width => 100,
-			:filterable => false,
-			:sortable => false,
 			:read_only => true
 		}
 	]

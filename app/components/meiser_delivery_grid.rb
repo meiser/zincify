@@ -31,40 +31,28 @@ class MeiserDeliveryGrid < DeliveryGrid
 		{
 			:name => :commission,
 			:width => 200,
-			:read_only => true,
-			:filterable => true,
-			:sortable => true,
+			:read_only => true
 		},
 		{
 			:name => :indate,
-			:width => 100,
-			:filterable => true,
-			:sortable => true
+			:width => 100
 		},
 		{
 			:name => :outdate,
-			:width => 100,
-			:filterable => true,
-			:sortable => true
+			:width => 100
 		},
 		{
 			:name => :remarks,
 			:width => 300,
-			:filterable => true,
-			:sortable => true,
 			:getter => lambda{|r| CGI::escapeHTML(r.remarks || "")}
 		},
 		{
 			:name => :created_at,
-			:width => 200,
-			:filterable => true,
-			:sortable => true
+			:width => 200
 		},
 		{
 			:name => :updated_at,
-			:width => 200,
-			:filterable => true,
-			:sortable => true
+			:width => 200
 		}
 	]
   end
@@ -113,9 +101,4 @@ class MeiserDeliveryGrid < DeliveryGrid
    ]
   end
   
-  #def columns
-#	super
-#	#super - [:state, :reference, :cash_payer_name]
- # end
-
 end

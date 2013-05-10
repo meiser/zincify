@@ -48,7 +48,7 @@ gem 'devise-i18n', :git => 'git://github.com/tigrish/devise-i18n.git'
 gem 'devise_ldap_authenticatable', :git => 'git://github.com/cschiewek/devise_ldap_authenticatable.git'
 
 # Sencha
-gem 'netzke-core', '0.8.2'#, :git => "git://github.com/netzke/netzke-core.git"
-gem 'netzke-basepack', '0.8.2'#, :git => "git://github.com/netzke/netzke-basepack.git"
+gem 'netzke-core'#, :git => "git://github.com/netzke/netzke-core.git"
+gem 'netzke-basepack'#, :git => "git://github.com/netzke/netzke-basepack.git"
 gem 'extr'#, :path => "../extr"
 

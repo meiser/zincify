@@ -30,61 +30,43 @@ class CashPayerDeliveryGrid < DeliveryGrid
 		{
 			:name => :commission,
 			:width => 200,
-			:read_only => true,
-			:filterable => true,
-			:sortable => true,
+			:read_only => true
 		},
 		{
 			:name => :customer__bpid,
-			:read_only => true,
-			:filterable => true,
-			:sortable => true
+			:read_only => true
 		},
 		{
 			:name => :customer__search_string,
-			:width => 400,
-			:filterable => false,
-			:sortable => false
+			:width => 400
 		},
 		{
 			:name => :custom_name
 		},
 		{
 			:name => :tag,
-			:width =>200,
-			:filterable => true,
-			:sortable => true
+			:width =>200
 		},
 		{
 			:name => :indate,
-			:width => 100,
-			:filterable => true,
-			:sortable => true
+			:width => 100
 		},
 		{
 			:name => :outdate,
-			:width => 100,
-			:filterable => true,
-			:sortable => true
+			:width => 100
 		},
 		{
 			:name => :remarks,
 			:width => 300,
-			:filterable => true,
-			:sortable => true,
 			:getter => lambda{|r| CGI::escapeHTML(r.remarks || "")}
 		},
 		{
 			:name => :created_at,
-			:width => 200,
-			:filterable => true,
-			:sortable => true
+			:width => 200
 		},
 		{
 			:name => :updated_at,
-			:width => 200,
-			:filterable => true,
-			:sortable => true
+			:width => 200
 		}
 	]
   end
@@ -94,15 +76,11 @@ class CashPayerDeliveryGrid < DeliveryGrid
 		{
 			:name => :commission,
 			:width => 200,
-			:read_only => true,
-			:filterable => false,
-			:sortable => false,
+			:read_only => true
 		},
 		{
 			:name => :cash_payer__search_string,
-			:width => 200,
-			:filterable => false,
-			:sortable => false
+			:width => 200
 		},
 		{
 			:name => :custom_name
@@ -112,34 +90,24 @@ class CashPayerDeliveryGrid < DeliveryGrid
 		},
 		{
 			:name => :indate,
-			:width => 100,
-			:filterable => false,
-			:sortable => false
+			:width => 100
 		},
 		{
 			:name => :outdate,
-			:width => 100,
-			:filterable => false,
-			:sortable => false
+			:width => 100
 		},
 		{
 			:name => :remarks,
 			:width => 300,
-			:filterable => false,
-			:sortable => false,
 			:getter => lambda{|r| CGI::escapeHTML(r.remarks)}
 		},
 		{
 			:name => :created_at,
-			:width => 200,
-			:filterable => false,
-			:sortable => false
+			:width => 200
 		},
 		{
 			:name => :updated_at,
-			:width => 200,
-			:filterable => false,
-			:sortable => false
+			:width => 200
 		}
 	]
 	super(c)
