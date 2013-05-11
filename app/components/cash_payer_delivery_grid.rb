@@ -25,53 +25,6 @@ class CashPayerDeliveryGrid < DeliveryGrid
   end
   
   def configure(c)
-   super(c)
-   c.columns = [
-		{
-			:name => :commission,
-			:width => 200,
-			:read_only => true
-		},
-		{
-			:name => :customer__bpid,
-			:read_only => true
-		},
-		{
-			:name => :customer__search_string,
-			:width => 400
-		},
-		{
-			:name => :custom_name
-		},
-		{
-			:name => :tag,
-			:width =>200
-		},
-		{
-			:name => :indate,
-			:width => 100
-		},
-		{
-			:name => :outdate,
-			:width => 100
-		},
-		{
-			:name => :remarks,
-			:width => 300,
-			:getter => lambda{|r| CGI::escapeHTML(r.remarks || "")}
-		},
-		{
-			:name => :created_at,
-			:width => 200
-		},
-		{
-			:name => :updated_at,
-			:width => 200
-		}
-	]
-  end
-
-  def configure(c)
 	c.columns = [
 		{
 			:name => :commission,
@@ -80,7 +33,8 @@ class CashPayerDeliveryGrid < DeliveryGrid
 		},
 		{
 			:name => :cash_payer__search_string,
-			:width => 200
+			:width => 200,
+			:minChars => 1
 		},
 		{
 			:name => :custom_name
@@ -123,7 +77,8 @@ class CashPayerDeliveryGrid < DeliveryGrid
 		#},
 		{
 			:name => :cash_payer__search_string,
-			:width => 300
+			:width => 300,
+			:minChars => 1
 		},
 		{
 			:name => :custom_name,

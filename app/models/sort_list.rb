@@ -13,6 +13,8 @@ class SortList < ActiveRecord::Base
    self.number.to_s+" "+self.description
   end  
    
-   
+  def search_string
+  [self.number, self.description].join(" ")
+  end
    
 end

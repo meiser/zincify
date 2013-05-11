@@ -34,11 +34,13 @@ class CustomerDeliveryGrid < DeliveryGrid
 		},
 		{
 			:name => :customer__bpid,
-			:read_only => true
+			:read_only => true,
+			:minChars => 1
 		},
 		{
 			:name => :customer__search_string,
-			:width => 400
+			:width => 400,
+			:minChars => 1
 		},
 		{
 			:name => :tag,
@@ -74,7 +76,8 @@ class CustomerDeliveryGrid < DeliveryGrid
    c.title = I18n.t("netzke.titles.new_customer_delivery")
    c.form_config.items = [
 		{
-			:name => :customer__search_string
+			:name => :customer__search_string,
+			:minChars => 1
 		},
 		{
 			:name => :tag

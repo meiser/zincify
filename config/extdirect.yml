@@ -8,3 +8,6 @@ Rails:
  CashPayerDeliveriesController:
   methods:
    print: 1
+ WeightingController:
+  methods:
+   print: 1

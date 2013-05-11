@@ -6,7 +6,7 @@ Zincify::Application.routes.draw do
 
   devise_for :users
   
-  resources :weighting, :only => :index
+  resources :weighting, :only => [:index, :new, :edit]
 
   #resources :sort_lists
 

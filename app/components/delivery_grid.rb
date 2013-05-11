@@ -58,11 +58,13 @@ class DeliveryGrid < Netzke::Basepack::Grid
 		},
 		{
 			:name => :customer__bpid,
-			:read_only => true
+			:read_only => true,
+			:minChars => 1
 		},
 		{
 			:name => :customer__search_string,
-			:width => 400
+			:width => 400,
+			:minChars => 1
 		},
 		{
 			:name => :indate,

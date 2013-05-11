@@ -69,9 +69,11 @@
     appointment: Kundentermin
     created_at: Eingangsdatum
     updated_at: letzte Änderung
-   completion:
+   weighting:
     ref: Barcode Etikett
     user: Anwender
+    sort_list: Kategorie
+    sort_list__search_string: Kategorie
     sort_list_id: Kategorie
     weight_brutto: verzinktes Bruttogewicht
     weight_netto: verzinktes Nettogewicht

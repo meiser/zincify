@@ -9,6 +9,7 @@ class ZincifyTabPanel < Netzke::Basepack::TabPanel
    c.model = "SortList"
    c.rows_per_page = 100
    c.force_fit = true
+   c.prevent_header = true
    c.enable_column_filters = false
    c.enable_edit_in_form = false
    c.title = I18n.t("activerecord.models.sort_list")
