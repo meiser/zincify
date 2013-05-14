@@ -15,7 +15,7 @@ class CashPayer < ActiveRecord::Base
   end
   
   def search_string
-   [name,address].join(" ")
+   [self.seak, self.name, self.address].join(" ")
   end
    
    

@@ -7,7 +7,7 @@ class Customer < ActiveRecord::Base
   has_many :deliveries
 
   def search_string
-   [self.name, self.address, self.bpid].join(" ")
+   [self.seak, self.name, self.address, self.bpid].join(" ")
   end
 
   def self.synchronize_with_baan
