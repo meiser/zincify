@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130510081706) do
+ActiveRecord::Schema.define(:version => 20130513093737) do
 
   create_table "cash_payer_deliveries", :force => true do |t|
     t.string   "commission"
@@ -33,6 +33,7 @@ ActiveRecord::Schema.define(:version => 20130510081706) do
     t.text     "address"
     t.datetime "created_at",  :null => false
     t.datetime "updated_at",  :null => false
+    t.string   "seak"
   end
 
   create_table "customer_deliveries", :force => true do |t|
@@ -54,6 +55,7 @@ ActiveRecord::Schema.define(:version => 20130510081706) do
     t.text     "address"
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
+    t.string   "seak"
   end
 
   add_index "customers", ["bpid"], :name => "index_customers_on_bpid"
