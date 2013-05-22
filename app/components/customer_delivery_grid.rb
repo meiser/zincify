@@ -77,7 +77,8 @@ class CustomerDeliveryGrid < DeliveryGrid
    c.form_config.items = [
 		{
 			:name => :customer__search_string,
-			:minChars => 1
+			:minChars => 1,
+			:xtype => "netzkebaanremotecombo"
 		},
 		{
 			:name => :tag

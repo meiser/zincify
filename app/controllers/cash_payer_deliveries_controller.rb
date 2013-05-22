@@ -23,7 +23,5 @@ class CashPayerDeliveriesController < ApplicationController
   	render :json => data
   end
 
-
-
 end
 

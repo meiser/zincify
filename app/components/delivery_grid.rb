@@ -1,6 +1,7 @@
 class DeliveryGrid < Netzke::Basepack::Grid
 
   js_configure do |c|
+	c.require :extensions
 	c.init_component = <<-JS
       function(){
         // calling superclass's initComponent
@@ -156,6 +157,14 @@ class DeliveryGrid < Netzke::Basepack::Grid
   
   def columns
 	super - [:state, :reference, :cash_payer_name]
+  end
+  
+  endpoint :get_combobox_options do |params, this|
+	puts "######################################"
+	puts params
+	puts "######################################"
+	column = final_columns.detect{ |c| c[:name] == params[:attr] }
+	this.data = data_adapter.combo_data(column, params[:query])
   end
   
 end

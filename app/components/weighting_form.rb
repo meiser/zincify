@@ -7,22 +7,40 @@ class WeightingForm < Netzke::Basepack::Form
         this.callParent();
 		this.on('submitsuccess', function(){
 			alert("Etikett wird gedruckt");
-			this.getForm().reset();
+			//Ext.Msg.show({
+			//		  title: "Info",
+			//		  width: 300,
+			//		  msg: "Etikett wird gedruckt",
+			//		  buttons: Ext.Msg.OK,
+			//		  icon: Ext.MessageBox.INFO
+			//});
+			this.getForm().findField("id").reset();
+			this.getForm().findField("barcode").reset();
+			this.getForm().findField("weight_brutto").reset();
+			this.getForm().findField("weight_tara").reset();
+			//this.getForm().reset();
 			this.items.items[1].focus();
 			//window.location.reload();
 		});
 		this.on('afterrender', function(form){
-			console.log(form.items.items[1].focus());
+			form.items.items[1].focus();
 		});
 	  }
     JS
   end
 
   def configure(c)
-  	super(c)
-    c.model = "Weighting"
+  
+	#@sort_lists = []
+	#SortList.all.each do |s|
+	# @sort_lists.append [s.number,s.description]	
+	#end  
+
+	#p @sort_lists
+    
+	c.model = "Weighting"
 	c.width = 400
-	c.items = [
+	c.items= [
 		{
 			:name => :barcode,
 			:width => 200
@@ -65,7 +83,19 @@ class WeightingForm < Netzke::Basepack::Form
 		#	:value => 0
 		#}
 	]
-
+  	super(c)
+  end
+  
+  endpoint :netzke_submit do |params, this|
+	data = ActiveSupport::JSON.decode(params[:data])
+	# adding weight to form params
+	# printing label is done in observer
+	data["ref"] = nil if data["barcode"].present?
+	data["weight_brutto"] = rand(1..9999)
+	data["weight_tara"] = rand(1..data["weight_brutto"])
+	params[:data] = ActiveSupport::JSON.encode(data)
+	# call parent
+	super(params,this)
   end
   
 end

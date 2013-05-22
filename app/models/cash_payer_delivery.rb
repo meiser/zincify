@@ -21,7 +21,7 @@ class CashPayerDelivery < ActiveRecord::Base
   private
 
   def set_commission
-   self.commission = NextFreeNumber.generate("Lohnkunden")#self.commission = SecureRandom.hex(10)#NextFreeNumber.generate("Meiser")
+   self.commission = NextFreeNumber.generate("Barzahler")#self.commission = SecureRandom.hex(10)#NextFreeNumber.generate("Meiser")
   end
   
   

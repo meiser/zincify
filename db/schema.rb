@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130513093737) do
+ActiveRecord::Schema.define(:version => 20130522101326) do
 
   create_table "cash_payer_deliveries", :force => true do |t|
     t.string   "commission"
@@ -170,6 +170,8 @@ ActiveRecord::Schema.define(:version => 20130513093737) do
     t.decimal  "weight_tara",   :precision => 8, :scale => 2
     t.datetime "created_at",                                  :null => false
     t.datetime "updated_at",                                  :null => false
+    t.string   "pid"
+    t.string   "shift"
   end
 
 end

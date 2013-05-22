@@ -1,5 +1,7 @@
 class Weighting < ActiveRecord::Base
-  attr_accessible :barcode, :ref, :sort_list_id, :weight_netto, :weight_brutto, :weight_tara
+  attr_accessible :barcode, :ref, :pid, :shift, :sort_list_id, :weight_netto, :weight_brutto, :weight_tara
+  
+  #attr_accessor :pid, :shift
   
   belongs_to :sort_list
   
@@ -10,7 +12,7 @@ class Weighting < ActiveRecord::Base
   validates :weight_netto, :numericality => {:greater_than => 0}
 
   
- before_validation :set_weight_netto
+  before_validation :set_weight_netto
   
   def set_weight_netto
    begin
