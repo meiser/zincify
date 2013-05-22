@@ -91,8 +91,8 @@ class WeightingForm < Netzke::Basepack::Form
 	# adding weight to form params
 	# printing label is done in observer
 	data["ref"] = nil if data["barcode"].present?
-	data["weight_brutto"] = rand(1..9999)
-	data["weight_tara"] = rand(1..data["weight_brutto"])
+	data["weight_brutto"] = rand(1..9999) unless data["weight_brutto"].present?
+	data["weight_tara"] = rand(1..data["weight_brutto"]) unless data["weight_tara"].present?
 	params[:data] = ActiveSupport::JSON.encode(data)
 	# call parent
 	super(params,this)

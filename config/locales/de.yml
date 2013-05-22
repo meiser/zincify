@@ -10,6 +10,11 @@
      tooltip: Druckt ein Etikett für alle selektierten Anlieferungen
  netzke:
   basepack:
+   form:
+    actions:
+     apply:
+      text: Speichern und Etikett drucken
+      tooltip: Speichert die Wiegung in der Datenbank und erzeugt anschließend einen Wiegecoupon
    grid:
     deleted_n_records: "%{n} Datensätze wurden gelöscht"
     deleted_records: "Datensatz gelöscht"
