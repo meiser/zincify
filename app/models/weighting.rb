@@ -22,4 +22,16 @@ class Weighting < ActiveRecord::Base
    end
   end
   
+  def weight_brutto
+   super.round
+  end
+  
+  def weight_tara
+   super.round
+  end
+  
+  def weight_netto
+   super.round
+  end
+
 end
