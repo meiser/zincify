@@ -2,7 +2,7 @@
  time:
   formats:
    short: "%d.%m.%Y"
-   coupon: "%d.%m.%Y %H:%M"
+   coupon: "%d.%m.%Y %H:%M:%S"
  delivery_grid:
    actions:
     print_card:

@@ -1,4 +1,4 @@
-class WeightingForm < Netzke::Basepack::Form
+﻿class WeightingForm < Netzke::Basepack::Form
 
   js_configure do |c|
    c.init_component = <<-JS
@@ -87,15 +87,37 @@ class WeightingForm < Netzke::Basepack::Form
   end
   
   endpoint :netzke_submit do |params, this|
-	data = ActiveSupport::JSON.decode(params[:data])
-	# adding weight to form params
-	# printing label is done in observer
-	data["ref"] = nil if data["barcode"].present?
-	data["weight_brutto"] = rand(1..9999) unless data["weight_brutto"].present?
-	data["weight_tara"] = rand(1..data["weight_brutto"]) unless data["weight_tara"].present?
-	params[:data] = ActiveSupport::JSON.encode(data)
-	# call parent
-	super(params,this)
+	begin
+		data = ActiveSupport::JSON.decode(params[:data])
+		# adding weight to form params
+		# printing label is done in observer
+		data["ref"] = nil if data["barcode"].present?
+		
+		# connection to scale
+		s =TCPSocket.new("150.101.123.45",8000)
+		s.puts "<FP>"
+
+		line = s.gets
+		scale=CSV.parse_line(line, {:col_sep => ";"})
+		
+		#"Wiegenummer #{scale[1]}"
+		#"Brutto #{scale[8]}"
+		#"Tara #{scale[9]}"
+		#"Einheit Gewicht #{scale[7]}"
+		
+		data["scale_ident"] = scale[1] unless data["weight_brutto"].present?
+		data["weight_unit"] = scale[7] unless data["weight_brutto"].present?
+		data["weight_brutto"] = scale[8] unless data["weight_brutto"].present?
+		data["weight_tara"] = scale[9] unless data["weight_tara"].present?
+		params[:data] = ActiveSupport::JSON.encode(data)
+		# call parent
+		super(params,this)		
+	rescue
+		this.netzke_feedback("Verbindung zur Waage ist gestört. Wiegedaten wurden nicht abgespeichert und es wird kein Etikett gedruckt.")
+		#params[:data] = ActiveSupport::JSON.encode({})
+	end
+	
+	
   end
   
 end

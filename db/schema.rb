@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130522101326) do
+ActiveRecord::Schema.define(:version => 20130524113518) do
 
   create_table "cash_payer_deliveries", :force => true do |t|
     t.string   "commission"
@@ -172,6 +172,8 @@ ActiveRecord::Schema.define(:version => 20130522101326) do
     t.datetime "updated_at",                                  :null => false
     t.string   "pid"
     t.string   "shift"
+    t.string   "scale_ident"
+    t.string   "weight_unit"
   end
 
 end

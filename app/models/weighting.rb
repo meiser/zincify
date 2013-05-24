@@ -1,7 +1,5 @@
 class Weighting < ActiveRecord::Base
-  attr_accessible :barcode, :ref, :pid, :shift, :sort_list_id, :weight_netto, :weight_brutto, :weight_tara
-  
-  #attr_accessor :pid, :shift
+  attr_accessible :barcode, :ref, :pid, :shift, :sort_list_id, :weight_netto, :weight_brutto, :weight_tara, :scale_ident, :weight_unit
   
   belongs_to :sort_list
   
