@@ -2,6 +2,8 @@ Zincify::Application.routes.draw do
   
   root :to => "application#start"
   
+  
+  
   netzke
 
   devise_for :users
@@ -37,6 +39,7 @@ Zincify::Application.routes.draw do
 
   #resource :printer, :only => :update
   
+  match "weighting/poll" => "weighting#poll", :defaults => { :format => 'json' }
   
   match "admin" => "application#admin"
 

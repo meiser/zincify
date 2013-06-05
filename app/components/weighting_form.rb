@@ -3,6 +3,21 @@
   js_configure do |c|
    c.init_component = <<-JS
       function(){
+		var pollScale = new Ext.direct.PollingProvider({
+			type:'polling',
+			url: 'poll',
+			interval: 10000
+		});
+		//Ext.direct.Manager.addProvider(pollScale);
+		//pollA.disconnect();
+		//Ext.Direct.on('scale_polling', function(e){
+		//	console.log(e.data);
+		//});
+		
+		Rails.WeightingController.poll(function(r,e){
+			console.log(r.data);
+		});
+		
         // calling superclass's initComponent
         this.callParent();
 		this.on('submitsuccess', function(){
@@ -16,6 +31,7 @@
 			//});
 			this.getForm().findField("id").reset();
 			this.getForm().findField("barcode").reset();
+			this.getForm().findField("ref").reset();
 			this.getForm().findField("weight_brutto").reset();
 			this.getForm().findField("weight_tara").reset();
 			//this.getForm().reset();
