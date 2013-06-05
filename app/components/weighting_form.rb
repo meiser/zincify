@@ -94,7 +94,7 @@
 		data["ref"] = nil if data["barcode"].present?
 		
 		# connection to scale
-		s =TCPSocket.new("150.101.123.45",8000)
+		s =TCPSocket.new("172.17.206.160",8000)
 		s.puts "<FP>"
 
 		line = s.gets
