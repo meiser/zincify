@@ -8,13 +8,19 @@
     print_card:
      text: Etikett drucken
      tooltip: Druckt ein Etikett für alle selektierten Anlieferungen
+ weighting_list:
+  actions:
+   print_card:
+    text: Tagesliste drucken
+    tooltip: Drucken der Tagesliste Verwiegungen
  netzke:
   basepack:
    form:
     actions:
      apply:
       text: Speichern und Etikett drucken
-      tooltip: Speichert die Wiegung in der Datenbank und erzeugt anschließend einen Wiegecoupon
+      tooltip: "OK"
+      #tooltip: Speichert die Wiegung in der Datenbank und erzeugt anschließend einen Wiegecoupon
    grid:
     deleted_n_records: "%{n} Datensätze wurden gelöscht"
     deleted_records: "Datensatz gelöscht"
@@ -63,6 +69,7 @@
    deliver_reference: Anlieferreferenz (Lieferschein u.a.)
    sort_list: Sortenverzeichnis
    next_free_number: "Nächste freie Nummer"
+   weighting_list: Verwiegungen
   attributes:
    user:
     login: Login
@@ -76,14 +83,19 @@
     created_at: Eingangsdatum
     updated_at: letzte Änderung
    weighting:
-    ref: Barcode Etikett
+    barcode: Barcode Etikett
+    ref: Kommission
     user: Anwender
     sort_list: Kategorie
     sort_list__search_string: Kategorie
-    sort_list_id: Kategorie
+    sort_list__id: Kategorie
     weight_brutto: verzinktes Bruttogewicht
     weight_netto: verzinktes Nettogewicht
     weight_tara: Tara
+    scale_ident: Nummer Messvorgang
+    weight_unit: Einheit
+    pid: Persionalkennung
+    shift: Schicht
     created_at: Fertiggemeldet am
     updated_at: Bearbeitet am
    customer:

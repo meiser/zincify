@@ -35,10 +35,14 @@ class ZincifyTabPanel < Netzke::Basepack::TabPanel
 	]
   end
   
+  component :weighting_list do |c|
+     c.title = I18n.t("activerecord.models.weighting_list")
+  end
+  
   def configure(c)
   	c.active_tab = 0
 	c.prevent_header = true
-    c.items = [:delivery_panel,:sort_list]
+    c.items = [:delivery_panel,:sort_list,:weighting_list]
 	super(c)
   end
 

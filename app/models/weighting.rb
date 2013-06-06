@@ -8,9 +8,17 @@ class Weighting < ActiveRecord::Base
   validates :weight_brutto, :numericality => {:greater_than => 0}
   validates :weight_tara, :numericality => {:within => 0..100}
   validates :weight_netto, :numericality => {:greater_than => 0}
-
+  validates :weight_unit, :presence => true
+  validates :scale_ident, :presence => true
+  validates :pid, :presence => true
   
   before_validation :set_weight_netto
+  
+  after_save :set_shift
+  
+  
+  default_scope order("#{self.table_name}.created_at DESC")
+  
   
   def set_weight_netto
    begin
@@ -31,5 +39,20 @@ class Weighting < ActiveRecord::Base
   def weight_netto
    super.round
   end
+  
+  
+  private
 
+  def set_shift
+   current_shift = case self.created_at.hour
+	   when 6..14 then 1
+	   when	14..22 then 2
+	   when 22..24 then 3
+	   when 0..6 then 3
+   end
+   
+   self.update_column(:shift, current_shift)
+   
+  end
+  
 end

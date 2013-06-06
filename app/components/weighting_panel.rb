@@ -5,18 +5,13 @@ class WeightingPanel < Application
     c.items = [
 		{
 			item_id: :main_panel,
-      region: :north,
+			region: :north,
 			tbar: [
 				{html: HEADER_HTML}#, :about, :sign_out, :sign_in}
 			]
 		},
-		{component: :weighting_form}
-    #{
-    #  region: :south,
-    #  bbar: [
-    #    :settings
-    #  ]
-    #}
+		{netzke_component: :weighting_form},
+		{netzke_component: :weighting_monitor}
     ]
 	  
   end
@@ -24,5 +19,10 @@ class WeightingPanel < Application
   component :weighting_form do |c|
    c.region = :center
   end
+  
+  component :weighting_monitor do |c|
+   c.region = :south
+   c.split = true 
+  end  
   
 end

@@ -1,6 +1,6 @@
 class WeightingObserver < ActiveRecord::Observer
 
- def after_save(record)
+ def after_create(record)
   t = PrintTrigger.new
   t.printer = "0002"
   t.label = "wiegecoupon.btw"
