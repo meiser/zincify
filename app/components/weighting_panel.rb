@@ -10,8 +10,8 @@ class WeightingPanel < Application
 				{html: HEADER_HTML}#, :about, :sign_out, :sign_in}
 			]
 		},
-		{netzke_component: :weighting_form},
-		{netzke_component: :weighting_monitor}
+		{netzke_component: :weighting_form}#,
+		#{netzke_component: :weighting_monitor}
     ]
 	  
   end
