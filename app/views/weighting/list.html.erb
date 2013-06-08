@@ -1,0 +1,23 @@
+<h1>Tagesliste</h1>
+<p><%= l @shift_time[0] %> bis <%= l @shift_time[1] %></p1>
+<table style = "margin: 2px;">
+<tr>
+    <th>Wiegung</th>
+    <th>Brutto</th>
+    <th>Netto</th>
+	<th>Tara</th>
+	<th>Personalkennung</th>
+	<th>Datum</th>
+</tr>
+
+<% @weightings.each_with_index do |w,i|%>
+	<tr>
+		<td><%= i+1 %></td>
+		<td><%= w.weight_brutto %> <%= w.weight_unit %></td>
+		<td><%= w.weight_netto %> <%= w.weight_unit %></td>
+		<td><%= w.weight_tara %> <%= w.weight_unit %></td>
+		<td><%= w.pid %></td>
+		<td><%= l w.created_at, :format => :coupon %></td>
+	</tr>
+<% end %>
+</table>

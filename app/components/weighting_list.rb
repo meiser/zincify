@@ -2,8 +2,11 @@ class WeightingList < Netzke::Basepack::Grid
 
   js_configure do |c|
    c.on_print_card = <<-JS
-      function(){
-		alert("Doit");
+      function(a){
+		console.log(this);
+		//c.netzkeLoadComponent("weighthing_form", {container: "application", callback: function(cmp) {
+		//alert("geladen");
+		//}, scope: this});
       }
     JS
   end
@@ -82,6 +85,7 @@ class WeightingList < Netzke::Basepack::Grid
   action :print_card do |c|
     c.icon = :printer
 	c.disabled = false
+	#this.netzkeLoadComponent('simple_component');
   end
   
 end

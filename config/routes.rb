@@ -3,12 +3,15 @@ Zincify::Application.routes.draw do
   root :to => "application#start"
   
   
-  
   netzke
 
   devise_for :users
   
-  resources :weighting, :only => [:index, :new, :edit]
+  resources :weighting, :only => [:index, :new, :edit] do
+	collection do
+	 get ':year/:month/:day/:shift' => "weighting#list", :as => 'shift_list', :defaults => { :format => 'html' }
+	end
+  end
 
   #resources :sort_lists
 
