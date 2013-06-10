@@ -42,6 +42,10 @@ class Shift
     @start_time = @date.change(:hour => 22)
 	@end_time = @date.change(:day =>(@date+1.day).day, :hour => 6)
   end
+  
+  @date = @date.utc
+  @start_time = @start_time.utc
+  @end_time = @end_time.utc
  end
  
 end
