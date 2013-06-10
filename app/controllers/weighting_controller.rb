@@ -25,7 +25,7 @@
   if params[:shift].present?
       @selected_shift = Shift.new(params[:shift],@list_date)
 	  @shift = params[:shift]
-	  @weightings = Weighting.where("sort_list_id <>36").where(:created_at => s.start_time..s.end_time)
+	  @weightings = Weighting.where("sort_list_id <>36").where(:created_at => @selected_shift.start_time..@selected_shift.end_time)
 	  @sum = @weightings.sum(:weight_netto)
 	  render :layout => "weight_list"
 	  #render :text => "#{l @shift_time[0]} bis #{l @shift_time[1]}"
