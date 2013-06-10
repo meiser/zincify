@@ -7,8 +7,6 @@
 	    // calling superclass's initComponent
         this.callParent();
 		this.on('submitsuccess', function(){
-			alert("Etikett wird gedruckt");
-			
 			this.getForm().findField("id").reset();
 			this.getForm().findField("barcode").reset();
 			this.getForm().findField("ref").reset();
@@ -75,7 +73,8 @@
 		data["weight_tara"] = scale.tara unless data["weight_tara"].present?
 		params[:data] = ActiveSupport::JSON.encode(data)
 		# call parent
-		super(params,this)		
+		super(params,this)
+		this.netzke_feedback("Etikett wird gedruckt")
 	rescue
 		this.netzke_feedback("Verbindung zur Waage ist gestört. Wiegedaten wurden nicht abgespeichert und es wird kein Etikett gedruckt.")
 		#params[:data] = ActiveSupport::JSON.encode({})
