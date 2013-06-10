@@ -49,3 +49,7 @@ class Shift
  end
  
 end
+
+
+
+#Weighting.where("sort_list_id <>36").where(:created_at => s.start_time..s.end_time).count)
