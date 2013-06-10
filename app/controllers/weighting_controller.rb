@@ -16,21 +16,18 @@
  
  end
  
+ def sum
+   
+ end
+ 
  def list
-  @list_date = DateTime.civil(params[:year].to_i, params[:month].to_i, params[:day].to_i)
+  @list_date = Date.civil(params[:year].to_i, params[:month].to_i, params[:day].to_i)
   if params[:shift].present?
+      @selected_shift = Shift.new(params[:shift],@list_date)
 	  @shift = params[:shift]
-  	  @shift_time = case params[:shift]
-	  when "1"
-		[@list_date.change(:hour => 6), @list_date.change(:hour => 14)]
-	  when "2"
-		[@list_date.change(:hour => 14), @list_date.change(:hour => 22)]
-	  when "3"  
-		[@list_date.change(:hour => 22), @list_date.change(:day =>@list_date.day.next, :hour => 6)]
-	  end
 	  @weightings = Weighting.where(
 		:shift => params[:shift],
-		:created_at => (@shift_time[0]..@shift_time[1])
+		:created_at => (@selected_shift.start_time..@selected_shift.end_time)
 	  )
 	  @sum = @weightings.sum(:weight_netto)
 	  render :layout => "weight_list"

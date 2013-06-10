@@ -1,11 +1,10 @@
-<h1>Tagesliste Schicht <%= @shift %> <%= l @shift_time[0] %> bis <%= l @shift_time[1] %></h1>
+<h1>Tagesliste Schicht <%= @selected_shift.description %> <%= l @selected_shift.start_time %> bis <%= l @selected_shift.end_time %></h1>
 <table style = "margin: 2px;">
 <tr>
     <th></th>
 	<th>Datum</th>
 	<th>PNr</th>
     <th>S</th>
-    <th>Kunde</th>
 	<th>KomNr</th>
 	<th>Sorte</th>
 	<th>Brutto</th>
@@ -21,7 +20,6 @@
 		<td><%= l w.created_at, :format => :coupon %></td>
 		<td><%= w.pid %></td>
 		<td><%= w.shift %></td>
-		<td></td>
 		<td><%= w.ref || w.barcode %></td>
 		<td><%= w.sort_list.description %></td>
 		<td><%= w.weight_brutto %> <%= w.weight_unit %></td>

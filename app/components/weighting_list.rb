@@ -21,7 +21,7 @@ class WeightingList < Netzke::Basepack::Grid
    c.enable_edit_in_form = false
    c.enable_extended_search = false
    c.edit_inline_available = false
-   c.prohibit_delete = true
+   c.prohibit_delete = false
    c.prohibit_create = true
    c.prohibit_update = false
    c.filterable = false

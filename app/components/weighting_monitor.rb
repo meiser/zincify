@@ -1,10 +1,10 @@
-class WeightingMonitor < Netzke::Base
+﻿class WeightingMonitor < Netzke::Base
   
   js_configure do |c|
     c.height = 400
 	c.body_padding = 5
 	c.layout = :border
-	c.title = "Monitor Waage"
+	c.title = "Tagesleistung"
 	c.init_component = <<-JS
 		function(){
 			this.callParent();
@@ -17,7 +17,7 @@ class WeightingMonitor < Netzke::Base
 			var task = new Ext.util.DelayedTask(function(){
 				comp.scalePoll();
 			});
-			task.delay(4000);
+			task.delay(30000);
 	
 		}
 	
@@ -28,15 +28,27 @@ class WeightingMonitor < Netzke::Base
     # updateBodyHtml is a JS-side method we inherit from Netkze::Basepack::Panel
 
     this[:update] = ["#{DateTime.now}"]
+	
   end
   
   endpoint :scale_poll do |params, this|
    begin
-	  scale=Rhewa82::Comfort.new("172.17.206.160",8000)
-	  this[:update] = ["<h1 style='font-size: 2em; text-align:center; color: green;'>#{scale.brutto} #{scale.unit} ( Tara #{scale.tara} #{scale.unit})</h1>".strip]
+	  current_shift = Shift.now
+	  
+	  @weightings = Weighting.where(
+		:shift => current_shift.description,
+		:created_at => (current_shift.start_time..current_shift.end_time)
+	  )
+	  @sum = @weightings.sum(:weight_netto)
+	  if @weightings.present?
+		this[:update] = ["<h1 style='font-size: 2em; text-align:center; color: green;'>#{@weightings.length} Verwiegung(en), #{@sum} #{@weightings.first.weight_unit}</h1>"]
+	  else
+		this[:update] = ["<h1 style='font-size: 2em; text-align:center; color: green;'>In der aktuellen Schicht wurden noch keine Verwiegungen durchgeführt.</h1>"]
+	  end
+	  this.set_title "Tagesleistung Schicht #{current_shift.description}"
 	  this.show_weight
    rescue
-	  this[:update] = ["<h1 style='font-size: 2em; text-align:center; color: red;'>Bitte Warten</h1>"]
+	  this[:update] = ["<h1 style='font-size: 2em; text-align:center; color: red;'>Bitte Warten ...</h1>"]
 	  this.show_weight
    ensure
 	  this.show_weight
