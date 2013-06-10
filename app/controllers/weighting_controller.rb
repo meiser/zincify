@@ -21,7 +21,7 @@
  end
  
  def list
-  @list_date = Date.civil(params[:year].to_i, params[:month].to_i, params[:day].to_i)
+  @list_date = Time.parse("#{params[:year]}-#{params[:month]}-#{params[:day]}")
   if params[:shift].present?
       @selected_shift = Shift.new(params[:shift],@list_date)
 	  @shift = params[:shift]

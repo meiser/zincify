@@ -45,10 +45,10 @@ class Weighting < ActiveRecord::Base
 
   def set_shift
    current_shift = case self.created_at.hour
-	   when 6..14 then 1
-	   when	14..22 then 2
-	   when 22..24 then 3
-	   when 0..6 then 3
+	   when 6..13 then 1
+	   when	14..21 then 2
+	   when 22..23 then 3
+	   when 0..5 then 3
    end
    
    self.update_column(:shift, current_shift)

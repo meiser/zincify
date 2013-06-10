@@ -35,10 +35,7 @@
    begin
 	  current_shift = Shift.now
 	  
-	  @weightings = Weighting.where(
-		:shift => current_shift.description,
-		:created_at => (current_shift.start_time..current_shift.end_time)
-	  )
+	  @weightings = Weighting.where("sort_list_id <>36").where(:created_at => current_shift.start_time..current_shift.end_time)
 	  @sum = @weightings.sum(:weight_netto)
 	  if @weightings.present?
 		this[:update] = ["<h1 style='font-size: 2em; text-align:center; color: green;'>#{@weightings.length} Verwiegung(en), #{@sum} #{@weightings.first.weight_unit}</h1>"]
