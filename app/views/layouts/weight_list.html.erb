@@ -1,0 +1,17 @@
+﻿<html>
+  <head>
+    <meta name="generator" content="zincify" />
+    <title>Verzinkerei Plauen Tagesliste</title>
+	<%= csrf_meta_tags %>
+    <meta charset="utf-8" />
+	<%#= stylesheet_link_tag "application", :media => "all" %>
+  </head>
+  <style>
+	td {text-align: right; padding: 10px;}
+	th {text-align: right; padding: 10px;}
+	tr.sum {font-weight: bold;}
+  </style>
+  <body>
+ 	 <%= yield %>
+  </body>
+</html>

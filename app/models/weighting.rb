@@ -17,7 +17,7 @@ class Weighting < ActiveRecord::Base
   after_save :set_shift
   
   
-  default_scope order("#{self.table_name}.created_at DESC")
+  default_scope order("#{self.table_name}.created_at ASC")
   
   
   def set_weight_netto
