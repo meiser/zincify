@@ -21,7 +21,7 @@
  end
  
  def list
-  @list_date = Time.parse("#{params[:year]}-#{params[:month]}-#{params[:day]}")
+  @list_date = Time.parse("#{params[:year]}-#{params[:month]}-#{params[:day]} 22:00")
   if params[:shift].present?
       @selected_shift = Shift.new(params[:shift],@list_date)
 	  @shift = params[:shift]
