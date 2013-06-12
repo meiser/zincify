@@ -9,13 +9,14 @@
 		this.on('submitsuccess', function(){
 			this.getForm().findField("id").reset();
 			this.getForm().findField("barcode").reset();
-			this.getForm().findField("ref").reset();
-			
+			var ref = this.getForm().findField("ref");
+			kom = ref.getValue().substr(0,2);
+			ref.setValue(kom);			
 			//this.getForm().findField("shift").reset();
 			//this.getForm().findField("weight_brutto").reset();
-			
 			this.getForm().findField("weight_tara").reset();
-			this.items.items[1].focus();
+			this.body.highlight("028102");
+			this.items.items[2].focus();
 		});
 		this.on('afterrender', function(form){
 			form.items.items[1].focus();
@@ -74,7 +75,7 @@
 		params[:data] = ActiveSupport::JSON.encode(data)
 		# call parent
 		super(params,this)
-		this.netzke_feedback("Etikett wird gedruckt")
+		#this.netzke_feedback("Etikett wird gedruckt")
 	rescue
 		this.netzke_feedback("Verbindung zur Waage ist gestört. Wiegedaten wurden nicht abgespeichert und es wird kein Etikett gedruckt.")
 		#params[:data] = ActiveSupport::JSON.encode({})
