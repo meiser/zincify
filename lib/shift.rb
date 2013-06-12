@@ -31,7 +31,7 @@ class Shift
 		@start_time = @date.change(:hour => 22)
 		@end_time = @date.change(:day =>(@date+1.day).day, :hour => 5, :min => 59, :sec => 59)
  	when 0..5
-		@start_time = @date.change(:day =>(@date+-.day).day:hour => 22)
+		@start_time = @date.change(:day =>(@date+-.day).day, :hour => 22)
 		@end_time = @date.change(:hour => 5, :min => 59, :sec => 59)
   end
  end
