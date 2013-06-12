@@ -5,7 +5,7 @@ class Weighting < ActiveRecord::Base
   
   validates :barcode, :presence => {:if => Proc.new { |w| w.ref.nil? }}#, :uniqueness => true
   validates :ref, length: {minimum: 5, maximum: 5}, :if => Proc.new { |w| w.barcode.nil? }
-  validates_format_of :ref, :with => /^(30|31)\d{2}[1-9]$/, :if => Proc.new { |w| w.barcode.nil? }
+  validates_format_of :ref, :with => /^(30|31)\d{3}$/, :if => Proc.new { |w| w.barcode.nil? }
   
   validates :sort_list, :presence => true
   validates :weight_brutto, :numericality => {:greater_than => 0}
