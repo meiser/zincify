@@ -1,7 +1,7 @@
 <h1>Tagesliste Schicht <%= @selected_shift.description %> <%= l @selected_shift.start_time, :format => :coupon %> bis <%= l @selected_shift.end_time, :format => :coupon %></h1>
-<table style = "margin: 2px;">
+<table style>
 <tr>
-    <th></th>
+    <th>Nr</th>
 	<th>Datum</th>
 	<th>PNr</th>
     <th>S</th>
@@ -28,7 +28,7 @@
 	</tr>
 <% end %>
 	<tr class="sum">
-		<td colspan="9"><%= @weightings.count %> Wiegung(en) mit Summe</td>
+		<td colspan="8"><%= @weightings.count %> Wiegung(en) mit Summe</td>
 		<td><%= @sum %><%= @weightings.first.weight_unit %></td>
 	</tr>
 <% end %>
