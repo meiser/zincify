@@ -24,6 +24,10 @@ class ApplicationController < ActionController::Base
   def admin
   
   end
+  
+  def delivery_control
+
+  end
  
   def authenticate_netzke! 
     authenticate_user! if self.class.to_s != "NetzkeController" 

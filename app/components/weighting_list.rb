@@ -17,7 +17,7 @@ class WeightingList < Netzke::Basepack::Grid
    c.rows_per_page = 100
    c.force_fit = true
    c.prevent_header = true
-   c.enable_column_filters = false
+   c.enable_column_filters = true
    c.enable_edit_in_form = false
    c.enable_extended_search = false
    c.edit_inline_available = false

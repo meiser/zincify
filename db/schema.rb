@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130524113518) do
+ActiveRecord::Schema.define(:version => 20130617123922) do
 
   create_table "cash_payer_deliveries", :force => true do |t|
     t.string   "commission"
@@ -85,6 +85,15 @@ ActiveRecord::Schema.define(:version => 20130524113518) do
     t.datetime "updated_at",  :null => false
   end
 
+  create_table "meiser_bundle_tags", :force => true do |t|
+    t.string   "barcode"
+    t.integer  "deliver_reference_id"
+    t.datetime "created_at",           :null => false
+    t.datetime "updated_at",           :null => false
+  end
+
+  add_index "meiser_bundle_tags", ["barcode"], :name => "index_meiser_bundle_tags_on_barcode", :unique => true
+
   create_table "meiser_deliveries", :force => true do |t|
     t.string   "commission"
     t.date     "indate"
@@ -92,9 +101,11 @@ ActiveRecord::Schema.define(:version => 20130524113518) do
     t.text     "remarks"
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
+    t.string   "tag"
   end
 
   add_index "meiser_deliveries", ["commission"], :name => "index_meiser_deliveries_on_commission", :unique => true
+  add_index "meiser_deliveries", ["tag"], :name => "index_meiser_deliveries_on_tag"
 
   create_table "next_free_numbers", :force => true do |t|
     t.string   "name"

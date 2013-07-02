@@ -3,6 +3,15 @@
   formats:
    short: "%d.%m.%Y"
    coupon: "%d.%m.%Y %H:%M:%S"
+ meiser_references:
+  actions:
+   add:
+    text: Neuen Lieferschein anlegen
+ meiser_delivery_grid:
+  actions:
+   add:
+    text: Neue Anlieferung anlegen
+    tooltip: 
  delivery_grid:
    actions:
     print_card:
@@ -51,6 +60,14 @@
  activerecord:
   errors:
    models:
+    weighting:
+     attributes:
+      barcode:
+       not_accepted: nicht gültig
+    meiser_delivery:
+     attributes:
+      tag:
+       wrong_range: nicht gültig
     delivery:
      attributes:
       outdate:
@@ -102,6 +119,7 @@
     name: Kunde
    meiser_delivery:
     commission: Anliefernummer
+    tag: Kommission
     remarks: Anmerkungen
     created_at: Erstellungsdatum
     updated_at: Aktualisiert am
@@ -159,7 +177,7 @@
     outdate: Abholtermin
     deliver_references: Lieferscheine
    deliver_reference:
-    name: Barcode Lieferschein
+    name: Lieferscheinnummer (Barcode)
     created_at: Scandatum
     updated_at: Aktualisiert am
    booking:

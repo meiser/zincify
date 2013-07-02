@@ -1,6 +1,9 @@
 class DeliverReferenceObserver < ActiveRecord::Observer
 
  def after_save(record)
+  #Extraktion Barcodes aus Lieferscheintabellen Baan
+  Delayed::Job.enqueue BundleDataJob.new(record)
+  #Rückmeldung Ankunft in Verzinkerei Plauen
   Delayed::Job.enqueue BundleArrivalJob.new(record.name,DateTime.now)
  end
 

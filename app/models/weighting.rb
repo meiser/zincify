@@ -3,7 +3,9 @@ class Weighting < ActiveRecord::Base
   
   belongs_to :sort_list
   
+  validates_with BarcodeValidator
   validates :barcode, :presence => {:if => Proc.new { |w| w.ref.nil? }}#, :uniqueness => true
+    
   validates :ref, length: {minimum: 5, maximum: 5}, :if => Proc.new { |w| w.barcode.nil? }
   validates_format_of :ref, :with => /^(30|31)\d{3}$/, :if => Proc.new { |w| w.barcode.nil? }
   
@@ -20,7 +22,7 @@ class Weighting < ActiveRecord::Base
   after_save :set_shift
   
   
-  default_scope order("#{self.table_name}.created_at DESC")
+  default_scope order("#{self.table_name}.created_at ASC")
   
   
   def set_weight_netto
@@ -32,15 +34,15 @@ class Weighting < ActiveRecord::Base
   end
   
   def weight_brutto
-   super.round
+   super.try(:round)
   end
   
   def weight_tara
-   super.round
+   super.try(:round)
   end
   
   def weight_netto
-   super.round
+   super.try(:round)
   end
   
   

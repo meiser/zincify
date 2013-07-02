@@ -28,8 +28,13 @@ class MeiserDeliveryGrid < DeliveryGrid
   	super(c)
     c.model = "MeiserDelivery"
 	c.columns = [
+		#{
+		#	:name => :commission,
+		#	:width => 200,
+		#	:read_only => true
+		#},
 		{
-			:name => :commission,
+			:name => :tag,
 			:width => 200,
 			:read_only => true
 		},
@@ -63,6 +68,10 @@ class MeiserDeliveryGrid < DeliveryGrid
    c.title = I18n.t("netzke.titles.new_meiser_delivery")
    c.form_config.items = [
 		{
+			:name => :tag,
+			:width => 200
+		},
+		{
 			:name => :indate,
 			:width => 100,
 			:getter => lambda{|r| I18n.l(DateTime.now, :format => :short)}
@@ -84,6 +93,10 @@ class MeiserDeliveryGrid < DeliveryGrid
    super(c)
    c.title = I18n.t("netzke.titles.edit_delivery")
    c.form_config.items = [
+		{
+			:name => :tag,
+			:width => 200
+		},
 		{
 			:name => :indate,
 			:width => 100,

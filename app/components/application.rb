@@ -29,7 +29,7 @@ class Application < Netzke::Basepack::Viewport
     c.items = [
 		{
 			item_id: :main_panel,
-      region: :north,
+			region: :north,
 			tbar: [
 				{html: HEADER_HTML}#, :about, :sign_out, :sign_in}
 			]

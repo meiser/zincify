@@ -7,12 +7,19 @@ Zincify::Application.routes.draw do
 
   devise_for :users
   
-  resources :weighting, :only => [:index, :new, :edit] do
+  resources :weighting, :only => [:index, :new] do
 	collection do
 	 get ':year/:month/:day/:shift' => "weighting#list", :as => 'shift_list', :defaults => { :format => 'html' }
 	end
   end
 
+  match 'buero' => "application#start"
+  match 'waage' => "weighting#new"
+  match '/waage/:year/:month/:day/:shift' => "weighting#list", :defaults => { :format => 'html' }
+  match '/waage/:year/:month/:day/:shift' => "weighting#list", :as => 'shift_list', :defaults => { :format => 'html' }
+  match 'warenannahme' => "application#delivery_control"
+  
+  
   #resources :sort_lists
 
   #resources :completions
@@ -42,7 +49,7 @@ Zincify::Application.routes.draw do
 
   #resource :printer, :only => :update
   
-  match "weighting/poll" => "weighting#poll", :defaults => { :format => 'json' }
+  #match "weighting/poll" => "weighting#poll", :defaults => { :format => 'json' }
   
   match "admin" => "application#admin"
 
