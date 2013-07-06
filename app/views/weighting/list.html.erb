@@ -32,9 +32,9 @@
 		<td><%= @sum %><%= @weightings.first.weight_unit %></td>
 	</tr>
 <% end %>
-<% unless @weightings.empty? %>
+<% unless @zink_weightings.empty? %>
 
-<% @zink_weightings.each_with_index do |w,i|%>
+	<% @zink_weightings.each_with_index do |w,i|%>
 	<tr>
 		<td><%= i+1 %></td>
 		<td><%= l w.created_at, :format => :coupon %></td>
@@ -46,10 +46,10 @@
 		<td><%= w.weight_tara %> <%= w.weight_unit %>T</td>
 		<td><%= w.weight_netto %> <%= w.weight_unit %>NE</td>
 	</tr>
-<% end %>
+	<% end %>
 	<tr class="sum">
-		<td colspan="8"><%= @zin_weightings.count %> Harzinkverwiegung(en) mit Summe</td>
-		<td><%= @sum %><%= @zink_weightings.first.weight_unit %></td>
+		<td colspan="8"><%= @zink_weightings.count %> Hartzinkverwiegung(en) mit Summe</td>
+		<td><%= @sum_zink %><%= @zink_weightings.first.weight_unit %></td>
 	</tr>
 <% end %>
 

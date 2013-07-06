@@ -33,7 +33,8 @@
 	  
 	  # Nur Hartzinkverwiegungen
 	  @zink_weightings = regular_weightings.where("sort_list_id = 36")
-	  
+	  @sum_zink = @zink_weightings.sum(:weight_netto)
+
 	  render :layout => "weight_list"
 	  #render :text => "#{l @shift_time[0]} bis #{l @shift_time[1]}"
   else
