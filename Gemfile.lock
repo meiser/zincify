@@ -112,9 +112,9 @@ GEM
     mime-types (1.23)
     multi_json (1.7.7)
     net-ldap (0.3.1)
-    netzke-basepack (0.8.4)
+    netzke-basepack (0.8.3)
       netzke-core (~> 0.8.2)
-    netzke-core (0.8.4)
+    netzke-core (0.8.3)
       execjs
       uglifier
     orm_adapter (0.4.0)
@@ -204,8 +204,8 @@ DEPENDENCIES
   linguistics
   meiser-rails!
   net-ldap
-  netzke-basepack
-  netzke-core
+  netzke-basepack (= 0.8.3)
+  netzke-core (= 0.8.3)
   rails (= 3.2.12)
   rails-i18n
   sass-rails (~> 3.2.3)

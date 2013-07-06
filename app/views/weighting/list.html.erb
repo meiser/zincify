@@ -1,4 +1,4 @@
-<h1>Tagesliste Schicht <%= @selected_shift.description %> <%= l @selected_shift.start_time, :format => :coupon %> bis <%= l @selected_shift.end_time, :format => :coupon %></h1>
+﻿<h1>Tagesliste Schicht <%= @selected_shift.description %> <%= l @selected_shift.start_time, :format => :coupon %> bis <%= l @selected_shift.end_time, :format => :coupon %></h1>
 <table style>
 <tr>
     <th>Nr</th>
@@ -32,4 +32,25 @@
 		<td><%= @sum %><%= @weightings.first.weight_unit %></td>
 	</tr>
 <% end %>
+<% unless @weightings.empty? %>
+
+<% @zink_weightings.each_with_index do |w,i|%>
+	<tr>
+		<td><%= i+1 %></td>
+		<td><%= l w.created_at, :format => :coupon %></td>
+		<td><%= w.pid %></td>
+		<td><%= w.shift %></td>
+		<td><%= w.ref || w.barcode %></td>
+		<td><%= w.sort_list.description %></td>
+		<td><%= w.weight_brutto %> <%= w.weight_unit %></td>
+		<td><%= w.weight_tara %> <%= w.weight_unit %>T</td>
+		<td><%= w.weight_netto %> <%= w.weight_unit %>NE</td>
+	</tr>
+<% end %>
+	<tr class="sum">
+		<td colspan="8"><%= @zin_weightings.count %> Harzinkverwiegung(en) mit Summe</td>
+		<td><%= @sum %><%= @zink_weightings.first.weight_unit %></td>
+	</tr>
+<% end %>
+
 </table>
