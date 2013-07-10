@@ -4,6 +4,7 @@ class DeliverReference < ActiveRecord::Base
   validates_uniqueness_of :name, :case_sensitive => true
   
   validates :name, :presence => true
+  validates_length_of :name, :minimum => 9, :maximum => 9
   
   has_many :meiser_bundle_tags, :dependent => :destroy
   

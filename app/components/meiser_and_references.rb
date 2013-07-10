@@ -13,102 +13,76 @@
 
   js_configure do |c|
     c.layout = :border
-    c.border = false
-
+    #c.border = false
+    c.update_references = <<-JS
+		function(my_title, enable){
+			this.getComponent('meiser_references').setTitle(my_title);
+			this.getComponent('meiser_references').getStore().load();
+			this.getComponent('meiser_references').setDisabled(enable);
+		}
+	JS
     # Overriding initComponent
     c.init_component = <<-JS
       function(){
         // calling superclass's initComponent
         this.callParent();
-		// setting the 'rowclick' event
-        
-		md = this.getComponent('meiser_deliveries');
-		mr = this.getComponent('meiser_references');
+		var view = this.getComponent('meiser_deliveries').getView();
 		
-		console.log(md.store);
-		md.getStore().on('del', function(self, records, successful, operation, eOpts){
-			if ((records) && (records.length > 0)) {
-				this.getSelectionModel().select(0);
+		mdstore = view.getStore();
+		
+		mdstore.on('refresh',function(store){
+			if (store.data.length != 0){
+				this.getComponent('meiser_references').setDisabled(true);
+				this.selectMeiserDelivery({delivery_id: store.data.items[0].get('id')});
+				this.getComponent('meiser_references').setDisabled(false);
+				this.getComponent('meiser_deliveries').getSelectionModel().select(0);
+			} else {
+				alert("Leer");
+				this.clearMeiserReference();
+				this.getComponent('meiser_references').setDisabled(true);
 			}
-		}, this);
+		},this);
 		
-		console.log(md);
-		md.on("deleted", function(view, record){
-			//alert("delete");
-			//mr.getView().refresh();
-			//console.log(this);//mr.refresh();
-		}, this);
-		
-		md.on('itemclick', function(view, record){
-			this.getComponent('meiser_references').setDisabled(true);
-			this.selectMeiserDelivery({delivery_id: record.get('id')});
-			this.getComponent('meiser_references').getStore().load();
-			this.getComponent('meiser_references').setDisabled(false);
-		}, this);
-		
-		md.on('focus', function(view, record){
-			this.getComponent('meiser_references').setDisabled(true);
-			this.selectMeiserDelivery({delivery_id: record.get('id')});
-			this.getComponent('meiser_references').getStore().load();
-			this.getComponent('meiser_references').setDisabled(false);
-		}, this);
-		
-		//var meiRef = this.getComponent('meiser_references').getView();
-		//console.log(view.store);
-		//view.store.on("refresh",function(){
-		//	alert("Test");
-		//	//this.selectMeiserDelivery({delivery_id: ""});
-		//	this.getComponent('meiser_references').setTitle("Lieferscheine");
-		//	//this.getComponent('meiser_references').setDisabled(true);
-		//	
-		//	meiRef.getStore().reload();
-		//},this);
-		
-		//
-		//});
-		//console.log(view);
-		//view.on('itemclick', function(view, record){
-		  // The beauty of using Ext.Direct: calling 3 endpoints in a row, which results in a single call to the server!
-        //  this.selectMeiserDelivery({delivery_id: record.get('id')});
-          //console.log(this.getComponent('meiser_references'));
-		//  this.getComponent('meiser_references').getStore().load();
-		//  this.getComponent('meiser_references').setTitle("Lieferscheine für Kommission "+record.data.tag);
-		//  this.getComponent('meiser_references').setDisabled(false);
-          //this.getComponent('boss_details').updateStats();
-		  //if (this.getComponent('meiser_deliveries').getStore().getCount() == 0){
-		//	this.getComponent('meiser_references').setDisabled(false);
-		 // };
-        //}, this);
+        view.on('itemclick', function(view, record){
+          // The beauty of using Ext.Direct: calling 3 endpoints in a row, which results in a single call to the server!
+          
+		  this.getComponent('meiser_references').setDisabled(true);
+		  this.selectMeiserDelivery({delivery_id: record.get('id')});
+        }, this);
 	
-		//console.log(this.getComponent('meiser_deliveries').getStore().getCount());
-		//console.log(view.getStore().getAt(1));
-		//console.log(view.getSelectionModel().getSelection());
-		//,function(key,value){
-		//}
-		//view.selectFirstRow();
-		//console.log(view);
-		//view.selectFirstRow();
       }
     JS
   end
-
-  endpoint :select_meiser_delivery do |params, this|
-    # store selected boss id in the session for this component's instance
+  
+  endpoint :select_meiser_delivery do |params,this|
 	component_session[:selected_meiser_delivery_id] = params[:delivery_id]
+	@meiser_delivery = MeiserDelivery.find(params[:delivery_id])
+	this.update_references "Lieferscheine für Kommission #{@meiser_delivery.tag}"
   end
-
+  
+  endpoint :clear_meiser_reference do |params, this|
+	component_session[:selected_meiser_delivery_id] = nil
+	this.update_references "Lieferscheine", true
+  end
+  
+  endpoint :meiser_delivery do |params, this|
+	
+  end
+  
   component :meiser_deliveries do |c|
    c.klass = MeiserDeliveryGrid
    c.model = "MeiserDelivery"
    c.title = I18n.t("netzke.titles.meiser_deliveries")
    c.tbar = [:add, :del, :edit]
    c.bbar = []
-   c.remember_selection_available = false
+   #c.remember_selection_available = false
   end
 
   component :meiser_references do |c|
     c.klass = Netzke::Basepack::Grid
 	c.model = "DeliverReference"
+	c.eager_loading = true
+	#c.data_store = {auto_load: false}
 	c.title = I18n.t("netzke.titles.deliver_references")
     c.scope = {:delivery_id => component_session[:selected_meiser_delivery_id]}
     c.strong_default_attrs = {:delivery_id => component_session[:selected_meiser_delivery_id]}
