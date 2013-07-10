@@ -37,7 +37,6 @@
 				this.getComponent('meiser_references').setDisabled(false);
 				this.getComponent('meiser_deliveries').getSelectionModel().select(0);
 			} else {
-				alert("Leer");
 				this.clearMeiserReference();
 				this.getComponent('meiser_references').setDisabled(true);
 			}
