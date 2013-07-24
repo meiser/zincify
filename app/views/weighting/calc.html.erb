@@ -1,0 +1,25 @@
+﻿<h1>Abrechnung Meiser Vogtland OHG (<%= l @list_date.beginning_of_day %> - <%= l @list_date.end_of_day %>)</h1>
+<table style>
+<tr>
+	<th>Anzahl Verwiegungen</th>
+	<th>Sorte</th>
+	<th>Brutto</th>
+	<th>Tara</th>
+	<th>Netto</th>
+	<th>Einheit</th>
+</tr>
+
+<% unless @weightings.empty? %>
+	<% @weightings.each do |s| %>
+	<tr>
+		<td><%= s.occ %></td>
+		<td><%= s.sort_list.description %></td>
+		<td><%= s.weight_brutto %></td>
+		<td><%= s.weight_tara %></td>
+		<td><%= s.weight_netto %></td>
+		<td><%= s.weight_unit %></td>
+	</tr>
+	<% end %>
+<% end %>
+
+</table>

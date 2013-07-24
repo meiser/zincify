@@ -14,6 +14,7 @@ class WeightingList < Netzke::Basepack::Grid
 
   def configure(c)
    c.model = "Weighting"
+   c.scope = Proc.new {|rel| rel.unscoped.order("weightings.created_at DESC") }
    c.rows_per_page = 100
    c.force_fit = true
    c.prevent_header = true

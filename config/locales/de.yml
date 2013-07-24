@@ -8,10 +8,20 @@
    add:
     text: Neuen Lieferschein anlegen
  meiser_delivery_grid:
+  edit_window:
+   actions:
+    cancel:
+     text: Bearbeiten
   actions:
    add:
     text: Neue Anlieferung anlegen
-    tooltip: 
+    tooltip: Öffnet ein neues Fenster zur Erstellung einer neuen Meiser-Anlieferung
+   del:
+    text: Anlieferung löschen
+    tooltip: Löscht die aktuell markierten Meiser-Anlieferungen
+   edit:
+    text: Anlieferung bearbeiten
+    tooltip: Öffnet ein neues Fenster zur Bearbeitung der markierten Meiser-Anlieferung
  delivery_grid:
    actions:
     print_card:

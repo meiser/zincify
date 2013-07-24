@@ -19,7 +19,7 @@ Zincify::Application.routes.draw do
   match '/waage/:year/:month/:day/:shift' => "weighting#list", :as => 'shift_list', :defaults => { :format => 'html' }
   match 'warenannahme' => "application#delivery_control"
   
-  
+  match 'abrechnung/:year/:month/:day' => "weighting#calc", :defaults => { :format => 'html' }
   #resources :sort_lists
 
   #resources :completions

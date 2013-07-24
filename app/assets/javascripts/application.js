@@ -14,4 +14,3 @@
 //= require jquery_ujs
 //= require sessions
 // require_tree .
-
