@@ -1,7 +1,6 @@
 class CustomerDeliveryObserver < ActiveRecord::Observer
 
  def after_create(customer_delivery)
-    puts "Hello"
 	t = PrintTrigger.new
 	t.printer = "0001"
   	t.label = "commission.btw"
