@@ -3,10 +3,6 @@
   formats:
    short: "%d.%m.%Y"
    coupon: "%d.%m.%Y %H:%M:%S"
- meiser_references:
-  actions:
-   add:
-    text: Neuen Lieferschein anlegen
  meiser_delivery_grid:
   edit_window:
    actions:
@@ -44,6 +40,9 @@
     deleted_n_records: "%{n} Datensätze wurden gelöscht"
     deleted_records: "Datensatz gelöscht"
     cannot_delete: "Datensatz kann nicht gelöscht werden"
+    actions:
+     apply:
+      text: Abspeichern
   formats:
    date: d.m.Y
    datetime: d.m.Y H:i:s

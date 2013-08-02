@@ -78,14 +78,13 @@
   end
 
   component :meiser_references do |c|
-    c.klass = Netzke::Basepack::Grid
+	c.klass = Netzke::Basepack::Grid
 	c.model = "DeliverReference"
 	c.eager_loading = true
 	#c.data_store = {auto_load: false}
 	c.title = I18n.t("netzke.titles.deliver_references")
     c.scope = {:delivery_id => component_session[:selected_meiser_delivery_id]}
     c.strong_default_attrs = {:delivery_id => component_session[:selected_meiser_delivery_id]}
-	
 	c.columns = [
 		{
 			:name => :name,
