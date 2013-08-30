@@ -24,7 +24,7 @@ module Zincify
     # config.plugins = [ :exception_notification, :ssl_requirement, :all ]
 
     # Activate observers that should always be running.
-    config.active_record.observers = :deliver_reference_observer, :customer_delivery_observer, :cash_payer_delivery_observer, :weighting_observer
+    config.active_record.observers = :meiser_bundle_tag_observer, :deliver_reference_observer, :customer_delivery_observer, :cash_payer_delivery_observer, :weighting_observer
 
     # Set Time.zone default to the specified zone and make Active Record auto-convert to this zone.
     # Run "rake -D time" for a list of tasks for finding time zone names. Default is UTC.

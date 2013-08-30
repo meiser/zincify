@@ -24,6 +24,24 @@ Zincify::Application.routes.draw do
 
   #resources :completions
 
+  #resources 'meiser_deliveries', :only => [:create] do
+   
+  # post :bundles, :on => :collection, :defaults => { :format => 'json' }
+  
+  #end
+  
+  
+  scope '/scanner/wa' do
+    get '/commission/last' => "scanner_wa#last_commission"
+  	get '/commission/check/:commission' => "scanner_wa#check_commission"
+	post '/commission/new' => "scanner_wa#new_commission"
+	post '/barcode/new' => "scanner_wa#new_barcode"
+	post '/barcode/update' => "scanner_wa#update_barcode"
+  end
+  
+  
+  
+  
   #resources :traverses do
   # get :fill, :on => :collection
   #end
