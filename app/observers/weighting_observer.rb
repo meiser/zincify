@@ -43,8 +43,7 @@ class WeightingObserver < ActiveRecord::Observer
  
  def after_save(weighting)
   if weighting.barcode.present?
-	Delayed::Job.enqueue BaanCompletionJob.new(weighting.barcode, weighting.weight_netto, weighting.created_at, "test")
-	
+	Delayed::Job.enqueue BaanCompletionJob.new(weighting.barcode, weighting.weight_netto, weighting.created_at, weighting.pid)
   end
  end
 
