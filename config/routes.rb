@@ -39,6 +39,11 @@ Zincify::Application.routes.draw do
 	post '/barcode/update' => "scanner_wa#update_barcode"
   end
   
+  scope 'scanner/waage' do
+    get 'categories' => 'scanner_waage#categories', :defaults => { :format => 'json' }
+	post 'weighting/new' => 'scanner_waage#new_weighting'
+  end
+  
   
   
   

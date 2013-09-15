@@ -83,6 +83,8 @@
 				
 				render :text => "Barcode bereits für Kommission #{bundle.deliver_reference.meiser_delivery.tag} gescannt. Ändern?"
 			end
+		else
+			render :text => "Kommission wurde gelöscht. Bitte auf ""Zurück"" klicken!!!"
 		end
 	else
 		render :text => "Barcode und Kommission nicht angegeben!!!"
@@ -107,6 +109,8 @@
 			else
 				render :text => bundle.errors
 			end
+		else
+			render :text => "Kommission wurde gelöscht. Bitte auf ""Zurück"" klicken!!!"
 		end
 	else
 		render :text => "Barcode und Kommission für die Aktualisierung nicht angegeben!!!"
