@@ -198,6 +198,7 @@
     description: Bezeichnung
     created_at: Erstellt am
     number: Nummer
+    ranking: Rangfolge
    next_free_number:
     name: Nummernkreis
     description: Bezeichnung

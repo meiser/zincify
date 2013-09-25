@@ -25,8 +25,7 @@
     JS
   end
 
-  def configure(c)
-  
+  def configure(c)  
 	c.model = "Weighting"
 	c.width = 400
 	c.items= [
@@ -47,6 +46,7 @@
 		},
 		{
 			:name => :sort_list__search_string,
+			:scope => lambda {|s| s.order("ranking ASC")},
 			:minChars => 1,
 			:eager_loading => true
 		},

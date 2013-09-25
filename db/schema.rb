@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130617123922) do
+ActiveRecord::Schema.define(:version => 20130925055041) do
 
   create_table "cash_payer_deliveries", :force => true do |t|
     t.string   "commission"
@@ -150,6 +150,7 @@ ActiveRecord::Schema.define(:version => 20130617123922) do
     t.string   "description"
     t.datetime "created_at",  :null => false
     t.datetime "updated_at",  :null => false
+    t.integer  "ranking"
   end
 
   create_table "users", :force => true do |t|

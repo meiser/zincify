@@ -15,12 +15,20 @@ class ZincifyTabPanel < Netzke::Basepack::TabPanel
    c.title = I18n.t("activerecord.models.sort_list")
    c.columns = [
 		{
+			:name => :id,
+			:read_only => true
+		},
+		{
 			:name => :number,
 			:width => 200
 		},
 		{
 			:name => :description,
 			:width => 400,
+		},
+		{
+			:name => :ranking,
+			:width => 200,
 		},
 		{
 			:name => :created_at,

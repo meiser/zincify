@@ -1,5 +1,7 @@
 class SortList < ActiveRecord::Base
-  attr_accessible :description, :number
+  attr_accessible :description, :number, :ranking
+  
+  has_many :weightings, :dependent => :restrict
   
   validates :number,
 	:presence => true,
@@ -8,6 +10,8 @@ class SortList < ActiveRecord::Base
 	:numericality => {:greater_than => 0}
 
   validates :description, :presence => true
+  
+  validates :ranking, :uniqueness => true
 	
   def desc_with_number
    self.number.to_s+" "+self.description
@@ -16,5 +20,6 @@ class SortList < ActiveRecord::Base
   def search_string
   [self.number, self.description].join(" ")
   end
+  
    
 end
