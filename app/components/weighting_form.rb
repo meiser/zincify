@@ -16,7 +16,7 @@
 			//this.getForm().findField("weight_brutto").reset();
 			this.getForm().findField("weight_tara").reset();
 			this.body.highlight("028102");
-			this.items.items[2].focus();
+			this.items.items[1].focus();
 		});
 		this.on('afterrender', function(form){
 			form.items.items[1].focus();
