@@ -197,6 +197,7 @@
    sort_list:
     description: Bezeichnung
     created_at: Erstellt am
+    updated_at: Aktualisiert am
     number: Nummer
     ranking: Rangfolge
    next_free_number:
