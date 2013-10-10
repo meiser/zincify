@@ -8,7 +8,7 @@ class BundleArrivalJobByHandheld < Struct.new(:bundle_id, :scan_date)
    
    if art == '003' and bundle_id.length == 15
 	sql= "UPDATE ttibde914120 SET t_adate=? where t_load=? and t_bund=?"
-	Meiser.update_baan(sql,[scan_date, load, bund])
+	Meiser.update_baan(sql,[scan_date.to_datetime, load, bund])
    end
    
   end
