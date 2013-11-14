@@ -12,7 +12,7 @@ Zincify::Application.routes.draw do
 	 get ':year/:month/:day/:shift' => "weighting#list", :as => 'shift_list', :defaults => { :format => 'html' }
 	end
   end
-
+  
   match 'buero' => "application#start"
   match 'waage' => "weighting#new"
   match '/waage/:year/:month/:day/:shift' => "weighting#list", :defaults => { :format => 'html' }
@@ -34,6 +34,7 @@ Zincify::Application.routes.draw do
   scope '/scanner/wa' do
     get '/commission/last' => "scanner_wa#last_commission"
   	get '/commission/check/:commission' => "scanner_wa#check_commission"
+	get '/commission/barcode_count/:commission' => "scanner_wa#barcode_count_commission"
 	post '/commission/new' => "scanner_wa#new_commission"
 	post '/barcode/new' => "scanner_wa#new_barcode"
 	post '/barcode/update' => "scanner_wa#update_barcode"

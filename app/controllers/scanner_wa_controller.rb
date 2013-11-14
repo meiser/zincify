@@ -76,18 +76,19 @@
 			
 			if bundle.valid?
 				bundle.save
-				render :text => "OK"
+				render :nothing => true, :status => 201, :content_type => 'text/html'
+				#render :text => "mit #{MeiserBundleTag.where(:deliver_reference_id => dr.id).count.to_s} Scan(s)", :status => 201
 			else
 				
 				bundle = MeiserBundleTag.where(:barcode => params[:barcode]).first
 				
-				render :text => "Barcode bereits für Kommission #{bundle.deliver_reference.meiser_delivery.tag} gescannt. Ändern?"
+				render :text => "Barcode bereits für Kommission #{bundle.deliver_reference.meiser_delivery.tag} gescannt. Ändern?", :status => 302
 			end
 		else
-			render :text => "Kommission wurde gelöscht. Bitte auf ""Zurück"" klicken!!!"
+			render :text => "Kommission wurde gelöscht. Bitte auf ""Zurück"" klicken!!!", :status => 404
 		end
 	else
-		render :text => "Barcode und Kommission nicht angegeben!!!"
+		render :text => "Barcode und Kommission nicht angegeben!!!", :status => 406
 	end
   end
 
@@ -107,16 +108,30 @@
 				bundle.save
 				render :text => "OK"
 			else
-				render :text => bundle.errors
+				render :text => bundle.errors, :status => 406
 			end
 		else
-			render :text => "Kommission wurde gelöscht. Bitte auf ""Zurück"" klicken!!!"
+			render :text => "Kommission wurde gelöscht. Bitte auf ""Zurück"" klicken!!!", :status => 404
 		end
 	else
-		render :text => "Barcode und Kommission für die Aktualisierung nicht angegeben!!!"
+		render :text => "Barcode und Kommission für die Aktualisierung nicht angegeben!!!", :status => 406
 	end
 	
   end
+  
+  # Get amount of barcodes for current commission
+  def barcode_count_commission
+	if params[:commission].present?
+		@md= MeiserDelivery.where(:tag => params[:commission]).first
+		if @md.present?
+			dr = DeliverReference.where(:delivery_id =>@md.id, :name => "ScannerWA").first
+			render :text => "mit #{MeiserBundleTag.where(:deliver_reference_id => dr.id).count.to_s} Scan(s)"
+		else
+			render :text => "Unbekannter Fehler", :status => 404
+		end
+	end
+  end
+  
   
 end
 
