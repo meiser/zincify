@@ -5,4 +5,6 @@ class MeiserBundleTag < ActiveRecord::Base
   
   belongs_to :deliver_reference
   
+  has_many :weightings, :primary_key => :barcode, :foreign_key => :barcode
+  
 end

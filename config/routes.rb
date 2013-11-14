@@ -24,7 +24,9 @@ Zincify::Application.routes.draw do
 
   #resources :completions
 
-  #resources 'meiser_deliveries', :only => [:create] do
+  resources 'meiser_deliveries', :only => [:show]
+  
+  # do
    
   # post :bundles, :on => :collection, :defaults => { :format => 'json' }
   

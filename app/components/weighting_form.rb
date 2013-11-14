@@ -72,6 +72,7 @@
 		data["weight_unit"] = scale.unit unless data["weight_brutto"].present?
 		data["weight_brutto"] = scale.brutto unless data["weight_brutto"].present?
 		data["weight_tara"] = scale.tara unless data["weight_tara"].present?
+		data["weight_brutto"] = "432" if Rails.env.development?
 		params[:data] = ActiveSupport::JSON.encode(data)
 		# call parent
 		super(params,this)

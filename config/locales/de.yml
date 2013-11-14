@@ -18,6 +18,9 @@
    edit:
     text: Anlieferung bearbeiten
     tooltip: Öffnet ein neues Fenster zur Bearbeitung der markierten Meiser-Anlieferung
+   list_details_excel:
+    text: Excel-Export
+    tooltip: Öffnet die Informationen der Kommission in einer Excel-Datei zur weiteren Bearbeitung
  delivery_grid:
    actions:
     print_card:

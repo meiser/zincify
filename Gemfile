@@ -51,3 +51,5 @@ gem 'devise_ldap_authenticatable', :git => 'git://github.com/cschiewek/devise_ld
 gem 'netzke-core', '0.8.4' #, :git => "git://github.com/netzke/netzke-core.git"
 gem 'netzke-basepack', '0.8.4' #, :git => "git://github.com/netzke/netzke-basepack.git"
 gem 'extr'#, :path => "../extr"
+
+gem 'spreadsheet'

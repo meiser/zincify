@@ -6,7 +6,10 @@
   skip_before_filter :verify_authenticity_token, :only => [:create, :bundles]
   
   respond_to :json, :only => [:print, :create, :bundles]
-
+  
+  respond_to :xls, :only => :show
+  
+  
   def print
   	@meiser_delivery =MeiserDelivery.find(params[:data].first[:id])
     p @customer = Customer.where(:bpid => "280000001").first
@@ -71,9 +74,6 @@
   
   
   def bundles
-   p "###################################"
-   p params
-   p "###################################"
    if params[:commission].present? and params[:barcode].present?
 		@md= MeiserDelivery.where(:tag => params[:commission]).first
 		@dr= DeliverReference.where(:name => "ScannerWA", :delivery_id => @md).first
@@ -124,7 +124,60 @@
 	
   end
 
+  def show
+  
+	@meiser_delivery = MeiserDelivery.find(params[:id])
+	
+	if @meiser_delivery.present?
+		@bundles = MeiserBundleTag.where(:deliver_reference_id => @meiser_delivery.deliver_reference_ids).includes(:weightings)
+	end
+	
+	respond_with do |format|
+		format.xls {
+		
+			book = Spreadsheet::Workbook.new
+			sheet1 = book.create_worksheet :name => "Kommission #{@meiser_delivery.tag} vom #{I18n.l @meiser_delivery.created_at}"
+			7.times {|x| sheet1.column(x).width = 20}
+			
+			sheet1.row(2).push("Erstellungsdatum:", "#{I18n.l(Time.now)}")
+			
+			
+			
+			sheet1.row(4).push("Kommission", "Barcode", "Brutto", "Netto", "Tara", "Kategorie", "Gewichtseinheit", "Verwogen am")
+			#Datensaetze ab Zeile 5
+			i = 5
+			
+			sum_brutto = 0
+			sum_netto = 0
+			sum_tara = 0
+			
+			@bundles.each do |b|
+			
+				if b.weightings.empty?
+					sheet1.row(i).push(@meiser_delivery.tag, b.barcode)
+					i = i + 1
+				else
+					b.weightings.each do|w|
+						sheet1.row(i).push(@meiser_delivery.tag, b.barcode, w.weight_brutto, w.weight_netto, w.weight_tara, w.sort_list.description, w.weight_unit, w.created_at)
+						i = i + 1
+						sum_brutto = sum_brutto+w.weight_brutto
+						sum_netto = sum_netto+w.weight_netto
+						sum_tara = sum_tara+w.weight_tara
+					end
+				end
+						
+			end
+			
+			sheet1.row(i+3).push("Summen","#{@bundles.count} Bunde",sum_brutto,sum_netto, sum_tara)
 
+			spreadsheet = StringIO.new 
+			book.write spreadsheet 
+			send_data spreadsheet.string, :filename => "Kommission #{@meiser_delivery.tag} vom #{I18n.l @meiser_delivery.created_at}.xls", :type =>  "application/vnd.ms-excel", :disposition => "inline"
+			
+		}
+	end
+	
+  end
 
 end
 

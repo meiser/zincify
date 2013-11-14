@@ -1,29 +1,37 @@
 class MeiserDeliveryGrid < DeliveryGrid
-
+   
   js_configure do |c|
-	c.on_print_card = <<-JS
+   c.force_fit = true
+   
+   
+   c.init_component = <<-JS
       function(){
+        // calling superclass's initComponent
+        this.callParent();
+		this.on("selectionchange",function(selModel){
+			this.actions.listDetailsExcel.setDisabled(selModel.getCount() > 1);
+		});
+      }
+    JS
+   
+   # handler for the 'list details' action
+   c.on_list_details_excel = <<-JS
+      function(m,r){
 		grid = this;
 		Ext.iterate(this.getSelectionModel().getSelection(),function(key,value){
-			Rails.MeiserDeliveriesController.print({"id": key.data.id}, function(r,e){
-				if (r.success == true){
-					Ext.Msg.show({
-					  title: r.title,
-					  width: 300,
-					  msg: r.message,
-					  buttons: Ext.Msg.OK,
-					  icon: Ext.MessageBox.INFO
-					});
-				} else {
-					alert(r.success);
-				}
-			});
+			window.open("meiser_deliveries/"+key.data.id+".xls");
 		});
 		
       }
     JS
   end
-
+  
+  
+  action :list_details_excel do |c|
+    c.icon = :page_white_excel
+	c.disabled = true
+  end
+  
   def configure(c)
   	super(c)
     c.model = "MeiserDelivery"
@@ -60,6 +68,9 @@ class MeiserDeliveryGrid < DeliveryGrid
 			:width => 200
 		}
 	]
+	c.tbar = [:add, :del, :edit, :list_details_excel]
+	c.bbar = []
+   
   end
   
 
@@ -113,5 +124,6 @@ class MeiserDeliveryGrid < DeliveryGrid
 		}
    ]
   end
+ 
   
 end

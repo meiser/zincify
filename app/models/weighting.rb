@@ -2,6 +2,8 @@ class Weighting < ActiveRecord::Base
   attr_accessible :barcode, :ref, :pid, :shift, :sort_list_id, :weight_netto, :weight_brutto, :weight_tara, :scale_ident, :weight_unit
   
   belongs_to :sort_list
+  belongs_to :meiser_bundle_tag, :primary_key => :barcode, :foreign_key => :barcode
+ 
   
   validates_with BarcodeValidator
   validates :barcode, :presence => {:if => Proc.new { |w| w.ref.nil? }}#, :uniqueness => true
@@ -22,7 +24,7 @@ class Weighting < ActiveRecord::Base
   after_save :set_shift
   
   
-  default_scope order("#{self.table_name}.created_at ASC")
+  default_scope includes(:sort_list).order("#{self.table_name}.created_at ASC")
   
   
   def set_weight_netto
