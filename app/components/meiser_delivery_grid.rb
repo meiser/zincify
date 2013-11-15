@@ -171,7 +171,7 @@
   end
   
   def default_context_menu
-	[*super, :list_details_html]
+	[:list_details_html,*super]
   end
   
 end
