@@ -1,0 +1,145 @@
+<style>
+
+	/*Generated from Designmycss.com*/
+table
+{
+    color:#000000;
+    border-collapse:collapse;
+    font:14px Arial, Helvetica, sans-serif;
+	padding:1em;
+	text-align: left;
+}
+ 
+table:hover{
+	cursor: pointer;
+} 
+ 
+th
+{
+    color:#000000;
+    font-weight:bold;
+    padding:8px;
+	background-color:#FFFFFF;
+}
+ 
+tr
+{
+    font-weight:normal;
+}
+ 
+tr:hover td
+{
+    color:#000000;
+}
+ 
+tr:nth-child(odd) td
+{
+	background:#e0e0e0;
+}
+
+tr td:nth-child(2) { /* I don't think they are 0 based */
+   text-align: right;
+}
+ 
+td
+{
+    background:#FFFFFF;
+    padding:3px 8px;
+}
+
+</style>
+
+<div style="margin: 1em;">
+	<table id="info">
+		<thead>
+			<tr>
+				<th colspan="2">Gesamtstatus Kommission <%= @meiser_delivery.tag %></th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>Anzahl Bunde mit Barcodes im Wareneingang</td>
+				<td><%= @bundles.count %></td>
+			</tr>
+			<tr>
+				<td>Anzahl Bunde mit Barcodes im Wareneingang verzinkt</td>
+				<td><%= @count_bundles_ready %></td>
+			</tr>
+			<tr>
+				<td>Bunde ohne Barcode verwogen</td>
+				<td><%= @bundles_without_barcode.count %></td>
+			</tr>
+			<tr>
+				<td>bisherige Summe Kommission Brutto</td>
+				<td><%= number_to_human @sum_brutto, :units => :weight, :precision => 10 %></td>
+			</tr>
+			<tr>
+				<td>bisherige Summe Kommission Netto</td>
+				<td><%= number_to_human @sum_netto, :units => :weight, :precision => 10 %></td>
+			</tr>
+			<tr>
+				<td>bisherige Summe Kommission Tara</td>
+				<td><%= number_to_human @sum_tara, :units => :weight, :precision => 10 %></td>
+			</tr>
+		</tbody>
+	</table>
+</div>
+
+
+<div style="display:table; width: 90%; margin: 1em;">
+
+<table id="detail">
+  <thead>
+    <tr>
+		<th>Barcode</th>
+		<th>Brutto</th>
+		<th>Netto</th>
+		<th>Tara</th>
+		<th>Kategorie</th>
+		<th>GE</th>
+		<th>Datum Wareneingang</th>
+		<th>Datum Verwiegung</th>
+    </tr>
+  </thead>
+  <tbody>
+  
+	<% @bundles.each_with_index do |b,i| %>
+  		<% if b.weightings.empty? %>
+			<tr>
+				<td style="background-color: rgba(200, 54, 54, 0.5);"><%= b.barcode %></td>
+				<td style="background-color: rgba(200, 54, 54, 0.5);" colspan="7"></td>
+			</tr>
+		<% else %>
+			<% b.weightings.each do|w| %>
+			
+				<tr class="info">
+					<td><%= b.barcode %></td>
+					<td><%= number_to_human w.weight_brutto, :units => :weight, :precision => 10 %></td>
+					<td><%= number_to_human w.weight_netto, :units => :weight, :precision => 10 %></td>
+					<td><%= number_to_human w.weight_tara, :units => :weight, :precision => 10 %></td>
+					<td><%= w.sort_list.description %></td>
+					<td><%= w.weight_unit %></td>
+					<td><%= l b.created_at, :format => :coupon %></td>
+					<td><%= l w.created_at, :format => :coupon %></td>
+				</tr>
+				
+			<% end %>
+		<% end %>
+	<% end %>
+	
+	<% @bundles_without_barcode.each do |w| %>
+		<tr>
+			<td></td>
+			<td><%= number_to_human w.weight_brutto, :units => :weight, :precision => 10 %></td>
+			<td><%= number_to_human w.weight_netto, :units => :weight, :precision => 10 %></td>
+			<td><%= number_to_human w.weight_tara, :units => :weight, :precision => 10 %></td>
+			<td><%= w.sort_list.description %></td>
+			<td><%= w.weight_unit %></td>
+			<td><%= l @meiser_delivery.created_at, :format => :coupon %></td>
+			<td><%= l w.created_at, :format => :coupon %></td>
+		</tr>
+	<% end %>
+	
+  </tbody>
+</table>
+</div>

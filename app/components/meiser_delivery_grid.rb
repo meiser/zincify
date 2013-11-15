@@ -1,4 +1,4 @@
-class MeiserDeliveryGrid < DeliveryGrid
+﻿class MeiserDeliveryGrid < DeliveryGrid
    
   js_configure do |c|
    c.force_fit = true
@@ -10,11 +10,12 @@ class MeiserDeliveryGrid < DeliveryGrid
         this.callParent();
 		this.on("selectionchange",function(selModel){
 			this.actions.listDetailsExcel.setDisabled(selModel.getCount() > 1);
+			this.actions.listDetailsHtml.setDisabled(selModel.getCount() > 1);
 		});
       }
     JS
    
-   # handler for the 'list details' action
+   # handler for the 'list details excel' action
    c.on_list_details_excel = <<-JS
       function(m,r){
 		grid = this;
@@ -24,8 +25,52 @@ class MeiserDeliveryGrid < DeliveryGrid
 		
       }
     JS
+   # handler for the 'list details html' action
+   c.on_list_details_html = <<-JS
+      function(m,r){
+		grid = this;
+		Ext.iterate(this.getSelectionModel().getSelection(),function(key,value){
+			var win = new Ext.Window({  
+				id: 'myWindow',  
+				title: 'My First Ext JS Window',  
+				width: 1000,  
+				height: 800, 
+				autoScroll: true,				
+				layout: 'fit',
+				autoLoad : { 
+					method: 'get',
+					url : 'meiser_deliveries/'+key.data.id+'.html',  
+					callback: function(el,a,b){
+						console.log(el);
+						console.log(a);
+						console.log(b);
+					}
+				}
+			});
+			win.modal = true;			
+			win.setTitle("Überblick Kommission "+key.data.tag);
+			win.show();
+			
+			
+			//grid.netzkeLoadComponent("WeightingListPrintDialog", {container: grid, callback: function(cmp) {
+			//	//this.updateInfo(cmp.desc);
+			//	if (cmp.isFloating()) { 
+			//		cmp.modal = true;
+			//		cmp.show(); 
+			//	}
+			//}, scope: this});
+		});
+		
+      }
+    JS
   end
   
+  action :list_details_html do |c|
+    c.icon = :information
+	c.disabled = true
+  end
+  
+  component :weighting_list_print_dialog
   
   action :list_details_excel do |c|
     c.icon = :page_white_excel
@@ -68,7 +113,7 @@ class MeiserDeliveryGrid < DeliveryGrid
 			:width => 200
 		}
 	]
-	c.tbar = [:add, :del, :edit, :list_details_excel]
+	c.tbar = [:add, :del, :edit, :list_details_html]#, :list_details_excel]
 	c.bbar = []
    
   end
@@ -124,6 +169,9 @@ class MeiserDeliveryGrid < DeliveryGrid
 		}
    ]
   end
- 
+  
+  def default_context_menu
+	[*super, :list_details_html]
+  end
   
 end

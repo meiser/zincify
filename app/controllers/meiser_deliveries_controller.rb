@@ -9,6 +9,7 @@
   
   respond_to :xls, :only => :show
   
+  layout false
   
   def print
   	@meiser_delivery =MeiserDelivery.find(params[:data].first[:id])
@@ -128,8 +129,21 @@
   
 	@meiser_delivery = MeiserDelivery.find(params[:id])
 	
+	
 	if @meiser_delivery.present?
+		#alle Bunde mit Barcode
 		@bundles = MeiserBundleTag.where(:deliver_reference_id => @meiser_delivery.deliver_reference_ids).includes(:weightings)
+		
+		#Anzahl verwogene Bunde mit Barcode 
+		@count_bundles_ready = MeiserBundleTag.where(:deliver_reference_id => @meiser_delivery.deliver_reference_ids).joins(:weightings).count(distinct: true)
+		
+		#alle Bunde die mit Kommission eingegeben wurden
+		@bundles_without_barcode = Weighting.where(:ref => @meiser_delivery.tag, :barcode => nil)
+		
+		#bisherige Summe bei der Verwiegung
+		@sum_brutto = Weighting.where(:ref =>@meiser_delivery.tag).sum(:weight_brutto)
+		@sum_netto = Weighting.where(:ref =>@meiser_delivery.tag).sum(:weight_netto)
+		@sum_tara = Weighting.where(:ref =>@meiser_delivery.tag).sum(:weight_tara)
 	end
 	
 	respond_with do |format|
@@ -175,6 +189,7 @@
 			send_data spreadsheet.string, :filename => "Kommission #{@meiser_delivery.tag} vom #{I18n.l @meiser_delivery.created_at}.xls", :type =>  "application/vnd.ms-excel", :disposition => "inline"
 			
 		}
+		format.html
 	end
 	
   end

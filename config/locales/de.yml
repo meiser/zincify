@@ -1,4 +1,14 @@
 ﻿de:
+ weight:
+  centi:
+   one: "g"
+   other: "kg"
+  unit:
+   one: "kg"
+   other: "kg"
+  thousand:
+   one: "t"
+   other: "t"
  time:
   formats:
    short: "%d.%m.%Y"
@@ -21,6 +31,9 @@
    list_details_excel:
     text: Excel-Export
     tooltip: Öffnet die Informationen der Kommission in einer Excel-Datei zur weiteren Bearbeitung
+   list_details_html:
+    text: Überblick Kommission
+    tooltip: Kontrolle des Bearbeitungsstandes der gesamten Kommission
  delivery_grid:
    actions:
     print_card:
