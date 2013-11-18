@@ -5,14 +5,11 @@ class BundleDataJob < Struct.new(:deliver_reference)
 
    load = deliver_reference.name
    
-   Meiser.foreach_baan("SELECT COUNT(*) as count FROM ttibde914120 WHERE t_load = ?",[load]) do |bund|
-	(1..bund["count"]).each do |i|
-		b=MeiserBundleTag.new
-		b.deliver_reference = deliver_reference
-		b.barcode = "003#{deliver_reference.name}"+ "#{i}".rjust(3," ")
-		b.save
-	end
-	
+   Meiser.foreach_baan("SELECT DISTINCT t_bund FROM ttibde914120 where t_load = ?",[load]) do |bund|
+	b=MeiserBundleTag.new
+	b.deliver_reference = deliver_reference
+	b.barcode = "003#{load}"+ "#{bund["t_bund"]}".rjust(3," ")
+	b.save
    end
    
   end
