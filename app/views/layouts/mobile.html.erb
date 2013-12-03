@@ -1,0 +1,15 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+            "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta name="generator" content="zincify" />
+    <title>Verzinkerei Plauen</title>
+	<%= csrf_meta_tags %>
+	<%= stylesheet_link_tag "application", :media => "all" %>
+	<%= javascript_include_tag "application" %>
+  </head>
+  <body id="skeller" style="width:300px; height:200px;">
+	<p id="error"><%= flash[:error] %></p>
+ 	<%= yield %>
+  </body>
+</html>

@@ -24,8 +24,14 @@ Zincify::Application.routes.draw do
 
   #resources :completions
 
-  resources 'meiser_deliveries', :only => [:show]
+  resources :meiser_deliveries do
+	get 'select' => "meiser_deliveries#select", :on => :collection, :as => :select
+  end
   
+  resources :deliver_references do
+	resources :meiser_bundle_tags
+  end
+	#end
   # do
    
   # post :bundles, :on => :collection, :defaults => { :format => 'json' }
@@ -52,10 +58,6 @@ Zincify::Application.routes.draw do
   
   #resources :traverses do
   # get :fill, :on => :collection
-  #end
-
-  #resources :meiser_deliveries do
-  #  post 
   #end
 
   #resources :deliveries do

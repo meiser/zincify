@@ -12,5 +12,43 @@
 //
 //= require jquery
 //= require jquery_ujs
-//= require sessions
+// require sessions
 // require_tree .
+
+// require jquery.mobile-1.3.2
+
+
+$( document ).ready(function() {
+	
+	var $barcode = $("#meiser_bundle_tag_barcode");
+	
+	$barcode.val('');
+	$barcode.focus();
+	$barcode.click(function(){
+		$(this).val('');
+	})
+	
+	$('#meiser_delivery_tag').focus();	
+	//$barcode.blur(function(e){
+			//alert("Focus weg");
+		//$barcode.focus();
+		//this.focus();
+	//	this.focus();
+	//	
+	//})
+		
+	//$("#meiser_bundle_tag_barcode").on('change', function(){
+		
+	//});
+
+    //$(document).keydown(function(e) {
+	//	var code = e.keyCode || e.which;
+		
+	//	if (e.keyCode == 9) {
+	//		e.preventDefault();
+	//		alert('tab');
+	//		$("#meiser_bundle_tag_barcode").focus();
+	//	}
+	//});
+});
+

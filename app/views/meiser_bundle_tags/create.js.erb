@@ -1,0 +1,10 @@
+var $el = $('#skeller'); 
+var x = 1000;
+var originalColor = $el.css('background');
+$el.css('background', '#00ff00');
+setTimeout(function(){
+  $el.css('background', '#ffffff');
+}, x);
+$('#meiser_bundle_tag_barcode').val('');
+$('#meiser_bundle_tag_barcode').focus();
+$('#commission_header').text('Kommission <%= escape_javascript @dr.meiser_delivery.tag %> (<%= @number_bundles %> Scans)');

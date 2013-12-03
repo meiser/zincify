@@ -1,0 +1,6 @@
+﻿<h1 class="header">Warenannahme</h1>
+<p>Bunde scannen für?</p>
+<%= button_to 'Bestehende Kommission', select_meiser_deliveries_path, :method => :get %>
+<%= form_for @meiser_delivery do |f| %>
+	<%= f.submit "Neue Kommission", :confirm => "Wollen Sie wirklich eine neue Anlieferung anlegen?" %>
+<% end %>

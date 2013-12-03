@@ -1,0 +1,7 @@
+﻿<h1>Warenannahme</h1>
+<h2 id="commission_header">Kommission <%= @dr.meiser_delivery.tag %> (<%= @number_bundles %> Scans)</h2>
+<p>Bitte scannen und anschließend bestätigen:</p>
+<%= form_for [@dr, @meiser_bundle_tag], :remote => true do |f| %>
+	<p><%= f.text_field :barcode, :size => 20 %></p>
+	<p><%= f.submit "Bestätigen", :disable_with => "Bitte warten", :style => "height: 100px; width: 240px;" %></p>
+<% end %>

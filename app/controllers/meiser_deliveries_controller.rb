@@ -3,13 +3,13 @@
   # GET /deliveries
   # GET /deliveries.json
   
-  skip_before_filter :verify_authenticity_token, :only => [:create, :bundles]
+  #skip_before_filter :verify_authenticity_token, :only => [:create, :bundles]
   
   respond_to :json, :only => [:print, :create, :bundles]
   
   respond_to :xls, :only => :show
   
-  layout false
+  layout 'mobile'
   
   def print
   	@meiser_delivery =MeiserDelivery.find(params[:data].first[:id])
@@ -30,7 +30,63 @@
   	render :json => data
   end
   
+  def new
+	@meiser_delivery = MeiserDelivery.new
+  end
+  
+  def select
+	@meiser_delivery = MeiserDelivery.new
+  end
+  
   def create
+  
+    if params[:meiser_delivery].present?
+		@md= MeiserDelivery.where(:tag => params[:meiser_delivery][:tag]).first
+		@dr= DeliverReference.where(:name => "ScannerWA", :delivery_id => @md).first
+		
+		if @md.present? and @dr.present?
+			redirect_to new_deliver_reference_meiser_bundle_tag_path(@dr)
+		else
+			redirect_to select_meiser_deliveries_path
+		end
+	else
+  
+	   #get last meiser delivery
+	   @ld=MeiserDelivery.first
+	   
+	   if @ld.present?
+		next_tag = @ld.tag.to_i+1
+		next_tag = next_tag+1 if next_tag == 30000 or next_tag == 31000
+		next_tag = 30001 if next_tag == 32000
+		next_tag = next_tag.to_s
+	   else
+		next_tag = "30001"
+	   end
+	   
+	   @md=MeiserDelivery.new
+	   @md.tag = next_tag
+	   @md.indate= DateTime.now
+	   @md.outdate= @md.indate+1.day
+	   
+	   if @md.valid?
+			MeiserDelivery.transaction do
+				@dr = DeliverReference.new(:name => "ScannerWA")
+				@md.deliver_references= [@dr]
+				@md.save!
+			end
+			redirect_to new_deliver_reference_meiser_bundle_tag_path(@dr)
+	   else
+		redirect_to new_meiser_delivery_path
+	   end
+   
+	end
+  end
+  
+  def scan
+	render :text => "scan"
+  end
+  
+  def create2
    #get last meiser delivery
    @ld=MeiserDelivery.first
    

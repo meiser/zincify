@@ -1,0 +1,39 @@
+﻿var $el = $('#skeller'); 
+var x = 1000;
+var originalColor = $el.css('background');
+$el.css('background', '#ff0000');
+setTimeout(function(){
+  $el.css('background', '#ffffff');
+}, x);
+
+
+var r=confirm('Barcode bereits für Kommission <%= @already_dr.meiser_delivery.tag %> (<%= l @already_dr.meiser_delivery.created_at, :format => :long %>) gescannt. Verschieben in aktuelle Kommission <%= @dr.meiser_delivery.tag %> (<%= l @dr.meiser_delivery.created_at, :format => :long %>) ?');
+if (r==true)
+  {
+  x="You pressed Verschieben!";
+  
+	$.ajax({
+	  type: 'PUT',
+	  url: '<%= deliver_reference_meiser_bundle_tag_path(@already_dr, @already_meiser_bundle_tag, :format => :js) %>',
+	  data: {
+		new_deliver_reference_id: <%= @dr.id %>
+	  },
+	  error: function (xhr, ajaxOptions, thrownError) {
+        alert(xhr.status);
+        alert(thrownError);
+      }
+	}).done(function() {
+	  //alert('Hi');
+	});
+  
+	//alert('<%= deliver_reference_meiser_bundle_tag_path(@already_dr, @already_meiser_bundle_tag) %>');
+	
+  }
+else
+  {
+  x="You pressed nicht verschieben!";
+  }
+
+var $barcode = $("#meiser_bundle_tag_barcode");
+$barcode.val('');
+$barcode.focus();
