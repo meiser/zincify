@@ -14,7 +14,7 @@ class ApplicationController < ActionController::Base
     :password => ENV["VZPL_PASSWORD"],
     :realm => "Bitte geben Sie die Zugangsdaten an"
   
-  
+  rescue_from ActiveRecord::RecordNotFound, :with => :record_not_found
   
      
   def start
@@ -36,6 +36,10 @@ class ApplicationController < ActionController::Base
   #def default_url_options
   #  {:locale => I18n.locale, :debug => true }.merge(super)
   #end
+  
+  def record_not_found
+	redirect_to new_meiser_delivery_path
+  end
 
 end
 

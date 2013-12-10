@@ -2,7 +2,13 @@
 
   layout 'mobile'
   
+  def index
+		@dr = DeliverReference.find(params[:deliver_reference_id])
+		@meiser_bundle_tags = @dr.meiser_bundle_tags
+  end
+  
   def new
+		@dr = DeliverReference.find(params[:deliver_reference_id])
 		@dr = DeliverReference.find(params[:deliver_reference_id])
 		@number_bundles = @dr.meiser_bundle_tags.count
 		@meiser_bundle_tag = MeiserBundleTag.new
@@ -48,6 +54,15 @@
 	else
 	
 	end
+  end
+  
+  def destroy
+	@meiser_bundle_tag = MeiserBundleTag.find(params[:id])
+	@dr = DeliverReference.find(params[:deliver_reference_id])
+	
+	@meiser_bundle_tag.destroy
+	
+	redirect_to deliver_reference_meiser_bundle_tags_path(@dr)
   end
 
 end

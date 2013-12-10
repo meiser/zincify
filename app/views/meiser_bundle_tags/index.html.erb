@@ -1,0 +1,9 @@
+﻿<h1>Warenannahme</h1>
+<h2 id="commission_header">Scans Kommission <%= @dr.meiser_delivery.tag %></h2>
+<h2><%= link_to "Weiterscannen", new_deliver_reference_meiser_bundle_tag_path(@dr)%></h2>
+<ol>
+	<% @meiser_bundle_tags.each do |bundle| %>
+			<li><%= bundle.barcode %> <%= link_to("Löschen",[@dr,bundle], :confirm => "Wirklich den Bund #{bundle.barcode} löschen?", :method => :delete) %></li>
+	<% end %>
+
+</ol>
