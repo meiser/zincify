@@ -193,9 +193,8 @@
 		#Anzahl verwogene Bunde mit Barcode 
 		@count_bundles_ready = MeiserBundleTag.where(:deliver_reference_id => @meiser_delivery.deliver_reference_ids).joins(:weightings).count(distinct: true)
 		
-		#alle Bunde die mit Kommission eingegeben wurden
-		@bundles_without_barcode = Weighting.where(:ref => @meiser_delivery.tag, :barcode => nil)
-		
+		#alle Bunde die mit Kommission eingegeben wurden, bereinigt nach Zeit, da Kommission mehrmals durchlaufen sein kann
+		@bundles_without_barcode = Weighting.where(:ref => @meiser_delivery.tag, :barcode => nil).reject{|w| @meiser_delivery.created_at > w.created_at}
 		#bisherige Summe bei der Verwiegung
 		@sum_brutto = Weighting.where(:ref =>@meiser_delivery.tag).sum(:weight_brutto)
 		@sum_netto = Weighting.where(:ref =>@meiser_delivery.tag).sum(:weight_netto)

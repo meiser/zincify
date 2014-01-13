@@ -74,13 +74,14 @@ td
 				<td><%= @sum_brutto %> kg</td>
 			</tr>
 			<tr>
-				<td>bisherige Summe Kommission Netto</td>
-				<td><%= @sum_netto %> kg</td>
-			</tr>
-			<tr>
 				<td>bisherige Summe Kommission Tara</td>
 				<td><%=@sum_tara %> kg</td>
 			</tr>
+			<tr>
+				<td>bisherige Summe Kommission Netto</td>
+				<td><%= @sum_netto %> kg</td>
+			</tr>
+			
 		</tbody>
 	</table>
 </div>
@@ -117,8 +118,8 @@ td
 				<tr class="info">
 					<td><%= b.barcode %></td>
 					<td><%= w.weight_brutto %></td>
-					<td><%= w.weight_netto %></td>
 					<td><%= w.weight_tara %></td>
+					<td><%= w.weight_netto %></td>
 					<td><%= w.sort_list.description %></td>
 					<td><%= w.weight_unit %></td>
 					<td><%= l b.created_at, :format => :coupon %></td>
@@ -130,18 +131,16 @@ td
 	<% end %>
 	
 	<% @bundles_without_barcode.each do |w| %>
-		<% if @meiser_delivery.created_at > w.created_at %>
 			<tr>
 				<td></td>
 				<td><%= w.weight_brutto %></td>
-				<td><%= w.weight_netto %></td>
 				<td><%= w.weight_tara %></td>
+				<td><%= w.weight_netto %></td>
 				<td><%= w.sort_list.description %></td>
 				<td><%= w.weight_unit %></td>
 				<td><%= l @meiser_delivery.created_at, :format => :coupon %></td>
 				<td><%= l w.created_at, :format => :coupon %></td>
 			</tr>
-		<% end %>
 	<% end %>
 	
   </tbody>
