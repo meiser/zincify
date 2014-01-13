@@ -8,7 +8,7 @@ GIT
 
 GIT
   remote: git://github.com/meiser/meiser-rails.git
-  revision: e371476b1192f0e0e8a875ccb1eaf2a3cb9772dd
+  revision: 7312e06cb994eef2ab2079e012f228b22fb6855d
   specs:
     meiser-rails (0.0.1)
       ibm_db (~> 2.5.10)
@@ -88,7 +88,7 @@ GEM
       rails (> 3.0)
     gravatar_image_tag (1.1.3)
     hike (1.2.3)
-    i18n (0.6.5)
+    i18n (0.6.9)
     ibm_db (2.5.11)
       activerecord (>= 1.15.1)
     ibm_db (2.5.11-x86-mingw32)

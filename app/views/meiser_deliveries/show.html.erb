@@ -71,15 +71,15 @@ td
 			</tr>
 			<tr>
 				<td>bisherige Summe Kommission Brutto</td>
-				<td><%= number_to_human @sum_brutto, :units => :weight, :precision => 10 %></td>
+				<td><%= @sum_brutto %> kg</td>
 			</tr>
 			<tr>
 				<td>bisherige Summe Kommission Netto</td>
-				<td><%= number_to_human @sum_netto, :units => :weight, :precision => 10 %></td>
+				<td><%= @sum_netto %> kg</td>
 			</tr>
 			<tr>
 				<td>bisherige Summe Kommission Tara</td>
-				<td><%= number_to_human @sum_tara, :units => :weight, :precision => 10 %></td>
+				<td><%=@sum_tara %> kg</td>
 			</tr>
 		</tbody>
 	</table>
@@ -107,16 +107,18 @@ td
   		<% if b.weightings.empty? %>
 			<tr>
 				<td style="background-color: rgba(200, 54, 54, 0.5);"><%= b.barcode %></td>
-				<td style="background-color: rgba(200, 54, 54, 0.5);" colspan="7"></td>
+				<td style="background-color: rgba(200, 54, 54, 0.5);" colspan="5"></td>
+				<td style="background-color: rgba(200, 54, 54, 0.5);"><%= l b.created_at, :format => :coupon %></td>
+				<td style="background-color: rgba(200, 54, 54, 0.5);"></td>
 			</tr>
 		<% else %>
 			<% b.weightings.each do|w| %>
 			
 				<tr class="info">
 					<td><%= b.barcode %></td>
-					<td><%= number_to_human w.weight_brutto, :units => :weight, :precision => 10 %></td>
-					<td><%= number_to_human w.weight_netto, :units => :weight, :precision => 10 %></td>
-					<td><%= number_to_human w.weight_tara, :units => :weight, :precision => 10 %></td>
+					<td><%= w.weight_brutto %></td>
+					<td><%= w.weight_netto %></td>
+					<td><%= w.weight_tara %></td>
 					<td><%= w.sort_list.description %></td>
 					<td><%= w.weight_unit %></td>
 					<td><%= l b.created_at, :format => :coupon %></td>
@@ -128,16 +130,18 @@ td
 	<% end %>
 	
 	<% @bundles_without_barcode.each do |w| %>
-		<tr>
-			<td></td>
-			<td><%= number_to_human w.weight_brutto, :units => :weight, :precision => 10 %></td>
-			<td><%= number_to_human w.weight_netto, :units => :weight, :precision => 10 %></td>
-			<td><%= number_to_human w.weight_tara, :units => :weight, :precision => 10 %></td>
-			<td><%= w.sort_list.description %></td>
-			<td><%= w.weight_unit %></td>
-			<td><%= l @meiser_delivery.created_at, :format => :coupon %></td>
-			<td><%= l w.created_at, :format => :coupon %></td>
-		</tr>
+		<% if @meiser_delivery.created_at > w.created_at %>
+			<tr>
+				<td></td>
+				<td><%= w.weight_brutto %></td>
+				<td><%= w.weight_netto %></td>
+				<td><%= w.weight_tara %></td>
+				<td><%= w.sort_list.description %></td>
+				<td><%= w.weight_unit %></td>
+				<td><%= l @meiser_delivery.created_at, :format => :coupon %></td>
+				<td><%= l w.created_at, :format => :coupon %></td>
+			</tr>
+		<% end %>
 	<% end %>
 	
   </tbody>
