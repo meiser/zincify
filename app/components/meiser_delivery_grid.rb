@@ -34,17 +34,12 @@
 				id: 'myWindow',  
 				title: 'My First Ext JS Window',  
 				width: 1000,  
-				height: 800, 
+				height: 600, 
 				autoScroll: true,				
 				layout: 'fit',
 				autoLoad : { 
 					method: 'get',
-					url : 'meiser_deliveries/'+key.data.id+'.html',  
-					callback: function(el,a,b){
-						console.log(el);
-						console.log(a);
-						console.log(b);
-					}
+					url : 'meiser_deliveries/'+key.data.id+'.html'  
 				}
 			});
 			win.modal = true;			

@@ -31,8 +31,6 @@
 				
 				render :already_scanned
 			else
-				p "############NICHT GueLTIG############"
-				
 				render :js => "window.location.href='"+new_deliver_reference_meiser_bundle_tag_path(@dr, :format => :html)+"'"
 				#redirect_to new_deliver_reference_meiser_bundle_tag_path(@dr, :format => :html)
 			end

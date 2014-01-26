@@ -38,13 +38,17 @@ tr:nth-child(odd) td
 }
 
 tr td:nth-child(2) { /* I don't think they are 0 based */
-   text-align: right;
+
 }
  
 td
 {
     background:#FFFFFF;
     padding:3px 8px;
+}
+
+td.weight {
+	text-align: right;
 }
 
 </style>
@@ -115,11 +119,11 @@ td
 		<% else %>
 			<% b.weightings.each do|w| %>
 			
-				<tr class="info">
+				<tr>
 					<td><%= b.barcode %></td>
-					<td><%= w.weight_brutto %></td>
-					<td><%= w.weight_tara %></td>
-					<td><%= w.weight_netto %></td>
+					<td class="weight"><%= w.weight_brutto %></td>
+					<td class="weight"><%= w.weight_tara %></td>
+					<td class="weight"><%= w.weight_netto %></td>
 					<td><%= w.sort_list.description %></td>
 					<td><%= w.weight_unit %></td>
 					<td><%= l b.created_at, :format => :coupon %></td>
@@ -133,9 +137,9 @@ td
 	<% @bundles_without_barcode.each do |w| %>
 			<tr>
 				<td></td>
-				<td><%= w.weight_brutto %></td>
-				<td><%= w.weight_tara %></td>
-				<td><%= w.weight_netto %></td>
+				<td class="weight"><%= w.weight_brutto %></td>
+				<td class="weight"><%= w.weight_tara %></td>
+				<td class="weight"><%= w.weight_netto %></td>
 				<td><%= w.sort_list.description %></td>
 				<td><%= w.weight_unit %></td>
 				<td><%= l @meiser_delivery.created_at, :format => :coupon %></td>
