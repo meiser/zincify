@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130925055041) do
+ActiveRecord::Schema.define(:version => 20140126221820) do
 
   create_table "cash_payer_deliveries", :force => true do |t|
     t.string   "commission"
@@ -88,8 +88,11 @@ ActiveRecord::Schema.define(:version => 20130925055041) do
   create_table "meiser_bundle_tags", :force => true do |t|
     t.string   "barcode"
     t.integer  "deliver_reference_id"
-    t.datetime "created_at",           :null => false
-    t.datetime "updated_at",           :null => false
+    t.datetime "created_at",                                         :null => false
+    t.datetime "updated_at",                                         :null => false
+    t.decimal  "weight_raw",           :precision => 8, :scale => 2
+    t.text     "info"
+    t.string   "zinc"
   end
 
   add_index "meiser_bundle_tags", ["barcode"], :name => "index_meiser_bundle_tags_on_barcode", :unique => true

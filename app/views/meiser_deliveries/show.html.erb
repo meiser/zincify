@@ -63,27 +63,27 @@ td.weight {
 		<tbody>
 			<tr>
 				<td>Anzahl Bunde mit Barcodes im Wareneingang</td>
-				<td><%= @bundles.count %></td>
+				<td class="weight"><%= @bundles.count %></td>
 			</tr>
 			<tr>
 				<td>Anzahl Bunde mit Barcodes im Wareneingang verzinkt</td>
-				<td><%= @count_bundles_ready %></td>
+				<td class="weight"><%= @count_bundles_ready %></td>
 			</tr>
 			<tr>
 				<td>Bunde ohne Barcode verwogen</td>
-				<td><%= @bundles_without_barcode.count %></td>
+				<td class="weight"><%= @bundles_without_barcode.count %></td>
 			</tr>
 			<tr>
 				<td>bisherige Summe Kommission Brutto</td>
-				<td><%= @sum_brutto %> kg</td>
+				<td class="weight"><%= @sum_brutto %> kg</td>
 			</tr>
 			<tr>
 				<td>bisherige Summe Kommission Tara</td>
-				<td><%=@sum_tara %> kg</td>
+				<td class="weight"><%=@sum_tara %> kg</td>
 			</tr>
 			<tr>
 				<td>bisherige Summe Kommission Netto</td>
-				<td><%= @sum_netto %> kg</td>
+				<td class="weight"><%= @sum_netto %> kg</td>
 			</tr>
 			
 		</tbody>
@@ -97,6 +97,9 @@ td.weight {
   <thead>
     <tr>
 		<th>Barcode</th>
+		<th>Verzinkung</th>
+		<th>Besonderheiten</th>
+		<th>Roh</th>
 		<th>Brutto</th>
 		<th>Tara</th>
 		<th>Netto</th>
@@ -112,6 +115,9 @@ td.weight {
   		<% if b.weightings.empty? %>
 			<tr>
 				<td style="background-color: rgba(200, 54, 54, 0.5);"><%= b.barcode %></td>
+				<td style="background-color: rgba(200, 54, 54, 0.5);"><%= b.zinc %></td>
+				<td style="background-color: rgba(200, 54, 54, 0.5);"><%= b.info %></td>
+				<td style="background-color: rgba(200, 54, 54, 0.5);"><%= b.weight_raw %></td>
 				<td style="background-color: rgba(200, 54, 54, 0.5);" colspan="5"></td>
 				<td style="background-color: rgba(200, 54, 54, 0.5);"><%= l b.created_at, :format => :coupon %></td>
 				<td style="background-color: rgba(200, 54, 54, 0.5);"></td>
@@ -121,6 +127,9 @@ td.weight {
 			
 				<tr>
 					<td><%= b.barcode %></td>
+					<td><%= b.zinc %></td>
+					<td><%= b.info %></td>
+					<td class="weight"><%= b.weight_raw %></td>
 					<td class="weight"><%= w.weight_brutto %></td>
 					<td class="weight"><%= w.weight_tara %></td>
 					<td class="weight"><%= w.weight_netto %></td>
@@ -136,6 +145,9 @@ td.weight {
 	
 	<% @bundles_without_barcode.each do |w| %>
 			<tr>
+				<td></td>
+				<td></td>
+				<td></td>
 				<td></td>
 				<td class="weight"><%= w.weight_brutto %></td>
 				<td class="weight"><%= w.weight_tara %></td>

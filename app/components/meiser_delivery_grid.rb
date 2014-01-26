@@ -33,7 +33,7 @@
 			var win = new Ext.Window({  
 				id: 'myWindow',  
 				title: 'My First Ext JS Window',  
-				width: 1000,  
+				width: 1200,
 				height: 600, 
 				autoScroll: true,				
 				layout: 'fit',
