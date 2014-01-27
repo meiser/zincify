@@ -12,7 +12,7 @@ class BundleInfoJob < Struct.new(:bundle)
    
    Meiser.foreach_baan("SELECT t_wght, t_verzink, t_dicke FROM ttibde915120 where t_load = ? and t_bund = ?",[delivery, bund]) do |bund|
 	# get weight bundle
-	#bundle.weight_raw = bund["t_wght"]
+	bundle.weight_raw = bund["t_wght"]
 	
 	#Besondere Verzinkung
 	Meiser.foreach_baan("SELECT tttadv401000.t_ctnm from tttadv401000 where t_cpac = ? and t_cdom = ? and t_vers = ? and t_rele = ? and t_cust = ? and t_cnst = ?",["ti","bde.verzink","B50C", "c", "mg1", bund["t_verzink"]]) do |domain|
@@ -36,14 +36,8 @@ class BundleInfoJob < Struct.new(:bundle)
 	end
 		
 	
-	# get zinc
-	# table domain ttadv401120
-	
 	
 	bundle.save
-	#bundle.barcode = "003#{load}"+ "#{bund["t_bund"]}".rjust(3," ")
-	#b.save
-	
 	
 	
 	
