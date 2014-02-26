@@ -85,7 +85,10 @@ td.weight {
 				<td>bisherige Summe Kommission Netto</td>
 				<td class="weight"><%= @sum_netto %> kg</td>
 			</tr>
-			
+			<tr>
+				<td>bisherige Summe Kommission Roh</td>
+				<td class="weight"><%= @sum_raw %> kg</td>
+			</tr>
 		</tbody>
 	</table>
 </div>
@@ -99,10 +102,10 @@ td.weight {
 		<th>Barcode</th>
 		<th>Verzinkung</th>
 		<th>Besonderheiten</th>
-		<th>Roh</th>
 		<th>Brutto</th>
 		<th>Tara</th>
 		<th>Netto</th>
+		<th>Roh</th>
 		<th>Kategorie</th>
 		<th>GE</th>
 		<th>Datum Wareneingang</th>
@@ -117,8 +120,9 @@ td.weight {
 				<td style="background-color: rgba(200, 54, 54, 0.5);"><%= b.barcode %></td>
 				<td style="background-color: rgba(200, 54, 54, 0.5);"><%= b.zinc %></td>
 				<td style="background-color: rgba(200, 54, 54, 0.5);"><%= b.info %></td>
+				<td style="background-color: rgba(200, 54, 54, 0.5);" colspan="3"></td>
 				<td class="weight" style="background-color: rgba(200, 54, 54, 0.5);"><%= b.weight_raw %></td>
-				<td style="background-color: rgba(200, 54, 54, 0.5);" colspan="5"></td>
+				<td style="background-color: rgba(200, 54, 54, 0.5);" colspan="2"></td>
 				<td style="background-color: rgba(200, 54, 54, 0.5);"><%= l b.created_at, :format => :coupon %></td>
 				<td style="background-color: rgba(200, 54, 54, 0.5);"></td>
 			</tr>
@@ -129,10 +133,10 @@ td.weight {
 					<td><%= b.barcode %></td>
 					<td><%= b.zinc %></td>
 					<td><%= b.info %></td>
-					<td class="weight"><%= b.weight_raw %></td>
 					<td class="weight"><%= w.weight_brutto %></td>
 					<td class="weight"><%= w.weight_tara %></td>
 					<td class="weight"><%= w.weight_netto %></td>
+					<td class="weight"><%= b.weight_raw %></td>
 					<td><%= w.sort_list.description %></td>
 					<td><%= w.weight_unit %></td>
 					<td><%= l b.created_at, :format => :coupon %></td>
@@ -148,10 +152,10 @@ td.weight {
 				<td></td>
 				<td></td>
 				<td></td>
-				<td></td>
 				<td class="weight"><%= w.weight_brutto %></td>
 				<td class="weight"><%= w.weight_tara %></td>
 				<td class="weight"><%= w.weight_netto %></td>
+				<td></td>
 				<td><%= w.sort_list.description %></td>
 				<td><%= w.weight_unit %></td>
 				<td><%= l @meiser_delivery.created_at, :format => :coupon %></td>

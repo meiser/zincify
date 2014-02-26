@@ -205,6 +205,8 @@
 		@sum_brutto = w.sum(:weight_brutto)
 		@sum_netto = w.sum(:weight_netto)
 		@sum_tara = w.sum(:weight_tara)
+		@sum_raw = @bundles.sum(:weight_raw)
+		
 	end
 	
 	respond_with do |format|
