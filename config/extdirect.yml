@@ -2,6 +2,7 @@ Rails:
  MeiserDeliveriesController:
   methods:
    print: 1
+   print_commission: 1
  CustomerDeliveriesController:
   methods:
    print: 1

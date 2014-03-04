@@ -113,54 +113,57 @@ td.weight {
     </tr>
   </thead>
   <tbody>
-  
-	<% @bundles.each_with_index do |b,i| %>
-  		<% if b.weightings.empty? %>
-			<tr>
-				<td style="background-color: rgba(200, 54, 54, 0.5);"><%= b.barcode %></td>
-				<td style="background-color: rgba(200, 54, 54, 0.5);"><%= b.zinc %></td>
-				<td style="background-color: rgba(200, 54, 54, 0.5);"><%= b.info %></td>
-				<td style="background-color: rgba(200, 54, 54, 0.5);" colspan="3"></td>
-				<td class="weight" style="background-color: rgba(200, 54, 54, 0.5);"><%= b.weight_raw %></td>
-				<td style="background-color: rgba(200, 54, 54, 0.5);" colspan="2"></td>
-				<td style="background-color: rgba(200, 54, 54, 0.5);"><%= l b.created_at, :format => :coupon %></td>
-				<td style="background-color: rgba(200, 54, 54, 0.5);"></td>
-			</tr>
-		<% else %>
-			<% b.weightings.each do|w| %>
-			
+	<% if @bundles.present? %>
+		<% @bundles.each_with_index do |b,i| %>
+			<% if b.weightings.empty? %>
 				<tr>
-					<td><%= b.barcode %></td>
-					<td><%= b.zinc %></td>
-					<td><%= b.info %></td>
-					<td class="weight"><%= w.weight_brutto %></td>
-					<td class="weight"><%= w.weight_tara %></td>
-					<td class="weight"><%= w.weight_netto %></td>
-					<td class="weight"><%= b.weight_raw %></td>
-					<td><%= w.sort_list.description %></td>
-					<td><%= w.weight_unit %></td>
-					<td><%= l b.created_at, :format => :coupon %></td>
-					<td><%= l w.created_at, :format => :coupon %></td>
+					<td style="background-color: rgba(200, 54, 54, 0.5);"><%= b.barcode %></td>
+					<td style="background-color: rgba(200, 54, 54, 0.5);"><%= b.zinc %></td>
+					<td style="background-color: rgba(200, 54, 54, 0.5);"><%= b.info %></td>
+					<td style="background-color: rgba(200, 54, 54, 0.5);" colspan="3"></td>
+					<td class="weight" style="background-color: rgba(200, 54, 54, 0.5);"><%= b.weight_raw %></td>
+					<td style="background-color: rgba(200, 54, 54, 0.5);" colspan="2"></td>
+					<td style="background-color: rgba(200, 54, 54, 0.5);"><%= l b.created_at, :format => :coupon %></td>
+					<td style="background-color: rgba(200, 54, 54, 0.5);"></td>
 				</tr>
+			<% else %>
+				<% b.weightings.each do|w| %>
 				
+					<tr>
+						<td><%= b.barcode %></td>
+						<td><%= b.zinc %></td>
+						<td><%= b.info %></td>
+						<td class="weight"><%= w.weight_brutto %></td>
+						<td class="weight"><%= w.weight_tara %></td>
+						<td class="weight"><%= w.weight_netto %></td>
+						<td class="weight"><%= b.weight_raw %></td>
+						<td><%= w.sort_list.description %></td>
+						<td><%= w.weight_unit %></td>
+						<td><%= l b.created_at, :format => :coupon %></td>
+						<td><%= l w.created_at, :format => :coupon %></td>
+					</tr>
+					
+				<% end %>
 			<% end %>
 		<% end %>
 	<% end %>
 	
-	<% @bundles_without_barcode.each do |w| %>
-			<tr>
-				<td></td>
-				<td></td>
-				<td></td>
-				<td class="weight"><%= w.weight_brutto %></td>
-				<td class="weight"><%= w.weight_tara %></td>
-				<td class="weight"><%= w.weight_netto %></td>
-				<td></td>
-				<td><%= w.sort_list.description %></td>
-				<td><%= w.weight_unit %></td>
-				<td><%= l @meiser_delivery.created_at, :format => :coupon %></td>
-				<td><%= l w.created_at, :format => :coupon %></td>
-			</tr>
+	<% if @bundles_without_barcode.present? %>
+		<% @bundles_without_barcode.each do |w| %>
+				<tr>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td class="weight"><%= w.weight_brutto %></td>
+					<td class="weight"><%= w.weight_tara %></td>
+					<td class="weight"><%= w.weight_netto %></td>
+					<td></td>
+					<td><%= w.sort_list.description %></td>
+					<td><%= w.weight_unit %></td>
+					<td><%= l @meiser_delivery.created_at, :format => :coupon %></td>
+					<td><%= l w.created_at, :format => :coupon %></td>
+				</tr>
+		<% end %>
 	<% end %>
 	
   </tbody>

@@ -58,6 +58,28 @@
 		
       }
     JS
+	# handler for the 'print card' action
+	c.on_print_card = <<-JS
+      function(){
+		grid = this;
+		Ext.iterate(this.getSelectionModel().getSelection(),function(key,value){
+			Rails.MeiserDeliveriesController.print_commission({"id": key.data.id}, function(r,e){
+				if (r.success == true){
+					Ext.Msg.show({
+					  title: r.title,
+					  width: 300,
+					  msg: r.message,
+					  buttons: Ext.Msg.OK,
+					  icon: Ext.MessageBox.INFO
+					});
+				} else {
+					alert(r.success);
+				}
+			});
+		});
+		
+      }
+    JS
   end
   
   action :list_details_html do |c|
@@ -69,6 +91,11 @@
   
   action :list_details_excel do |c|
     c.icon = :page_white_excel
+	c.disabled = true
+  end
+  
+  action :print_card do |c|
+    c.icon = :printer
 	c.disabled = true
   end
   
@@ -108,7 +135,7 @@
 			:width => 200
 		}
 	]
-	c.tbar = [:add, :del, :edit, :list_details_html]#, :list_details_excel]
+	c.tbar = [:add, :del, :edit, :list_details_html, :print_card]#, :list_details_excel]
 	c.bbar = []
    
   end

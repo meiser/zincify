@@ -5,7 +5,7 @@
   
   #skip_before_filter :verify_authenticity_token, :only => [:create, :bundles]
   
-  respond_to :json, :only => [:print, :create, :bundles]
+  respond_to :json, :only => [:print, :print_commission, :create, :bundles]
   
   respond_to :xls, :only => :show
   
@@ -28,6 +28,44 @@
   	}
 
   	render :json => data
+  end
+  
+  def print_commission
+	@meiser_delivery =MeiserDelivery.find(params[:data].first[:id])
+
+	@dr = @meiser_delivery.deliver_references.try(:first)
+	
+	if @dr.present?
+		@meiser_bundle_tag = MeiserBundleTag.new
+		@meiser_bundle_tag.barcode = NextFreeNumber.generate("Meiser")
+		@meiser_bundle_tag.deliver_reference = @dr
+		if @meiser_bundle_tag.valid?
+			@meiser_bundle_tag.save
+			
+			@customer = Customer.find_by_bpid("280000001")
+			
+			t = PrintTrigger.new
+			t.printer = "0001"
+			t.label = "commission.btw"
+			t.data = "#{@meiser_bundle_tag.barcode}|#{@customer.name}|#{[@customer.name, @customer.address].join(": ")}|#{l(@meiser_delivery.indate)}|#{l(@meiser_delivery.outdate)}|#{@meiser_delivery.remarks}|#{@meiser_delivery.tag}"
+			t.save
+			
+			
+			data={
+				:title => 'Etikett drucken',
+				:message => 'Druckauftrag erfolgreich erstellt',
+				:success => true
+			}
+		else
+			data={
+				:title => 'Etikett drucken',
+				:message => 'Fehler 400 Resource DeliverReference not found',
+				:success => false
+			}
+		end
+	end
+	
+	render :json => data
   end
   
   def new
