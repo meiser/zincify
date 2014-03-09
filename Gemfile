@@ -54,5 +54,4 @@ gem 'extr'#, :path => "../extr"
 
 gem 'spreadsheet'
 gem 'ruby-oci8', require: 'oci8'
-gem 'wicked_pdf'
-#gem 'prawn'
+gem 'prawn'

@@ -40,9 +40,78 @@
 		render :layout => "weight_list"
 	end
 	format.pdf do
-		render :pdf => "TageslisteSchicht#{@selected_shift.description}_#{I18n.l(@list_date, :format => :short)}",
-			:formats => [:html],
-			:layout => "weight_list"
+	
+		pdf = Prawn::Document.new
+		pdf.text "Tagesliste Schicht #{ @selected_shift.description} #{l @selected_shift.start_time, :format => :coupon } bis #{l @selected_shift.end_time, :format => :coupon }"
+
+		
+		items = []
+		
+		items << ["Nr", "Datum", "PNr", "Schicht", "KomNr", "Sorte", "Brutto", "Tara", "Netto"]
+		
+		unless @weightings.empty?
+
+		
+			@weightings.each_with_index do |w,i|
+				items <<
+				[
+					i+1,
+					l(w.created_at, :format => :coupon),
+					w.pid,
+					w.shift,
+					w.ref || w.barcode,
+					w.sort_list.description,
+					"#{w.weight_brutto} #{w.weight_unit}",
+					"#{w.weight_tara} #{w.weight_unit}T",
+					"#{w.weight_netto} #{w.weight_unit}NE"
+				]
+			end
+			
+			items << [
+				{:content => "#{@weightings.count} Wiegung(en) mit Summe", :colspan => 8},
+				"#{@sum} #{@weightings.first.weight_unit}"
+			]
+			
+		end
+		
+		unless @zink_weightings.empty?
+			items << [
+				{:content => "ES WURDEN FOLGENDE HARTZINKVERWIEGUNGEN DURCHGEFÜHRT", :colspan => 9}
+			]
+			
+			@zink_weightings.each_with_index do |w,i|
+				items <<
+					[
+						i+1,
+						l(w.created_at, :format => :coupon),
+						w.pid,
+						w.shift,
+						w.ref || w.barcode,
+						w.sort_list.description,
+						"#{w.weight_brutto} #{w.weight_unit}",
+						"#{w.weight_tara} #{w.weight_unit}T",
+						"#{w.weight_netto} #{w.weight_unit}NE"
+					]
+			end
+			
+			
+			items << [
+				{:content => "#{@zink_weightings.count} Wiegung(en) mit Summe", :colspan => 8},
+				"#{@sum_zink} #{@zink_weightings.first.weight_unit}"
+			]
+		end
+
+		unless items.empty?
+			pdf.table items, :header => true,
+				:row_colors => ["FFFFFF", "E1EEf4"],
+				:cell_style => { :size => 10, :align => :right } do
+				row(0).font_style = :bold	
+			end
+		end
+		
+		send_data pdf.render, filename: "TageslisteVerwiegungenSchicht#{@selected_shift.description}_#{@selected_shift.date.strftime("%Y%m%d")}.pdf",
+                          type: "application/pdf",
+                          disposition: "inline"
 	end
  end
   
