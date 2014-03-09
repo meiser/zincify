@@ -31,16 +31,16 @@ gem 'validates_timeliness', '~> 3.0'
 gem 'gravatar_image_tag'
 gem 'rails-i18n'
 
-gem 'linguistics'
+#gem 'linguistics'
 
 gem 'delayed_job'
 gem 'delayed_job_active_record'
-gem 'daemons'
+#gem 'daemons'
 gem 'validates_timeliness', '~> 3.0'
 
 # SUPPORT SQL_SERVER
 gem 'tiny_tds'
-gem 'activerecord-sqlserver-adapter', :git => 'git://github.com/rails-sqlserver/activerecord-sqlserver-adapter.git'
+gem 'activerecord-sqlserver-adapter', '3.2.12'# :git => 'git://github.com/rails-sqlserver/activerecord-sqlserver-adapter.git'
 
 # Authentification
 gem 'devise'
@@ -53,3 +53,6 @@ gem 'netzke-basepack', '0.8.4' #, :git => "git://github.com/netzke/netzke-basepa
 gem 'extr'#, :path => "../extr"
 
 gem 'spreadsheet'
+gem 'ruby-oci8', require: 'oci8'
+gem 'wicked_pdf'
+#gem 'prawn'

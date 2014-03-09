@@ -3,14 +3,23 @@ class WeightingList < Netzke::Basepack::Grid
   js_configure do |c|
    c.on_print_card = <<-JS
       function(a){
-		console.log(this);
-		//c.netzkeLoadComponent("weighthing_form", {container: "application", callback: function(cmp) {
-		//alert("geladen");
-		//}, scope: this});
+		this.netzkeLoadComponent("weighting_select_form_window", {
+			container: "application__zincify_tab_panel",
+			configOnly: false,
+			callback: function(w){
+				//w.height = Ext.getBody().getViewSize().height*0.8,
+				//w.width = Ext.getBody().getViewSize().width*0.8,
+				w.modal = true;
+				w.show();	
+			}}
+		);
       }
     JS
   end
 
+  component :weighting_select_form_window do |c|
+	c.region = :north
+  end
 
   def configure(c)
    c.model = "Weighting"

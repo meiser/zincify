@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140126221820) do
+ActiveRecord::Schema.define(:version => 20140306074407) do
 
   create_table "cash_payer_deliveries", :force => true do |t|
     t.string   "commission"
@@ -81,6 +81,13 @@ ActiveRecord::Schema.define(:version => 20140126221820) do
     t.string   "name"
     t.text     "content"
     t.integer  "delivery_id"
+    t.datetime "created_at",  :null => false
+    t.datetime "updated_at",  :null => false
+  end
+
+  create_table "item_base_data", :force => true do |t|
+    t.string   "item"
+    t.string   "description"
     t.datetime "created_at",  :null => false
     t.datetime "updated_at",  :null => false
   end
@@ -180,15 +187,18 @@ ActiveRecord::Schema.define(:version => 20140126221820) do
     t.string   "barcode"
     t.string   "ref"
     t.integer  "sort_list_id"
-    t.decimal  "weight_netto",  :precision => 8, :scale => 2
-    t.decimal  "weight_brutto", :precision => 8, :scale => 2
-    t.decimal  "weight_tara",   :precision => 8, :scale => 2
-    t.datetime "created_at",                                  :null => false
-    t.datetime "updated_at",                                  :null => false
+    t.decimal  "weight_netto",      :precision => 8, :scale => 2
+    t.decimal  "weight_brutto",     :precision => 8, :scale => 2
+    t.decimal  "weight_tara",       :precision => 8, :scale => 2
+    t.datetime "created_at",                                      :null => false
+    t.datetime "updated_at",                                      :null => false
     t.string   "pid"
     t.string   "shift"
     t.string   "scale_ident"
     t.string   "weight_unit"
+    t.integer  "item_base_data_id"
   end
+
+  add_index "weightings", ["item_base_data_id"], :name => "index_weightings_on_item_base_data_id"
 
 end

@@ -1,4 +1,7 @@
 Rails:
+ ItemBaseDataController:
+  methods:
+   sync_item_base_data: 0
  MeiserDeliveriesController:
   methods:
    print: 1

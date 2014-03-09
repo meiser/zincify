@@ -2,6 +2,7 @@ class Weighting < ActiveRecord::Base
   attr_accessible :barcode, :ref, :pid, :shift, :sort_list_id, :weight_netto, :weight_brutto, :weight_tara, :scale_ident, :weight_unit
   
   belongs_to :sort_list
+  belongs_to :item_base_data
   belongs_to :meiser_bundle_tag, :primary_key => :barcode, :foreign_key => :barcode
  
   

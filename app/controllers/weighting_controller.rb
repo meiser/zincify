@@ -32,8 +32,20 @@
   # Nur Hartzinkverwiegungen
   @zink_weightings = regular_weightings.where("sort_list_id = 36")
   @sum_zink = @zink_weightings.sum(:weight_netto)
-	
-  render :layout => "weight_list"
+
+  
+  
+  respond_to do |format|
+	format.html do
+		render :layout => "weight_list"
+	end
+	format.pdf do
+		render :pdf => "TageslisteSchicht#{@selected_shift.description}_#{I18n.l(@list_date, :format => :short)}",
+			:formats => [:html],
+			:layout => "weight_list"
+	end
+ end
+  
  end
   
  private

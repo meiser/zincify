@@ -13,6 +13,25 @@
   formats:
    short: "%d.%m.%Y"
    coupon: "%d.%m.%Y %H:%M:%S"
+ weighting_select_form:
+  actions:
+   open_html:
+    text: Liste im Browser öffnen
+    tooltip: Öffnet die Liste der Verwiegungen in einem neuen Browserfenster
+   open_pdf:
+    text: Liste als PDF öffnen
+    tooltip: Öffnet die Liste der Verwiegungen als PDF-Datei
+   open_excel:
+    text: Liste als Excel öffnen
+    tooltip: Öffnet die Liste der Verwiegungen als Excel-Datei
+   apply:
+    text: Verwiegeliste als PDF öffnen
+    tooltip: Öffnet für die angegebene Schicht des gewählten Tages die Wiegeliste als PDF 
+ article_grid:
+  actions:
+   sync_item_base_data:
+    text: Stammdaten Artikel aktualisieren
+    tooltip: Stellt eine Verbindung zur Artikeldatenbank von Baan LN her und bringt die hier angezeigten Artikelinformationen auf den akutellen Stand.  
  meiser_delivery_grid:
   edit_window:
    actions:
@@ -42,8 +61,8 @@
  weighting_list:
   actions:
    print_card:
-    text: Tagesliste drucken
-    tooltip: Drucken der Tagesliste Verwiegungen
+    text: Tagesliste Verwiegungen
+    tooltip: Ruf Dialog zum Drucken der Tagesliste Verwiegungen auf
  netzke:
   basepack:
    form:
@@ -100,6 +119,7 @@
       deliver_references:
        at_least_one:  müssen vergeben werden (mindestens 1x) 
   models:
+   item_base_data: Stammartikel Baan
    user: Benutzer
    cash_payer: Barzahler
    completion: Fertigmeldung
@@ -113,6 +133,11 @@
    next_free_number: "Nächste freie Nummer"
    weighting_list: Verwiegungen
   attributes:
+   item_base_data:
+    item: Artikelcode
+    description: Artikelbeschreibung
+    created_at: Erstellungsdatum in Anwendung Verzinkerei
+    updated_at: letzter Abgleich mit Baan
    user:
     login: Login
     email: E-mail

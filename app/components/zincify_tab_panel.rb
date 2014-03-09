@@ -2,6 +2,7 @@ class ZincifyTabPanel < Netzke::Basepack::TabPanel
 
   component :delivery_panel do |c|
    c.title = I18n.t("activerecord.models.delivery")
+   c.prevent_header = true
   end
   
   component :sort_list do |c|
@@ -45,12 +46,19 @@ class ZincifyTabPanel < Netzke::Basepack::TabPanel
   
   component :weighting_list do |c|
      c.title = I18n.t("activerecord.models.weighting_list")
+	 c.prevent_header = true
+  end
+  
+  component :article_grid do |c|
+     #c.title = "Stammdaten Artikel"
+	 c.title = I18n.t("activerecord.models.item_base_data")
+	 c.prevent_header = true
   end
   
   def configure(c)
-  	c.active_tab = 0
+  	c.active_tab = 2
 	c.prevent_header = true
-    c.items = [:delivery_panel,:sort_list,:weighting_list]
+    c.items = [:delivery_panel,:sort_list,:weighting_list, :article_grid]
 	super(c)
   end
 

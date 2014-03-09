@@ -1,21 +1,23 @@
 ﻿<h1>Tagesliste Schicht <%= @selected_shift.description %> <%= l @selected_shift.start_time, :format => :coupon %> bis <%= l @selected_shift.end_time, :format => :coupon %></h1>
+<div class="datagrid">
 <table style>
+<thead>
 <tr>
     <th>Nr</th>
 	<th>Datum</th>
-	<th>PNr</th>
-    <th>S</th>
-	<th>KomNr</th>
+	<th>Personalnummer</th>
+    <th>Schicht</th>
+	<th>Kommissionnummer</th>
 	<th>Sorte</th>
 	<th>Brutto</th>
 	<th>Tara</th>
 	<th>Netto</th>
 </tr>
-
+</thead>
 <% unless @weightings.empty? %>
 
 <% @weightings.each_with_index do |w,i|%>
-	<tr>
+	<tr class="<%= cycle('', 'alt') -%>">
 		<td><%= i+1 %></td>
 		<td><%= l w.created_at, :format => :coupon %></td>
 		<td><%= w.pid %></td>
@@ -27,15 +29,15 @@
 		<td><%= w.weight_netto %> <%= w.weight_unit %>NE</td>
 	</tr>
 <% end %>
-	<tr class="sum">
-		<td colspan="8"><%= @weightings.count %> Wiegung(en) mit Summe</td>
-		<td><%= @sum %><%= @weightings.first.weight_unit %></td>
+	<tr>
+		<td style="background-color:#006699; color:#ffffff;" colspan="8"><%= @weightings.count %> Wiegung(en) mit Summe</td>
+		<td style="background-color:#006699; color:#ffffff;"><%= @sum %><%= @weightings.first.weight_unit %></td>
 	</tr>
 <% end %>
 <% unless @zink_weightings.empty? %>
 
 	<% @zink_weightings.each_with_index do |w,i|%>
-	<tr>
+	<tr class="<%= cycle('', 'alt') -%>">
 		<td><%= i+1 %></td>
 		<td><%= l w.created_at, :format => :coupon %></td>
 		<td><%= w.pid %></td>
@@ -47,10 +49,12 @@
 		<td><%= w.weight_netto %> <%= w.weight_unit %>NE</td>
 	</tr>
 	<% end %>
-	<tr class="sum">
-		<td colspan="8"><%= @zink_weightings.count %> Hartzinkverwiegung(en) mit Summe</td>
-		<td><%= @sum_zink %><%= @zink_weightings.first.weight_unit %></td>
+	<tr>
+		<td style="background-color:#006699; color:#ffffff;" colspan="8"><%= @zink_weightings.count %> Hartzinkverwiegung(en) mit Summe</td>
+		<td style="background-color:#006699; color:#ffffff;"><%= @sum_zink %><%= @zink_weightings.first.weight_unit %></td>
 	</tr>
 <% end %>
 
 </table>
+
+</div>

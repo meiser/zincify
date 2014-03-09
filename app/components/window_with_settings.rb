@@ -12,12 +12,16 @@ class WindowWithSettings < Netzke::Basepack::Window
 
   def configure(c)
     c.persistence = false
-    c.items = [:next_free_numbers]
+    c.items = [:weighting_form]
+	#c.items = [:next_free_numbers]
     c.title = "Einstellungen"
-    #c.maxHeight = 300
-    #c.autoShow = true
+    c.closable = true
   end
 
+  component :weighting_form do |c|
+	
+  end
+  
   component :next_free_numbers do |c|
   	c.klass = Netzke::Basepack::Grid
   	c.model = "NextFreeNumber"
