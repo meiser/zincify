@@ -104,7 +104,7 @@
 		unless items.empty?
 			pdf.table items, :header => true,
 				:row_colors => ["FFFFFF", "E1EEf4"],
-				:cell_style => { :size => 10, :align => :right } do
+				:cell_style => { :size => 8, :align => :right } do
 				row(0).font_style = :bold	
 			end
 		end
