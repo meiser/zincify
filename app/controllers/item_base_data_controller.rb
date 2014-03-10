@@ -8,9 +8,11 @@ class ItemBaseDataController <  ApplicationController
 		conn_echt = OCI8.new('bsp','triton123', '//BaanEcht:1521/erpln.meiser.de')
 
 		conn_echt.exec("select t$item, t$dsca from erpln.ttcibd001280") do |row|
-			item = ItemBaseData.find_or_initialize_by_item(row[0])
-			item.description = row[1]
-			item.save
+			if row[0][9] == 'V'
+				item = ItemBaseData.find_or_initialize_by_item(row[0])
+				item.description = row[1]
+				item.save
+			end
 		end
 
 		data={
