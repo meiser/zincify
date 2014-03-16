@@ -56,7 +56,7 @@ class ZincifyTabPanel < Netzke::Basepack::TabPanel
   end
   
   def configure(c)
-  	c.active_tab = 2
+  	c.active_tab = 0
 	c.prevent_header = true
     c.items = [:delivery_panel,:sort_list,:weighting_list, :article_grid]
 	super(c)

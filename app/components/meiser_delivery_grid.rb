@@ -11,9 +11,33 @@
 		this.on("selectionchange",function(selModel){
 			this.actions.listDetailsExcel.setDisabled(selModel.getCount() > 1);
 			this.actions.listDetailsHtml.setDisabled(selModel.getCount() > 1);
+			this.actions.setItems.setDisabled(selModel.getCount() > 1);
 		});
       }
     JS
+	
+   # handler for the 'application_' action
+   c.on_set_items = <<-JS
+      function(m,r){
+		Ext.iterate(this.getSelectionModel().getSelection(),function(key,value){
+			var win = new Ext.Window({  
+				id: 'set_items_window',  
+				autoScroll: true,				
+				layout: 'fit',
+				autoLoad: { 
+					method: 'get',
+					url : 'meiser_deliveries/'+key.data.id+'.html?item=1'  
+				}
+			});
+			win.modal = true;			
+			win.setTitle("Festlegen der Baan-Artikel für Kommission "+key.data.tag);
+			win.height = Ext.getBody().getViewSize().height*0.9,
+			win.width = Ext.getBody().getViewSize().width*0.9,
+			win.show();
+		});
+      }
+   JS
+   
    
    # handler for the 'list details excel' action
    c.on_list_details_excel = <<-JS
@@ -82,6 +106,11 @@
     JS
   end
   
+  action :set_items do |c|
+    c.icon = :application_form
+	c.disabled = true
+  end
+  
   action :list_details_html do |c|
     c.icon = :information
 	c.disabled = true
@@ -136,7 +165,7 @@
 		}
 	]
 	c.tbar = [:add, :del, :edit, :list_details_html, :print_card]#, :list_details_excel]
-	c.bbar = []
+	c.bbar = [:set_items]
    
   end
   
@@ -193,7 +222,7 @@
   end
   
   def default_context_menu
-	[:list_details_html,*super]
+	[:list_details_html,:set_items,*super]
   end
   
 end

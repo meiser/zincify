@@ -55,6 +55,12 @@
     tooltip: Kontrolle des Bearbeitungsstandes der gesamten Kommission
  delivery_grid:
    actions:
+    set_items:
+     text: Artikel festlegen
+     tooltip: Für jede Verwiegung den Baan-Artikel hinterlegen
+    add:
+     text: Hinzufügen
+     tooltip: Fügt einen neuen Datensatz hinzu
     print_card:
      text: Etikett drucken
      tooltip: Druckt ein Etikett für alle selektierten Anlieferungen

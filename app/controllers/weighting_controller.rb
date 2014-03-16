@@ -117,6 +117,15 @@
   
  end
   
+ def test
+	params[:weighting_ids].each_with_index do |id,j|
+		@weighting = Weighting.find(id)
+		@item_base_data = ItemBaseData.find(params[:item_base_data_ids][j])
+		@weighting.update_column(:item_base_data_id, @item_base_data.id)
+	end
+	render :nothing => true
+ end 
+ 
  private
  
  def parse_time

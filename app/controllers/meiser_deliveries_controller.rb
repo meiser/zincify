@@ -222,7 +222,7 @@
   def show
   
 	@meiser_delivery = MeiserDelivery.find(params[:id])
-	
+	@item_base_data = ItemBaseData.all
 	
 	if @meiser_delivery.present?
 		#alle Bunde mit Barcode
@@ -244,7 +244,6 @@
 		@sum_netto = w.sum(:weight_netto)
 		@sum_tara = w.sum(:weight_tara)
 		@sum_raw = @bundles.sum(:weight_raw)
-		
 	end
 	
 	respond_with do |format|

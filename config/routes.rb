@@ -10,6 +10,7 @@ Zincify::Application.routes.draw do
   resources :weighting, :only => [:index, :new] do
 	collection do
 	 get ':year/:month/:day/:shift' => "weighting#list", :as => 'shift_list', :defaults => { :format => 'html' }
+	 post 'item'
 	end
   end
   

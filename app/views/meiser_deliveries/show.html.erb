@@ -1,4 +1,4 @@
-<style>
+﻿<style>
 
 	/*Generated from Designmycss.com*/
 table
@@ -52,7 +52,6 @@ td.weight {
 }
 
 </style>
-
 <div style="margin: 1em;">
 	<table id="info">
 		<thead>
@@ -99,6 +98,7 @@ td.weight {
 <table id="detail">
   <thead>
     <tr>
+		<th><%= check_box_tag 'weighting_selected_all', false, false %></th>
 		<th>Barcode</th>
 		<th>Verzinkung</th>
 		<th>Besonderheiten</th>
@@ -110,13 +110,26 @@ td.weight {
 		<th>GE</th>
 		<th>Datum Wareneingang</th>
 		<th>Datum Verwiegung</th>
+		<% if params[:item].present? %>
+			<th>Artikel Baan</th>
+		<% end %>
     </tr>
   </thead>
   <tbody>
+  
+  <%= form_tag(item_weighting_index_path, :remote => true, :id => "change_item_form") do %>
+  
+	<% if params[:item].present? %>
+		<%= select_tag "", options_from_collection_for_select(@item_base_data, "id","item_dsca"), :id => "item_base_data_all_selected", :disabled => true %>
+		<%= button_tag "markierte Artikel setzen", :id => "change_item", :disabled => true %>
+
+	<% end %>
+  
 	<% if @bundles.present? %>
 		<% @bundles.each_with_index do |b,i| %>
 			<% if b.weightings.empty? %>
 				<tr>
+					<td style="background-color: rgba(200, 54, 54, 0.5);"></td>
 					<td style="background-color: rgba(200, 54, 54, 0.5);"><%= b.barcode %></td>
 					<td style="background-color: rgba(200, 54, 54, 0.5);"><%= b.zinc %></td>
 					<td style="background-color: rgba(200, 54, 54, 0.5);"><%= b.info %></td>
@@ -130,6 +143,7 @@ td.weight {
 				<% b.weightings.each do|w| %>
 				
 					<tr>
+						<td><%= check_box_tag "weightings_ids[]", w.id, false, {:id => "weighting_ids_#{w.id}", :class => "weighting_selected"} %></td>
 						<td><%= b.barcode %></td>
 						<td><%= b.zinc %></td>
 						<td><%= b.info %></td>
@@ -141,6 +155,7 @@ td.weight {
 						<td><%= w.weight_unit %></td>
 						<td><%= l b.created_at, :format => :coupon %></td>
 						<td><%= l w.created_at, :format => :coupon %></td>
+						<%= render :partial => "set_items", :locals => {:w => w} %>
 					</tr>
 					
 				<% end %>
@@ -162,10 +177,14 @@ td.weight {
 					<td><%= w.weight_unit %></td>
 					<td><%= l @meiser_delivery.created_at, :format => :coupon %></td>
 					<td><%= l w.created_at, :format => :coupon %></td>
+					<%= render :partial => "set_items", :locals => {:w => w} %>
 				</tr>
 		<% end %>
 	<% end %>
-	
+	<% if params[:item].present? %>
+		<%= button_tag "Speichern", :disable_with => "Please wait..." %>
+	<% end %>
+<% end %>
   </tbody>
 </table>
 </div>
