@@ -117,7 +117,7 @@
   
  end
   
- def test
+ def item
 	params[:weighting_ids].each_with_index do |id,j|
 		@weighting = Weighting.find(id)
 		@item_base_data = ItemBaseData.find(params[:item_base_data_ids][j])
