@@ -98,7 +98,9 @@ td.weight {
 <table id="detail">
   <thead>
     <tr>
-		<th><%= check_box_tag 'weighting_selected_all', false, false %></th>
+		<% if params[:item].present? %>
+			<th><%= check_box_tag 'weighting_selected_all', false, false %></th>
+		<% end %>
 		<th>Barcode</th>
 		<th>Verzinkung</th>
 		<th>Besonderheiten</th>
@@ -122,7 +124,6 @@ td.weight {
 	<% if params[:item].present? %>
 		<%= select_tag "", options_from_collection_for_select(@item_base_data, "id","item_dsca"), :id => "item_base_data_all_selected", :disabled => true %>
 		<%= button_tag "markierte Artikel setzen", :id => "change_item", :disabled => true %>
-
 	<% end %>
   
 	<% if @bundles.present? %>
@@ -143,7 +144,9 @@ td.weight {
 				<% b.weightings.each do|w| %>
 				
 					<tr>
-						<td><%= check_box_tag "weightings_ids[]", w.id, false, {:id => "weighting_ids_#{w.id}", :class => "weighting_selected"} %></td>
+						<% if params[:item].present? %>
+							<td><%= check_box_tag "weightings_ids[]", w.id, false, {:id => "weighting_ids_#{w.id}", :class => "weighting_selected"} %></td>
+						<% end %>
 						<td><%= b.barcode %></td>
 						<td><%= b.zinc %></td>
 						<td><%= b.info %></td>
