@@ -140,7 +140,9 @@ td.weight {
 					<td class="weight" style="background-color: rgba(200, 54, 54, 0.5);"><%= b.weight_raw %></td>
 					<td style="background-color: rgba(200, 54, 54, 0.5);" colspan="2"></td>
 					<td style="background-color: rgba(200, 54, 54, 0.5);"><%= l b.created_at, :format => :coupon %></td>
-					<td style="background-color: rgba(200, 54, 54, 0.5);"></td>
+					<% if params[:item].present? %>
+						<td style="background-color: rgba(200, 54, 54, 0.5);"></td>
+					<% end %>
 				</tr>
 			<% else %>
 				<% b.weightings.each do|w| %>
