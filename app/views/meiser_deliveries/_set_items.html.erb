@@ -1,4 +1,6 @@
 <% if params[:item].present? %>
 	<%= hidden_field_tag 'weighting_ids[]', w.id, :id => "weighting_id#{w.id}"  %>
 	<td style="margin:0; padding:0;"><%= select_tag"item_base_data_ids[]",	options_from_collection_for_select(@item_base_data, "id","item_dsca", w.item_base_data.present? ? w.item_base_data.id : nil), :include_blank => true, :id => "weighting_ids_#{w.id}_dropdown" %></td>
+<% else %>
+	<td></td>
 <% end %>
