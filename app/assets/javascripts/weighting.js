@@ -13,7 +13,6 @@ $(document).ready(function() {
 	$(document).on( "click", "#change_item", function(e) {
 		e.preventDefault();
 			var current_item = $("#item_base_data_all_selected").val();
-			console.log(current_item);
 			$(".weighting_selected:checked").each(function(){
 				var x = $(this).attr("id");
 				$("#"+x+"_dropdown").val(current_item);
