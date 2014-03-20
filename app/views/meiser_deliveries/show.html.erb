@@ -130,7 +130,9 @@ td.weight {
 		<% @bundles.each_with_index do |b,i| %>
 			<% if b.weightings.empty? %>
 				<tr>
-					<td style="background-color: rgba(200, 54, 54, 0.5);"></td>
+					<% if params[:item].present? %>
+						<td style="background-color: rgba(200, 54, 54, 0.5);"></td>
+					<% end %>
 					<td style="background-color: rgba(200, 54, 54, 0.5);"><%= b.barcode %></td>
 					<td style="background-color: rgba(200, 54, 54, 0.5);"><%= b.zinc %></td>
 					<td style="background-color: rgba(200, 54, 54, 0.5);"><%= b.info %></td>
