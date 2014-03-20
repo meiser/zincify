@@ -172,7 +172,7 @@ td.weight {
 		<% @bundles_without_barcode.each do |w| %>
 				<tr>
 					<% if params[:item].present? %>
-							<td></td>
+						<td><%= check_box_tag "weightings_ids[]", w.id, false, {:id => "weighting_ids_#{w.id}", :class => "weighting_selected"} %></td>
 					<% end %>
 					<td></td>
 					<td></td>
