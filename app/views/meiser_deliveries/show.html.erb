@@ -171,6 +171,9 @@ td.weight {
 	<% if @bundles_without_barcode.present? %>
 		<% @bundles_without_barcode.each do |w| %>
 				<tr>
+					<% if params[:item].present? %>
+							<td></td>
+					<% end %>
 					<td></td>
 					<td></td>
 					<td></td>
