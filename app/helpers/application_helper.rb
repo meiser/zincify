@@ -33,7 +33,7 @@ module ApplicationHelper
  #Parameter 2 Gewicht mit Zink, netto, keine Verpackung
  def za(r,n)
 	begin
-		@za = (n / r * 100) - 100
+		@za = ((n / r * 100) - 100).round(2)
 		@za = 0 if @za < 0
 	rescue
 		@za = 0

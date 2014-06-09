@@ -31,8 +31,8 @@
 			});
 			win.modal = true;			
 			win.setTitle("Festlegen der Baan-Artikel für Kommission "+key.data.tag);
-			win.height = Ext.getBody().getViewSize().height*0.99,
-			win.width = Ext.getBody().getViewSize().width*0.99,
+			win.height = Ext.getBody().getViewSize().height*0.95,
+			win.width = Ext.getBody().getViewSize().width*0.95,
 			win.show();
 		});
       }
@@ -56,9 +56,6 @@
 		Ext.iterate(this.getSelectionModel().getSelection(),function(key,value){
 			var win = new Ext.Window({  
 				id: 'myWindow',  
-				title: 'My First Ext JS Window',  
-				width: 1200,
-				height: 600, 
 				autoScroll: true,				
 				layout: 'fit',
 				autoLoad : { 
@@ -68,6 +65,8 @@
 			});
 			win.modal = true;			
 			win.setTitle("Überblick Kommission "+key.data.tag);
+			win.height = Ext.getBody().getViewSize().height*0.95,
+			win.width = Ext.getBody().getViewSize().width*0.95,
 			win.show();
 			
 			
