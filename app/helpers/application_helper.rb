@@ -27,6 +27,19 @@ module ApplicationHelper
    return nil
   end
  end
-
+ 
+ #Helper Zinkauflage
+ #Parameter 1 Gewicht roh
+ #Parameter 2 Gewicht mit Zink, netto, keine Verpackung
+ def za(r,n)
+	begin
+		@za = (n / r * 100) - 100
+		@za = 0 if @za < 0
+	rescue
+		@za = 0
+	end
+	return @za
+ end
+ 
 end
 

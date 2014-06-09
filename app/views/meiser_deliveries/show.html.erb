@@ -88,6 +88,10 @@ td.weight {
 				<td>bisherige Summe Kommission Roh</td>
 				<td class="weight"><%= @sum_raw %> kg</td>
 			</tr>
+			<tr>
+				<td>bisherige Zinkauflage</td>
+				<td class="weight"><%= @za %> %</td>
+			</tr>
 		</tbody>
 	</table>
 </div>
@@ -112,6 +116,7 @@ td.weight {
 		<th>GE</th>
 		<th>Datum Wareneingang</th>
 		<th>Datum Verwiegung</th>
+		<th>ZA</th>
 		<% if params[:item].present? %>
 			<th>Artikel Baan</th>
 		<% end %>
@@ -140,6 +145,7 @@ td.weight {
 					<td class="weight" style="background-color: rgba(200, 54, 54, 0.5);"><%= b.weight_raw %></td>
 					<td style="background-color: rgba(200, 54, 54, 0.5);" colspan="2"></td>
 					<td style="background-color: rgba(200, 54, 54, 0.5);"><%= l b.created_at, :format => :coupon %></td>
+					<td style="background-color: rgba(200, 54, 54, 0.5);"></td>
 					<% if params[:item].present? %>
 						<td style="background-color: rgba(200, 54, 54, 0.5);"></td>
 					<% end %>
@@ -162,6 +168,7 @@ td.weight {
 						<td><%= w.weight_unit %></td>
 						<td><%= l b.created_at, :format => :coupon %></td>
 						<td><%= l w.created_at, :format => :coupon %></td>
+						<td class="weight"><%= za(b.weight_raw, w.weight_netto) %>%</td>
 						<%= render :partial => "set_items", :locals => {:w => w} %>
 					</tr>
 					
@@ -187,6 +194,7 @@ td.weight {
 					<td><%= w.weight_unit %></td>
 					<td><%= l @meiser_delivery.created_at, :format => :coupon %></td>
 					<td><%= l w.created_at, :format => :coupon %></td>
+					<td class="weight"></td>
 					<%= render :partial => "set_items", :locals => {:w => w} %>
 				</tr>
 		<% end %>

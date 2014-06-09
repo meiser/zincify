@@ -31,8 +31,8 @@
 			});
 			win.modal = true;			
 			win.setTitle("Festlegen der Baan-Artikel für Kommission "+key.data.tag);
-			win.height = Ext.getBody().getViewSize().height*0.9,
-			win.width = Ext.getBody().getViewSize().width*0.9,
+			win.height = Ext.getBody().getViewSize().height*0.99,
+			win.width = Ext.getBody().getViewSize().width*0.99,
 			win.show();
 		});
       }

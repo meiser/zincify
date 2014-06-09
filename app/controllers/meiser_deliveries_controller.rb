@@ -239,11 +239,11 @@
 		@bundles_without_barcode = w.where(:barcode => nil)
 		
 		#bisherige Summe bei der Verwiegung
-		
 		@sum_brutto = w.sum(:weight_brutto)
 		@sum_netto = w.sum(:weight_netto)
 		@sum_tara = w.sum(:weight_tara)
 		@sum_raw = @bundles.sum(:weight_raw)
+		
 	end
 	
 	respond_with do |format|
