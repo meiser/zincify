@@ -1,12 +1,12 @@
 class ArticleGrid < Netzke::Basepack::Grid
 
   js_configure do |c|
-   c.on_sync_item_base_data = <<-JS
+   c.on_sync_master_data = <<-JS
       function(a){
 		var cmp = this;
 		var myMask = new Ext.LoadMask(cmp.getEl(), {msg:"Bitte warten..."});
 		myMask.show();
-		Rails.ItemBaseDataController.sync_item_base_data(function(r,e){
+		Rails.ItemBaseDataController.sync_master_data(function(r,e){
 			cmp.unmask();
 			if (r.success == true){
 				cmp.store.reload();
@@ -70,10 +70,10 @@ class ArticleGrid < Netzke::Basepack::Grid
   end
 
   def default_bbar
-	[:sync_item_base_data]
+	[:sync_master_data]
   end
   
-  action :sync_item_base_data do |c|
+  action :sync_master_data do |c|
     c.icon = :connect
 	c.disabled = false
   end

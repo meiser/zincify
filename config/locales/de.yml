@@ -29,8 +29,8 @@
     tooltip: Öffnet für die angegebene Schicht des gewählten Tages die Wiegeliste als PDF 
  article_grid:
   actions:
-   sync_item_base_data:
-    text: Stammdaten aktualisieren
+   sync_master_data:
+    text: Stammdaten aus Infor LN aktualisieren
     tooltip: Stellt eine Verbindung zur Datenbank von Baan LN her und bringt die verfügbaren Lohnkunden-, Barzahler- und Artikeldaten auf den akutellen Stand.  
  meiser_delivery_grid:
   edit_window:
