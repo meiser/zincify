@@ -1,4 +1,4 @@
-class BaanMasterSyncJob
+﻿class BaanMasterSyncJob
 
 	def perform
 		CashPayer.synchronize_with_baan
