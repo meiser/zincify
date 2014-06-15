@@ -21,18 +21,18 @@ class Shift
   case shift
   when 1
 	@start_time = @date.change(:hour => 6)
-	@end_time = @date.change(:hour => 13, :min => 59, :sec => 59)
+	@end_time = @date.change(:hour => 14, :min => 0, :sec => 0)
   when 2
 	@start_time = @date.change(:hour => 14)
-	@end_time = @date.change(:hour => 21, :min => 59, :sec => 59)
+	@end_time = @date.change(:hour => 22, :min => 0, :sec => 0)
   when 3
     case @date.hour
 	when 22..23
 		@start_time = @date.change(:hour => 22)
-		@end_time = (@date+1.day).change(:hour => 5, :min => 59, :sec => 59)
+		@end_time = (@date+1.day).change(:hour => 6, :min => 0, :sec => 0)
  	when 0..5
 		@start_time = (@date-1.day).change(:hour => 22)
-		@end_time = @date.change(:hour => 5, :min => 59, :sec => 59)
+		@end_time = @date.change(:hour => 6, :min => 0, :sec => 0)
 	end
   end
  end
