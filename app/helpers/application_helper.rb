@@ -3,7 +3,11 @@ module ApplicationHelper
  def jquery_mobile_role
    controller_name == 'sessions' and params[:action] == "new" ? "dialog" : "page"
  end
-
+ 
+ def title(page_title)
+   content_for(:title){ page_title }
+   page_title
+ end
 
  def yaml_messages(flash)
   output = ""

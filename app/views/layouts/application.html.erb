@@ -1,7 +1,8 @@
 ﻿<html>
   <head>
     <meta name="generator" content="zincify" />
-    <title>Verzinkerei Plauen</title>
+    <% title = yield(:title).chop! %>
+	<title><%= title || 'Verzinkerei Plauen' %></title>
 	<%= csrf_meta_tags %>
     <meta charset="utf-8" />
 	<%#= stylesheet_link_tag "application", :media => "all" %>
