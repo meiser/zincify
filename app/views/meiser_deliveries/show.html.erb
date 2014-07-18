@@ -1,5 +1,6 @@
-﻿<style>
+﻿<%= content_for :head do %>
 
+<style>
 	/*Generated from Designmycss.com*/
 table
 {
@@ -50,8 +51,11 @@ td
 td.weight {
 	text-align: right;
 }
-
 </style>
+
+
+<% end %>
+
 <div style="margin: 1em;">
 	<table id="info">
 		<thead>
@@ -99,6 +103,8 @@ td.weight {
 
 <div style="display:table; width: 90%; margin: 1em;">
 
+<%= form_tag(item_weighting_index_path, :remote => true, :id => "change_item_form") do %>
+
 <table id="detail">
   <thead>
     <tr>
@@ -123,9 +129,7 @@ td.weight {
     </tr>
   </thead>
   <tbody>
-  
-  <%= form_tag(item_weighting_index_path, :remote => true, :id => "change_item_form") do %>
-  
+
 	<% if params[:item].present? %>
 		<%= select_tag "", options_from_collection_for_select(@item_base_data, "id","item_dsca"), :id => "item_base_data_all_selected", :disabled => true %>
 		<%= button_tag "markierte Artikel setzen", :id => "change_item", :disabled => true %>
@@ -203,7 +207,8 @@ td.weight {
 	<% if params[:item].present? %>
 		<%= button_tag "Speichern", :disable_with => "Please wait..." %>
 	<% end %>
-<% end %>
+
   </tbody>
 </table>
+<% end %>
 </div>

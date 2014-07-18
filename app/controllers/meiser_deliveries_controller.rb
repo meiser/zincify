@@ -289,7 +289,7 @@
 			send_data spreadsheet.string, :filename => "Kommission #{@meiser_delivery.tag} vom #{I18n.l @meiser_delivery.created_at}.xls", :type =>  "application/vnd.ms-excel", :disposition => "inline"
 			
 		}
-		format.html
+		format.html{render layout: "item"}
 	end
 	
   end

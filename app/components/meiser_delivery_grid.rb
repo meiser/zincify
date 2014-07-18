@@ -31,8 +31,8 @@
 			});
 			win.modal = true;			
 			win.setTitle("Festlegen der Baan-Artikel für Kommission "+key.data.tag);
-			win.height = Ext.getBody().getViewSize().height*0.95,
-			win.width = Ext.getBody().getViewSize().width*0.95,
+			win.height = Ext.getBody().getViewSize().height,
+			win.width = Ext.getBody().getViewSize().width,
 			win.show();
 		});
       }
@@ -65,8 +65,8 @@
 			});
 			win.modal = true;			
 			win.setTitle("Überblick Kommission "+key.data.tag);
-			win.height = Ext.getBody().getViewSize().height*0.95,
-			win.width = Ext.getBody().getViewSize().width*0.95,
+			win.height = Ext.getBody().getViewSize().height,
+			win.width = Ext.getBody().getViewSize().width,
 			win.show();
 			
 			
