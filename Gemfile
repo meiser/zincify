@@ -36,7 +36,6 @@ gem 'rails-i18n'
 gem 'delayed_job'
 gem 'delayed_job_active_record'
 #gem 'daemons'
-gem 'validates_timeliness', '~> 3.0'
 
 # SUPPORT SQL_SERVER
 gem 'tiny_tds'

@@ -2,7 +2,8 @@
             "http://www.w3.org/TR/html4/strict.dtd">
 <html>
   <head>
-    <title>Verzinkerei Plauen</title>
+    <% title = yield(:title).chop! %>
+	<title><%= title || 'Verzinkerei Plauen' %></title>
 	<%= csrf_meta_tags %>
 	<%= stylesheet_link_tag "application", :media => "all" %>
 	<%= yield :head %>

@@ -12,6 +12,7 @@
 			this.actions.listDetailsExcel.setDisabled(selModel.getCount() > 1);
 			this.actions.listDetailsHtml.setDisabled(selModel.getCount() > 1);
 			this.actions.setItems.setDisabled(selModel.getCount() > 1);
+			this.actions.listBill.setDisabled(selModel.getCount() > 1);
 		});
       }
     JS
@@ -103,6 +104,39 @@
 		
       }
     JS
+	
+	c.on_list_bill = <<-JS
+      function(a){
+		var delivery_date;
+		Ext.iterate(this.getSelectionModel().getSelection(),function(key,value){
+			delivery_date = key.data.indate;
+			
+		});
+		
+		this.netzkeLoadComponent("bill_form_window", {
+			container: "application__zincify_tab_panel",
+			configOnly: false,
+			callback: function(w){
+				w.modal = true;
+				var form = w.down("form");
+				form.getForm().setValues({
+					delivery_date: delivery_date
+				});
+				w.show();
+			}
+		});
+      }
+    JS
+	
+  end
+  
+  component :bill_form_window do |c|
+	c.region = :north
+  end
+  
+  action :list_bill do |c|
+	c.icon = :calculator
+	c.disabled = false
   end
   
   action :set_items do |c|
@@ -164,7 +198,7 @@
 		}
 	]
 	c.tbar = [:add, :del, :edit, :list_details_html, :print_card]#, :list_details_excel]
-	c.bbar = [:set_items]
+	c.bbar = [:set_items, :list_bill]
    
   end
   
@@ -221,7 +255,7 @@
   end
   
   def default_context_menu
-	[:list_details_html,:set_items,*super]
+	[:list_details_html,:set_items, :list_bill,*super]
   end
   
 end

@@ -1,25 +1,47 @@
-﻿<h1>Abrechnung Meiser Vogtland OHG (<%= l @list_date.beginning_of_day %> - <%= l @list_date.end_of_day %>)</h1>
-<table style>
-<tr>
-	<th>Anzahl Verwiegungen</th>
-	<th>Sorte</th>
-	<th>Brutto</th>
-	<th>Tara</th>
-	<th>Netto</th>
-	<th>Einheit</th>
-</tr>
+﻿<h1>Abrechnung Meiser Vogtland OHG (<%= l @indate, :format => :coupon %>, <%= @meiser_deliveries.count %> Kommissionen)</h1>
 
-<% unless @weightings.empty? %>
-	<% @weightings.each do |s| %>
+<% unless @meiser_deliveries.empty? %>
+	<div class="datagrid" style="width:50%">
+	<table style>
+	<thead>
 	<tr>
-		<td><%= s.occ %></td>
-		<td><%= s.sort_list.description %></td>
-		<td><%= s.weight_brutto %></td>
-		<td><%= s.weight_tara %></td>
-		<td><%= s.weight_netto %></td>
-		<td><%= s.weight_unit %></td>
+		<th>Nr</th>
+		<th>Kommission</th>
+		<th>Erstellungsdatum</th>
 	</tr>
-	<% end %>
+	</thead>
+		<% @meiser_deliveries.each_with_index do |md,i| %>
+			<tr class="<%= cycle('', 'alt') -%>">
+				<td><%= i+1 %></td>
+				<td><%= md.tag %></td>
+				<td><%= l md.created_at, :format => :coupon %></td>
+			</tr>
+		<% end %>
+	</table>
+	</div>
 <% end %>
 
-</table>
+<% unless @weightings.empty? %>
+	<div class="datagrid" style="margin-top: 2em;">
+	<table style>
+	<thead>
+	<tr>
+		<th>Nr</th>
+		<th>Artikelbezeichnung</th>
+		<th>Brutto</th>
+		<th>Tara</th>
+		<th>Netto</th>
+	</tr>
+	</thead>
+		<% @weightings.each_with_index do |w,i|%>
+			<tr class="<%= cycle('', 'alt') -%>">
+				<td><%= i+1 %></td>
+				<td><%= w.item_base_data.item if w.item_base_data.present? %> <%= w.item_base_data.description if w.item_base_data.present? %></td>
+				<td><%= w.weight_brutto %> <%= w.weight_unit %></td>
+				<td><%= w.weight_tara %> <%= w.weight_unit %>T</td>
+				<td><%= w.weight_netto %> <%= w.weight_unit %>NE</td>
+			</tr>
+		<% end %>
+	</table>
+	</div>
+<% end %>

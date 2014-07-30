@@ -9,10 +9,21 @@
   thousand:
    one: "t"
    other: "t"
+ date:
+  formats:
+   coupon: "%A, %d.%m.%Y"
  time:
   formats:
    short: "%d.%m.%Y"
    coupon: "%d.%m.%Y %H:%M:%S"
+ bill_form:
+  actions:
+   open_html:
+    text: Liste im Browser öffnen
+    tooltip: Öffnet die Liste Artikelsummen in einem neuen Browserfenster
+   open_pdf:
+    text: Liste als PDF öffnen
+    tooltip: Öffnet die Liste der Verwiegungen als PDF-Datei
  weighting_select_form:
   actions:
    open_html:
@@ -55,6 +66,9 @@
     tooltip: Kontrolle des Bearbeitungsstandes der gesamten Kommission
  delivery_grid:
    actions:
+    list_bill:
+     text: Abrechnung Anlieferungen
+     tooltip: Ausdruck der Summe der Verwiegungen pro Artikel pro Anlieferungstag
     set_items:
      text: Artikel festlegen
      tooltip: Für jede Verwiegung den Baan-Artikel hinterlegen

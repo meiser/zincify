@@ -13,7 +13,7 @@
   
   def print
   	@meiser_delivery =MeiserDelivery.find(params[:data].first[:id])
-    p @customer = Customer.where(:bpid => "280000001").first
+    @customer = Customer.where(:bpid => "280000001").first
     t = PrintTrigger.new
   	t.printer = "0001"
     #current_user.preferences.default_printer
@@ -230,10 +230,10 @@
 		
 		#Anzahl verwogene Bunde mit Barcode 
 		@count_bundles_ready = MeiserBundleTag.where(:deliver_reference_id => @meiser_delivery.deliver_reference_ids).joins(:weightings).count(distinct: true)
-		
+			
 		#alle Verwiegungen der Kommission, bereinigt nach Zeit, da Kommission mehrmals durchlaufen sein kann
 
-		w = Weighting.where(:ref =>@meiser_delivery.tag).where("created_at > ?", @meiser_delivery.created_at)
+		w = Weighting.where(:ref =>@meiser_delivery.tag).where(:created_at => @meiser_delivery.created_at..@meiser_delivery.created_at+30.days)
 		
 		#alle Bunde die mit Kommission eingegeben wurden
 		@bundles_without_barcode = w.where(:barcode => nil)

@@ -46,12 +46,22 @@
 	
 	@meiser_bundle_tag.deliver_reference = @dr
 	
-	if @meiser_bundle_tag.save
-		@number_bundles = @dr.meiser_bundle_tags.count
-		render :create
-	else
-	
+	#Speicherung neuen Anlieferungsreferenz für jeden Bund
+	#Änderung Eintrag Kommission bei jeder Verwiegung, alles als Transaktion
+	begin
+		ActiveRecord::Base.transaction do
+			@meiser_bundle_tag.save!
+			@meiser_bundle_tag.weightings.each do |w|
+				w.ref = @dr.meiser_delivery.tag
+				w.save!
+			end
+		end
+	rescue
+		render :js => "alert('Aktion kann nicht ausgeführt werden, da bereits Verwiegungen existieren. Kontaktieren Sie ihren Systembetreuer!');"
+		return
 	end
+	@number_bundles = @dr.meiser_bundle_tags.count
+	render :create
   end
   
   def destroy
