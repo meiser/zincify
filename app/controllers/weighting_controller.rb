@@ -58,7 +58,7 @@
 		
 		pdf.table items, :header => true,
 			:row_colors => ["FFFFFF", "E1EEf4"],
-			:cell_style => { :size => 8, :align => :right, :padding => [1,10,1,10] } do
+			:cell_style => { :size => 10, :align => :right, :padding => [3,10,3,10] } do
 			row(0).font_style = :bold	
 		end
 		
@@ -66,7 +66,7 @@
 		
 		items = []
 		
-		items << ["Nr", "Aritkel", "Artikelbezeichnung", "Brutto", "Tara", "Netto"]
+		items << ["Nr", "Aritkel", "Artikelbezeichnung", "Netto"]
 		
 		unless @weightings.empty?
 
@@ -77,16 +77,12 @@
 					i+1,
 					"#{w.item_base_data.item if w.item_base_data.present?}",
 					"#{w.item_base_data.description if w.item_base_data.present?}",
-					"#{w.weight_brutto} #{w.weight_unit}",
-					"#{w.weight_tara} #{w.weight_unit}T",
 					"#{w.weight_netto} #{w.weight_unit}NE"
 				]
 			end
 			
 			items << [
-				{:content => "Summen:", :colspan => 3, :font_style => :bold},
-				"#{@sum_brutto} #{@weightings.first.weight_unit}",
-				"#{@sum_tara} #{@weightings.first.weight_unit}T",
+				{:content => "Summe:", :colspan => 3, :font_style => :bold},
 				"#{@sum_netto} #{@weightings.first.weight_unit}NE"
 			]
 			
@@ -96,7 +92,7 @@
 		unless items.empty?
 			pdf.table items, :header => true,
 				:row_colors => ["FFFFFF", "E1EEf4"],
-				:cell_style => { :size => 8, :align => :right, :padding => [1,10,1,10] } do
+				:cell_style => { :size => 10, :align => :right, :padding => [3,10,3,10] } do
 				row(0).font_style = :bold	
 			end
 		end
