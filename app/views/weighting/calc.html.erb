@@ -27,18 +27,16 @@
 	<thead>
 	<tr>
 		<th>Nr</th>
+		<th>Artikel</th>
 		<th>Artikelbezeichnung</th>
-		<th>Brutto</th>
-		<th>Tara</th>
 		<th>Netto</th>
 	</tr>
 	</thead>
 		<% @weightings.each_with_index do |w,i|%>
 			<tr class="<%= cycle('', 'alt') -%>">
 				<td><%= i+1 %></td>
-				<td><%= w.item_base_data.item if w.item_base_data.present? %> <%= w.item_base_data.description if w.item_base_data.present? %></td>
-				<td><%= w.weight_brutto %> <%= w.weight_unit %></td>
-				<td><%= w.weight_tara %> <%= w.weight_unit %>T</td>
+				<td><%= w.item_base_data.item if w.item_base_data.present? %></td>
+				<td><%= w.item_base_data.description if w.item_base_data.present? %></td>
 				<td><%= w.weight_netto %> <%= w.weight_unit %>NE</td>
 			</tr>
 		<% end %>
