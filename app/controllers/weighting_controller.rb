@@ -1,5 +1,7 @@
 ﻿class WeightingController < ApplicationController
 
+ include ActionView::Helpers::NumberHelper
+ 
  before_filter :parse_time, :except => [:calc]
  
  def index
@@ -28,7 +30,12 @@
    
    @meiser_deliveries = MeiserDelivery.where(:indate => @indate)
    commission_list = @meiser_deliveries.pluck(:tag)
+   #@weightings = Weighting.select("Count(*) as occ, item_base_data_id, sum(weight_brutto) as weight_brutto, sum(weight_tara) as weight_tara, sum(weight_netto) as weight_netto, weight_unit as weight_unit").where(:created_at => @indate..@indate+30.days).where(ref: commission_list).group(:item_base_data_id, :weight_unit).includes(:item_base_data).reorder("item_base_data_id ASC")
    @weightings = Weighting.select("Count(*) as occ, item_base_data_id, sum(weight_brutto) as weight_brutto, sum(weight_tara) as weight_tara, sum(weight_netto) as weight_netto, weight_unit as weight_unit").where(:created_at => @indate..@indate+30.days).where(ref: commission_list).group(:item_base_data_id, :weight_unit).includes(:item_base_data).reorder("item_base_data_id ASC")
+   
+   #Sortierung nach Artikelnummer aufsteigend
+   @weightings = @weightings.sort_by{|w| w.item_base_data.item}
+   
    w = Weighting.where(:created_at => @indate..@indate+30.days).where(ref: commission_list)
    @sum_brutto = w.sum(:weight_brutto)
    @sum_tara = w.sum(:weight_tara)
@@ -67,7 +74,6 @@
 		items = []
 		
 		items << ["Nr", "Aritkel", "Artikelbezeichnung", "Netto"]
-		
 		unless @weightings.empty?
 
 		
@@ -77,13 +83,13 @@
 					i+1,
 					"#{w.item_base_data.item if w.item_base_data.present?}",
 					"#{w.item_base_data.description if w.item_base_data.present?}",
-					"#{w.weight_netto} #{w.weight_unit}NE"
+					"#{number_to_currency(w.weight_netto, unit: @weightings.first.weight_unit, precision: 0)}"
 				]
 			end
 			
 			items << [
 				{:content => "Summe:", :colspan => 3, :font_style => :bold},
-				"#{@sum_netto.round} #{@weightings.first.weight_unit}NE"
+				{:content => "#{number_to_currency(@sum_netto.round, unit: @weightings.first.weight_unit, precision: 0)}", :font_style => :bold}
 			]
 			
 		end

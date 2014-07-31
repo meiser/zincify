@@ -14,7 +14,7 @@
 			<tr class="<%= cycle('', 'alt') -%>">
 				<td><%= i+1 %></td>
 				<td><%= md.tag %></td>
-				<td><%= l md.created_at, :format => :coupon %></td>
+				<td><%= l md.created_at, :format => :hour %></td>
 			</tr>
 		<% end %>
 	</table>
@@ -37,9 +37,13 @@
 				<td><%= i+1 %></td>
 				<td><%= w.item_base_data.item if w.item_base_data.present? %></td>
 				<td><%= w.item_base_data.description if w.item_base_data.present? %></td>
-				<td><%= w.weight_netto %> <%= w.weight_unit %>NE</td>
+				<td><%= number_to_currency(w.weight_netto, unit: @weightings.first.weight_unit, precision: 0) %></td>
 			</tr>
 		<% end %>
+			<tr>
+				<td style="font-weight:bold;" colspan="3">Summe</td>
+				<td style="font-weight:bold;"><%= number_to_human(@sum_netto.round, unit: @weightings.first.weight_unit, precision: 0 %></td>
+			</tr>
 	</table>
 	</div>
 <% end %>
