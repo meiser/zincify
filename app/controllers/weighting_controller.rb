@@ -51,7 +51,7 @@
 				[
 					"#{i+1}",
 					md.tag,
-					"#{l md.created_at, :format => :coupon}"
+					"#{l md.created_at, :format => :hour}"
 				]
 			end
 		end
@@ -83,7 +83,7 @@
 			
 			items << [
 				{:content => "Summe:", :colspan => 3, :font_style => :bold},
-				"#{@sum_netto} #{@weightings.first.weight_unit}NE"
+				"#{@sum_netto.round} #{@weightings.first.weight_unit}NE"
 			]
 			
 		end

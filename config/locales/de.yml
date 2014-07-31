@@ -16,6 +16,7 @@
   formats:
    short: "%d.%m.%Y"
    coupon: "%d.%m.%Y %H:%M:%S"
+   hour: "%H:%M:%S"
  bill_form:
   actions:
    open_html:
