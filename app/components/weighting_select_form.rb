@@ -8,7 +8,7 @@
 		
 		if (shift_date.isValid(false) && shift.isValid(false)){
 			dateObj = shift_date.getValue();
-			window.open("waage/"+ dateObj.getFullYear()+"/"+ (dateObj.getUTCMonth()+1) +"/"+(dateObj.getUTCDate()+1)+"/"+shift.getValue()+".html" ,'_blank');	
+			window.open("waage/"+ dateObj.getFullYear()+"/"+ (dateObj.getMonth()+1) +"/"+(dateObj.getDate())+"/"+shift.getValue()+".html" ,'_blank');	
 		}
       }
     JS
@@ -20,7 +20,7 @@
 		
 		if (shift_date.isValid(false) && shift.isValid(false)){
 			dateObj = shift_date.getValue();
-			window.open("waage/"+ dateObj.getFullYear()+"/"+ (dateObj.getUTCMonth()+1) +"/"+(dateObj.getUTCDate()+1)+"/"+shift.getValue()+".pdf" ,'_blank');	
+			window.open("waage/"+ dateObj.getFullYear()+"/"+ (dateObj.getMonth()+1) +"/"+(dateObj.getDate())+"/"+shift.getValue()+".pdf" ,'_blank');	
 		}
 	  }
     JS

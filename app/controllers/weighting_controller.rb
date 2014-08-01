@@ -1,6 +1,8 @@
 ﻿class WeightingController < ApplicationController
 
  include ActionView::Helpers::NumberHelper
+ include ApplicationHelper
+ include ActionView::Helpers::OutputSafetyHelper
  
  before_filter :parse_time, :except => [:calc]
  
@@ -40,6 +42,14 @@
    @sum_brutto = w.sum(:weight_brutto)
    @sum_tara = w.sum(:weight_tara)
    @sum_netto = w.sum(:weight_netto)
+   
+   
+   #Rohgewicht
+   ref_ids = @meiser_deliveries.includes(:deliver_references).map(&:deliver_reference_ids).flatten
+
+   @bundles = MeiserBundleTag.where(:deliver_reference_id => ref_ids).includes(:weightings).order("barcode ASC")
+   @sum_raw = @bundles.sum(:weight_raw)
+   
    respond_to do |format|
 	format.html do
 		render :layout => "weight_list"
@@ -90,6 +100,11 @@
 			items << [
 				{:content => "Summe:", :colspan => 3, :font_style => :bold},
 				{:content => "#{number_to_currency(@sum_netto.round, unit: @weightings.first.weight_unit, precision: 0)}", :font_style => :bold}
+			]
+			
+			items << [
+				{:content =>  "Zinkauflage bei roh #{number_to_currency(@sum_raw.round, unit: @weightings.first.weight_unit, precision: 0)}", :colspan => 3, :font_style => :bold},
+				{:content => "#{za(@sum_raw, @sum_netto)}", :font_style => :bold}
 			]
 			
 		end

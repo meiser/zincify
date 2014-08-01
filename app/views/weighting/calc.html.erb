@@ -13,7 +13,7 @@
 		<% @meiser_deliveries.each_with_index do |md,i| %>
 			<tr class="<%= cycle('', 'alt') -%>">
 				<td><%= i+1 %></td>
-				<td><%= md.tag %></td>
+				<td><%= link_to md.tag, md %></td>
 				<td><%= l md.created_at, :format => :hour %></td>
 			</tr>
 		<% end %>
@@ -42,7 +42,11 @@
 		<% end %>
 			<tr>
 				<td style="font-weight:bold;" colspan="3">Summe</td>
-				<td style="font-weight:bold;"><%= number_to_human(@sum_netto.round, unit: @weightings.first.weight_unit, precision: 0 %></td>
+				<td style="font-weight:bold;"><%= number_to_currency(@sum_netto.round, unit: @weightings.first.weight_unit, precision: 0)%></td>
+			</tr>
+			<tr>
+				<td style="font-weight:bold;" colspan="3">&oslash; Zinkauflage bei roh <%= number_to_currency(@sum_raw.round, unit: @weightings.first.weight_unit, precision: 0)%></td>
+				<td style="font-weight:bold;"><%= za(@sum_raw, @sum_netto) %> %</td>
 			</tr>
 	</table>
 	</div>

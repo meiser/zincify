@@ -7,7 +7,7 @@
 		
 		if (delivery_date.isValid(false)){
 			dateObj = delivery_date.getValue();
-			window.open("abrechnung/"+ dateObj.getFullYear()+"/"+ (dateObj.getUTCMonth()+1) +"/"+(dateObj.getUTCDate()+1) ,'_blank');	
+			window.open("abrechnung/"+ dateObj.getFullYear()+"/"+ (dateObj.getMonth()+1) +"/"+(dateObj.getDate()) ,'_blank');	
 		}
       }
     JS
@@ -18,7 +18,7 @@
 		
 		if (delivery_date.isValid(false)){
 			dateObj = delivery_date.getValue();
-			window.open("abrechnung/"+ dateObj.getFullYear()+"/"+ (dateObj.getUTCMonth()+1) +"/"+(dateObj.getUTCDate()+1)+".pdf" ,'_blank');	
+			window.open("abrechnung/"+ dateObj.getFullYear()+"/"+ (dateObj.getMonth()+1) +"/"+(dateObj.getDate())+".pdf" ,'_blank');	
 		}
       }
     JS
