@@ -104,7 +104,7 @@
 			
 			items << [
 				{:content =>  "Zinkauflage bei roh #{number_to_currency(@sum_raw.round, unit: @weightings.first.weight_unit, precision: 0)}", :colspan => 3, :font_style => :bold},
-				{:content => "#{za(@sum_raw, @sum_netto)}", :font_style => :bold}
+				{:content => "#{za(@sum_raw, @sum_netto)} %", :font_style => :bold}
 			]
 			
 		end
