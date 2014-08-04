@@ -36,7 +36,7 @@
    @weightings = Weighting.select("Count(*) as occ, item_base_data_id, sum(weight_brutto) as weight_brutto, sum(weight_tara) as weight_tara, sum(weight_netto) as weight_netto, weight_unit as weight_unit").where(:created_at => @indate..@indate+30.days).where(ref: commission_list).group(:item_base_data_id, :weight_unit).includes(:item_base_data).reorder("item_base_data_id ASC")
    
    #Sortierung nach Artikelnummer aufsteigend
-   @weightings = @weightings.sort_by{|w| w.item_base_data.item}
+   @weightings = @weightings.sort_by{|w| w.item_base_data.try(:item)}
    
    w = Weighting.where(:created_at => @indate..@indate+30.days).where(ref: commission_list)
    @sum_brutto = w.sum(:weight_brutto)
