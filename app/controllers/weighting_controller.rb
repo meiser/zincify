@@ -30,10 +30,10 @@
    #@weightings = Weighting.select("Count(*) as occ, sort_list_id, sum(weight_brutto) as weight_brutto, sum(weight_tara) as weight_tara, sum(weight_netto) as weight_netto, weight_unit as weight_unit").where(:created_at => @list_date.beginning_of_day..@list_date.end_of_day).group(:sort_list_id, :weight_unit).includes(:sort_list).reorder("sort_list_id ASC")
    #@meiser_deliveries = MeiserDelivery.where(:created_at => @list_date.beginning_of_day..@list_date.end_of_day)
    
-   @meiser_deliveries = MeiserDelivery.where(:indate => @indate)
+   @meiser_deliveries = MeiserDelivery.unscoped.where(:indate => @indate).order("created_at ASC")
    commission_list = @meiser_deliveries.pluck(:tag)
    #@weightings = Weighting.select("Count(*) as occ, item_base_data_id, sum(weight_brutto) as weight_brutto, sum(weight_tara) as weight_tara, sum(weight_netto) as weight_netto, weight_unit as weight_unit").where(:created_at => @indate..@indate+30.days).where(ref: commission_list).group(:item_base_data_id, :weight_unit).includes(:item_base_data).reorder("item_base_data_id ASC")
-   @weightings = Weighting.select("Count(*) as occ, item_base_data_id, sum(weight_brutto) as weight_brutto, sum(weight_tara) as weight_tara, sum(weight_netto) as weight_netto, weight_unit as weight_unit").where(:created_at => @indate..@indate+30.days).where(ref: commission_list).group(:item_base_data_id, :weight_unit).includes(:item_base_data).reorder("item_base_data_id ASC")
+   @weightings = Weighting.unscoped.select("Count(*) as occ, ref, item_base_data_id, sum(weight_brutto) as weight_brutto, sum(weight_tara) as weight_tara, sum(weight_netto) as weight_netto, weight_unit as weight_unit").where(:created_at => @indate..@indate+30.days).where(ref: commission_list).group(:item_base_data_id, :ref, :weight_unit).includes(:item_base_data).order("item_base_data_id ASC")
    
    #Sortierung nach Artikelnummer aufsteigend
    @weightings = @weightings.sort_by{|w| w.item_base_data.try(:item)|| ""}
@@ -50,74 +50,75 @@
    @bundles = MeiserBundleTag.where(:deliver_reference_id => ref_ids).includes(:weightings).order("barcode ASC")
    @sum_raw = @bundles.sum(:weight_raw)
    
+   
+   #w = Weighting.where(:ref =>@meiser_delivery.tag).where(:created_at => @meiser_delivery.created_at..@meiser_delivery.created_at+30.days)
+   #commission_ids = @meiser_deliveries.map(&:tag)	
+   #@weightings_per_commission = 
+   
    respond_to do |format|
 	format.html do
 		render :layout => "weight_list"
 	end
 	format.pdf do
 	
-		pdf = Prawn::Document.new
+		pdf = Prawn::Document.new(
+			page_size: "A4",
+			page_layout: :landscape,
+			margin: [30,20,10,20]
+		)
 		pdf.text "Abrechnung Meiser Vogtland OHG #{l @indate, :format => :coupon }, #{@meiser_deliveries.count} Kommission(en)"
 		pdf.text " "
-		
 		items = []
-		items << ["Nr", "Kommission", "Erstellungsdatum"]
-		unless @meiser_deliveries.empty?
-			@meiser_deliveries.each_with_index do |md,i|
-				items <<
-				[
-					"#{i+1}",
-					md.tag,
-					"#{l md.created_at, :format => :hour}"
-				]
-			end
-		end
-		
-		pdf.table items, :header => true,
-			:row_colors => ["FFFFFF", "E1EEf4"],
-			:cell_style => { :size => 10, :align => :right, :padding => [3,10,3,10] } do
-			row(0).font_style = :bold	
-		end
-		
-		pdf.text " "
-		
-		items = []
-		
-		items << ["Nr", "Aritkel", "Artikelbezeichnung", "Netto"]
+		kommissionen = @meiser_deliveries.map(&:tag)
+		items << ["Kommission","Netto"]+kommissionen
+	
 		unless @weightings.empty?
-
-		
-			@weightings.each_with_index do |w,i|
-				items <<
-				[
-					i+1,
-					"#{w.item_base_data.item if w.item_base_data.present?}",
-					"#{w.item_base_data.description if w.item_base_data.present?}",
-					"#{number_to_currency(w.weight_netto, unit: @weightings.first.weight_unit, precision: 0)}"
-				]
+			weight_per_kommission = Array.new(kommissionen.length+2,0)
+			@weightings.group_by(&:item_base_data).each do |i,weightings|
+				row = Array.new(kommissionen.length+2,"")
+				kg = 0
+				#Artikel
+				row[0] = "#{i.item if i.present?} #{i.description if i.present?}"
+				
+				weightings.each do |w|
+					kg+=w.weight_netto
+					weight_per_kommission[kommissionen.index(w.ref)+2] +=w.weight_netto
+					row[kommissionen.index(w.ref)+2] = "#{number_to_currency(w.weight_netto, unit: @weightings.first.weight_unit, precision: 0)}"
+				end
+				row[1]= "#{number_to_currency(kg, unit: weightings.first.weight_unit, precision: 0)}"
+				
+				items << row
 			end
 			
-			items << [
-				{:content => "Summe:", :colspan => 3, :font_style => :bold},
-				{:content => "#{number_to_currency(@sum_netto.round, unit: @weightings.first.weight_unit, precision: 0)}", :font_style => :bold}
-			]
+			#Anzeige Gewicht pro Kommission
+			tmp = []
+			tmp << {:content => "Summe:", :font_style => :bold}
+			tmp << {:content => "#{number_to_currency(@sum_netto.round, unit: @weightings.first.weight_unit, precision: 0)}", :font_style => :bold}
 			
+			weight_per_kommission.each_with_index do |weight,i|
+				if i > 1
+					tmp << {content: "#{number_to_currency(weight.round, unit: @weightings.first.weight_unit, precision: 0)}", :font_style => :bold}
+				end
+			end
+			
+			items << tmp
+
 			items << [
-				{:content =>  "Zinkauflage bei roh #{number_to_currency(@sum_raw.round, unit: @weightings.first.weight_unit, precision: 0)}", :colspan => 3, :font_style => :bold},
+				{:content =>  "Zinkauflage bei roh #{number_to_currency(@sum_raw.round, unit: @weightings.first.weight_unit, precision: 0)}", :font_style => :bold},
 				{:content => "#{za(@sum_raw, @sum_netto)} %", :font_style => :bold}
 			]
 			
 		end
-		
+
 
 		unless items.empty?
 			pdf.table items, :header => true,
 				:row_colors => ["FFFFFF", "E1EEf4"],
-				:cell_style => { :size => 10, :align => :right, :padding => [3,10,3,10] } do
-				row(0).font_style = :bold	
+				:cell_style => { :size => 10, :align => :right, :padding => [3,5,3,5] } do
+				row(0).font_style = :bold
 			end
 		end
-		
+
 		send_data pdf.render, filename: "AbrechnungMeiserVogtlandOHG_#{@indate.strftime("%d%m%Y")}.pdf",
                           type: "application/pdf",
                           disposition: "inline"

@@ -38,7 +38,7 @@
 		}
 	]
 	
-	c.bbar = [:open_html, :open_pdf]
+	c.bbar = [:open_pdf]
 	
   	super(c)
   end
