@@ -80,7 +80,7 @@ Zincify::Application.routes.draw do
   
   #match "weighting/poll" => "weighting#poll", :defaults => { :format => 'json' }
   
-  match "admin" => "application#admin"
+  match "admin" => "application#admin_panel"
 
 end
 
