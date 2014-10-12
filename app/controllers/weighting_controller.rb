@@ -83,9 +83,9 @@
 				weightings.each do |w|
 					kg+=w.weight_netto
 					weight_per_kommission[kommissionen.index(w.ref)+2] +=w.weight_netto
-					row[kommissionen.index(w.ref)+2] = "#{number_to_currency(w.weight_netto, unit: nil, precision: 0)}"
+					row[kommissionen.index(w.ref)+2] = "#{number_to_currency(w.weight_netto, unit: "", precision: 0)}"
 				end
-				row[1]= "#{number_to_currency(kg, precision: 0)}"
+				row[1]= "#{number_to_currency(kg, unit: "", precision: 0)}"
 				
 				items << row
 			end
@@ -93,18 +93,18 @@
 			#Anzeige Gewicht pro Kommission
 			tmp = []
 			tmp << {:content => "Summe:", :font_style => :bold}
-			tmp << {:content => "#{number_to_currency(@sum_netto.round, precision: 0)}", :font_style => :bold}
+			tmp << {:content => "#{number_to_currency(@sum_netto.round, unit: "", precision: 0)}", :font_style => :bold}
 			
 			weight_per_kommission.each_with_index do |weight,i|
 				if i > 1
-					tmp << {content: "#{number_to_currency(weight.round, precision: 0)}", :font_style => :bold}
+					tmp << {content: "#{number_to_currency(weight.round, unit: "", precision: 0)}", :font_style => :bold}
 				end
 			end
 			
 			items << tmp
 
 			items << [
-				{:content =>  "Zinkauflage bei roh #{number_to_currency(@sum_raw.round, precision: 0)}", :font_style => :bold},
+				{:content =>  "Zinkauflage bei roh #{number_to_currency(@sum_raw.round, unit: "", precision: 0)}", :font_style => :bold},
 				{:content => "#{za(@sum_raw, @sum_netto)} %", :font_style => :bold}
 			]
 			

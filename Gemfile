@@ -54,3 +54,4 @@ gem 'extr'#, :path => "../extr"
 gem 'spreadsheet'
 gem 'ruby-oci8', require: 'oci8'
 gem 'prawn'
+gem 'prawn-table'
