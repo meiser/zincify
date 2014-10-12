@@ -9,7 +9,7 @@ class MeiserBundleTagObserver < ActiveRecord::Observer
 		
 		# Hole Etiketteninfos aus Baan
 		if bundle.barcode.starts_with?("003")
-			Delayed::Job.enqueue BundleInfoJob.new(bundle)
+			Delayed::Job.enqueue BundleInfoJob.new(bundle.id)
 		end
 
 	end

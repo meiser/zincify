@@ -48,7 +48,7 @@ class WeightingObserver < ActiveRecord::Observer
 	
 	
 	#Rueckmeldung Verzinkungsbunde Auf- und Abruestdatum
-	Delayed::Job.enqueue BundleDatiJob.new(weighting)
+	Delayed::Job.enqueue BundleDatiJob.new(weighting.id)
 	
   end
  end
