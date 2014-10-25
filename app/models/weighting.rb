@@ -21,6 +21,7 @@ class Weighting < ActiveRecord::Base
   validates :pid, :presence => true
   
   before_validation :set_weight_netto
+  before_update :set_barcode
   
   after_save :set_shift
   
@@ -34,6 +35,12 @@ class Weighting < ActiveRecord::Base
    rescue
 	self.weight_netto = 0
    end
+  end
+  
+  def set_barcode
+  	if self.barcode.blank?
+  		self.barcode = nil
+  	end
   end
   
   def weight_brutto
