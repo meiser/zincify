@@ -3,6 +3,8 @@
  include ActionView::Helpers::NumberHelper
  include ApplicationHelper
  include ActionView::Helpers::OutputSafetyHelper
+ include ActionView::Helpers::TextHelper
+
  
  before_filter :parse_time, :except => [:calc]
  
@@ -64,7 +66,7 @@
 		pdf = Prawn::Document.new(
 			page_size: "A4",
 			page_layout: :landscape,
-			margin: [30,20,10,20]
+			margin: [100,20,10,20]
 		)
 		pdf.text "Abrechnung Meiser Vogtland OHG #{l @indate, :format => :coupon }, #{@meiser_deliveries.count} Kommission(en)"
 		pdf.text " "
@@ -78,7 +80,7 @@
 				row = Array.new(kommissionen.length+2,"")
 				kg = 0
 				#Artikel
-				row[0] = "#{i.item if i.present?} #{i.description if i.present?}"
+				row[0] = truncate("#{i.item if i.present?} #{i.description if i.present?}",length: 25)
 				
 				weightings.each do |w|
 					kg+=w.weight_netto
@@ -103,10 +105,10 @@
 			
 			items << tmp
 
-			items << [
-				{:content =>  "Zinkauflage bei roh #{number_to_currency(@sum_raw.round, unit: "", precision: 0)}", :font_style => :bold},
-				{:content => "#{za(@sum_raw, @sum_netto)} %", :font_style => :bold}
-			]
+			#items << [
+			#	{:content =>  "Zinkauflage bei roh #{number_to_currency(@sum_raw.round, unit: "", precision: 0)}", :font_style => :bold},
+			#	{:content => "#{za(@sum_raw, @sum_netto)} %", :font_style => :bold}
+			#]
 			
 		end
 
@@ -115,8 +117,10 @@
 			pdf.table items, :header => true,
 				:row_colors => ["FFFFFF", "E1EEf4"],
 				:cell_style => { :size => 10, :align => :right, :padding => [3,5,3,5] } do
-				row(0).font_style = :bold
-			end
+					row(0).font_style = :bold
+					column(1).font_style = :bold
+				end
+
 		end
 
 		send_data pdf.render, filename: "AbrechnungMeiserVogtlandOHG_#{@indate.strftime("%d%m%Y")}.pdf",
