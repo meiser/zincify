@@ -80,8 +80,8 @@
 				row = Array.new(kommissionen.length+2,"")
 				kg = 0
 				#Artikel
-				row[0] = truncate("#{i.item if i.present?} #{i.description if i.present?}",length: 25)
-				
+				#row[0] = truncate("#{i.item if i.present?} #{i.description if i.present?}",length: 25)
+				row[0] = "#{i.item.strip if i.present?} \n #{i.description.strip if i.present?}"
 				weightings.each do |w|
 					kg+=w.weight_netto
 					weight_per_kommission[kommissionen.index(w.ref)+2] +=w.weight_netto
