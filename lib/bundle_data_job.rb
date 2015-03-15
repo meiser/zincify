@@ -15,6 +15,9 @@ class BundleDataJob < Struct.new(:deliver_reference_id)
 		b.save
 	   end
 	   
+	   #Oracle Datenbank Infor LN
+	   #keine Lieferscheinnummerscannung mehr moeglich fuer LN
+	   
    end
   end
 
