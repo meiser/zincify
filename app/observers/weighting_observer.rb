@@ -15,7 +15,16 @@ class WeightingObserver < ActiveRecord::Observer
 		dr = DeliverReference.find(tag.deliver_reference)
 		md = MeiserDelivery.find(dr.delivery_id)
 		c = Customer.where(:bpid => "280000001").first
-		t.data= "#{md.tag}|#{c.name}|#{weighting.sort_list.number}. #{weighting.sort_list.description}|#{I18n.l(weighting.created_at, :format => :coupon)}|#{weighting.weight_brutto}|#{weighting.weight_tara}|#{weighting.weight_netto}|#{weighting.pid}|#{("B "+weighting.barcode[-3,3].strip) if (weighting.barcode.starts_with?("003") and weighting.barcode.length == 15 and weighting.barcode[3]!="T")}"
+		
+		my_id = ""
+		if weighting.barcode.starts_with?("003") and weighting.barcode.length == 15 and weighting.barcode[3]!="T"
+			if weighting.barcode[-3,3].strip == "120"
+				my_id = weighting.barcode[-12,9]
+			else
+				my_id = "B "+weighting.barcode[-3,3].strip
+			end
+		end
+		t.data= "#{md.tag}|#{c.name}|#{weighting.sort_list.number}. #{weighting.sort_list.description}|#{I18n.l(weighting.created_at, :format => :coupon)}|#{weighting.weight_brutto}|#{weighting.weight_tara}|#{weighting.weight_netto}|#{weighting.pid}|#{my_id}"
 		t.save
 		commission= md.tag
 	else
