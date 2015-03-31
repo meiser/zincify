@@ -233,7 +233,7 @@
 			
 		#alle Verwiegungen der Kommission, bereinigt nach Zeit, da Kommission mehrmals durchlaufen sein kann
 
-		w = Weighting.where(:ref =>@meiser_delivery.tag).where(:created_at => @meiser_delivery.created_at..@meiser_delivery.created_at+30.days)
+		w = Weighting.where(:ref =>@meiser_delivery.tag).where(:created_at => @meiser_delivery.created_at-30.days..@meiser_delivery.created_at+30.days)
 		
 		#alle Bunde die mit Kommission eingegeben wurden
 		@bundles_without_barcode = w.where(:barcode => nil)
