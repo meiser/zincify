@@ -289,7 +289,96 @@
 			send_data spreadsheet.string, :filename => "Kommission #{@meiser_delivery.tag} vom #{I18n.l @meiser_delivery.created_at}.xls", :type =>  "application/vnd.ms-excel", :disposition => "inline"
 			
 		}
-		format.html{render layout: "item"}
+		format.html {render layout: "item"}
+		format.pdf {
+			pdf = Prawn::Document.new(
+				page_size: "A4",
+				page_layout: :portrait,
+				margin: [50,100,20,40],
+			)
+				
+			pdf.text "Ladeliste Meiser Vogtland OHG Kommission #{@meiser_delivery.tag} vom #{I18n.l @meiser_delivery.created_at}"
+			pdf.text " "
+			pdf.table [['Produktionsauftrag','Projekt','Artikel','Menge']], :header => true,
+				:width => 500,
+				:row_colors => ["FFFFFF", "E1EEf4"],
+				:cell_style => { :size => 10, :align => :right, :padding => [3,5,3,5] } do
+					row(0).font_style = :bold
+				end
+
+			
+			
+			pdf.text " "
+			
+			unless @bundles.empty?
+				@bundles.each do |b|
+					items = []
+					if b.barcode.length >= 9
+						
+						#Angabe Bundinformationen (Bund-Id, Zink und Besonerheit sowie Gesamtgewicht
+						if b.barcode.last(3) == '120'
+							items << [
+								"Bund-ID #{b.barcode[3,b.barcode.length-6]}",
+								b.info.to_s.strip,
+								b.zinc.to_s.strip,
+								"Bundgewicht (kg): #{b.weight_raw.to_s}"
+							]	
+						else						
+							items << [
+								"Lieferung #{b.barcode} Bund #{b.barcode.last(3).to_s.strip}",
+								b.info.to_s.strip,
+								b.zinc.to_s.strip,
+								"Bundgewicht (kg): #{b.weight_raw.to_s}"
+							]
+						end
+						oracle = OCI8.new(ENV["ORACLE_USER"], ENV["ORACLE_PASSWORD"], ENV["ORACLE_URL"])
+						#Besonderheiten Verzinkungsbund
+						sql = "SELECT t$pdno,t$cprj, t$mitm, t$dqua FROM ln61.ttibde914101 where t$ncmp =:1 and t$load =:2"
+						oracle.exec(sql,b.barcode.last(3).to_i, b.barcode[3,b.barcode.length-6]) do |r|
+						
+							items << r
+							#pdf.text "#{r[0]} mit #{r[1]} und #{r[2]}", align: :right
+						end
+					
+						oracle.logoff
+						
+						unless items.empty?# or items.length <= 1
+					
+							pdf.table items, :header => true,
+								:width => 500,
+								:row_colors => ["FFFFFF", "E1EEf4"],
+								:cell_style => { :size => 10, :align => :right, :padding => [3,5,3,5] } do
+									row(0).font_style = :bold
+									row(0).borders = []
+									column(3).font_style = :bold
+								end
+						end
+					
+					else
+						pdf.text "#{b.barcode}     #{b.info.to_s}     #{b.zinc.to_s}     Bundgewicht: #{b.weight_raw.to_s}"
+					end					
+					
+					pdf.text(" ")
+
+				end
+			
+			end
+	
+	
+			pdf.text "GESAMTGEWICHT (kg): #{@bundles.sum(:weight_raw).to_s}", align: :right
+		
+		
+			pdf.number_pages "<page> von <total>", { :start_count_at => 0, :page_filter => :all, :at => [pdf.bounds.right - 50, 0], :align => :right, :size => 14 }
+
+		
+			send_data pdf.render, filename: "LadelisteMeiserVogtlandOHG_#{@meiser_delivery.tag}_#{@meiser_delivery.created_at.strftime("%d%m%Y")}.pdf",
+                          type: "application/pdf",
+                          disposition: "inline"
+	
+			
+		
+			
+		}
 	end
 	
   end

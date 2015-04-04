@@ -65,6 +65,9 @@
    list_details_html:
     text: Überblick Kommission
     tooltip: Kontrolle des Bearbeitungsstandes der gesamten Kommission
+   commission_list:
+    text: Ladeliste
+    tooltip: Druck der Ladeliste der aktuellen Kommission
  delivery_grid:
    actions:
     list_bill:

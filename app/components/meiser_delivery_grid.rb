@@ -13,6 +13,7 @@
 			this.actions.listDetailsHtml.setDisabled(selModel.getCount() > 1);
 			this.actions.setItems.setDisabled(selModel.getCount() > 1);
 			this.actions.listBill.setDisabled(selModel.getCount() > 1);
+			this.actions.commissionList.setDisabled(selModel.getCount() > 1);
 		});
       }
     JS
@@ -128,6 +129,29 @@
       }
     JS
 	
+	c.on_commission_list = <<-JS
+		function(){
+			Ext.iterate(this.getSelectionModel().getSelection(),function(key,value){
+				window.open("meiser_deliveries/"+key.data.id+".pdf", "_blank");
+				//console.log(key.data.id);
+			/*Rails.MeiserDeliveriesController.print_commission({"id": key.data.id}, function(r,e){
+				if (r.success == true){
+					Ext.Msg.show({
+					  title: r.title,
+					  width: 300,
+					  msg: r.message,
+					  buttons: Ext.Msg.OK,
+					  icon: Ext.MessageBox.INFO
+					});
+				} else {
+					alert(r.success);
+				}
+				});*/
+			});
+		}
+	
+	JS
+	
   end
   
   component :bill_form_window do |c|
@@ -146,6 +170,11 @@
   
   action :list_details_html do |c|
     c.icon = :information
+	c.disabled = true
+  end
+  
+  action :commission_list do |c|
+	c.icon = :application_view_list
 	c.disabled = true
   end
   
@@ -197,7 +226,7 @@
 			:width => 200
 		}
 	]
-	c.tbar = [:add, :del, :edit, :list_details_html, :print_card]#, :list_details_excel]
+	c.tbar = [:add, :del, :edit, :list_details_html, :print_card, :commission_list]#, :list_details_excel]
 	c.bbar = [:set_items, :list_bill]
    
   end
