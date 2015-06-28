@@ -48,6 +48,31 @@ class WeightingObserver < ActiveRecord::Observer
    t.data= "#{weighting.ref}||#{weighting.sort_list.number}. #{weighting.sort_list.description}|#{I18n.l(weighting.created_at, :format => :coupon)}|#{weighting.weight_brutto}|#{weighting.weight_tara}|#{weighting.weight_netto}|#{weighting.pid}|"
    t.save
   end
+  
+  #Automatisches setzen der Infor LN Artikel-Spalte an Hand der selektierten Werte aus dem Sortenverzeichnis
+  #id	number	description
+  #40	90	Meiser Gitterroste				
+  #41	91	Meiser Treppenbau
+  #42	92	Meiser Blechprofilroste
+  #43	93	Meiser Weinbergpfaehle
+  
+  #Artikel V400010 – Gitterroste	ID 149
+  #Artikel V400020 – Treppenbau		ID 195
+  #Artikel V400050 – Blechprofilroste ID 207
+  #Artikel V400040 – Weinbergpfaehle   ID 206   
+    
+  case weighting.sort_list_id
+  when 40
+	weighting.update_column(:item_base_data_id, 149)
+  when 41
+	weighting.update_column(:item_base_data_id, 195)
+  when 42
+	weighting.update_column(:item_base_data_id, 207)
+  when 43
+	weighting.update_column(:item_base_data_id, 206)
+  else
+  end
+  
  end
  
  def after_save(weighting)
@@ -55,12 +80,11 @@ class WeightingObserver < ActiveRecord::Observer
 	#Rueckmeldung Verzinkungsbunde Gewicht, Datum, User
 	Delayed::Job.enqueue BaanCompletionJob.new(weighting.barcode, weighting.weight_netto, weighting.created_at, weighting.pid)
 	
-	
 	#Rueckmeldung Verzinkungsbunde Auf- und Abruestdatum
 	Delayed::Job.enqueue BundleDatiJob.new(weighting.id)
 	
   end
+  
  end
-
 end
 
