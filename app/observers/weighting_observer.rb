@@ -55,12 +55,14 @@ class WeightingObserver < ActiveRecord::Observer
   #41	91	Meiser Treppenbau
   #42	92	Meiser Blechprofilroste
   #43	93	Meiser Weinbergpfaehle
+  #44	94	Meiser privat
   
   #Artikel V400010 – Gitterroste	ID 149
   #Artikel V400020 – Treppenbau		ID 195
   #Artikel V400050 – Blechprofilroste ID 207
   #Artikel V400040 – Weinbergpfaehle   ID 206   
-    
+  #Artikel V400100 – Meiser privat   ID 237 
+  
   case weighting.sort_list_id
   when 40
 	weighting.update_column(:item_base_data_id, 149)
@@ -70,6 +72,8 @@ class WeightingObserver < ActiveRecord::Observer
 	weighting.update_column(:item_base_data_id, 207)
   when 43
 	weighting.update_column(:item_base_data_id, 206)
+  when 44
+	weighting.update_column(:item_base_data_id,237)
   else
   end
   
