@@ -17,7 +17,7 @@ class WeightingObserver < ActiveRecord::Observer
 		c = Customer.where(:bpid => "280000001").first
 		
 		my_id = ""
-		if weighting.barcode.starts_with?("003") and weighting.barcode.length == 15 and weighting.barcode[3]!="T"
+		if weighting.barcode.starts_with?("003") and weighting.barcode.length == 15
 			if weighting.barcode[-3,3].strip == "120"
 				my_id = weighting.barcode[-12,9]
 			else
