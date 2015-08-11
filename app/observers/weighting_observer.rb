@@ -51,12 +51,14 @@ class WeightingObserver < ActiveRecord::Observer
   
   #Automatisches setzen der Infor LN Artikel-Spalte an Hand der selektierten Werte aus dem Sortenverzeichnis
   #id	number	description
+  #38   53	Entzinken
   #40	90	Meiser Gitterroste				
   #41	91	Meiser Treppenbau
   #42	92	Meiser Blechprofilroste
   #43	93	Meiser Weinbergpfaehle
   #44	94	Meiser privat
   
+  #Artikel V702201 - nur Entzinken (Sonderpreis)	ID 155
   #Artikel V400010 – Gitterroste	ID 149
   #Artikel V400020 – Treppenbau		ID 195
   #Artikel V400050 – Blechprofilroste ID 207
@@ -64,6 +66,8 @@ class WeightingObserver < ActiveRecord::Observer
   #Artikel V400100 – Meiser privat   ID 237 
   
   case weighting.sort_list_id
+  when 38
+    weighting.update_column(:item_base_data_id, 155)
   when 40
 	weighting.update_column(:item_base_data_id, 149)
   when 41
