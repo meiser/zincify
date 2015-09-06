@@ -13,6 +13,7 @@ class MeiserBundleTag < ActiveRecord::Base
   
   def strip_barcode
 	self.barcode.strip!
+	self.barcode.upcase!
   end
   
 end

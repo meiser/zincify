@@ -14,6 +14,8 @@
   
 	@weighting = Weighting.new
 	@weighting.barcode = params[:barcode]
+	@weighting.barcode.strip!
+	@weighting.barcode.upcase!
 	@weighting.pid = params[:pid]
 	
 	scale=Rhewa82::Comfort.new("172.17.206.160",8000)

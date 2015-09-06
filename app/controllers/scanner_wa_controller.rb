@@ -80,7 +80,7 @@
 				#render :text => "mit #{MeiserBundleTag.where(:deliver_reference_id => dr.id).count.to_s} Scan(s)", :status => 201
 			else
 				
-				bundle = MeiserBundleTag.where(:barcode => params[:barcode]).first
+				bundle = MeiserBundleTag.where(:barcode => params[:barcode].upcase).first
 				
 				render :text => "Barcode bereits für Kommission #{bundle.deliver_reference.meiser_delivery.tag} gescannt. Ändern?", :status => 302
 			end
