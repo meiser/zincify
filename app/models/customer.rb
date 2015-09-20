@@ -2,7 +2,7 @@ class Customer < ActiveRecord::Base
 
   include MeiserRails::Informix
 
-  attr_accessible :address, :name
+  attr_accessible :address, :name, :telephone
   
   has_many :deliveries
 
