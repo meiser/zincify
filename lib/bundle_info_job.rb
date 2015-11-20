@@ -12,7 +12,7 @@ class BundleInfoJob < Struct.new(:meiser_bundle_tag_id)
 			art = bundle_id[0,3]
 			delivery = bundle_id[3,9]
 			bund = bundle_id[12,3]
-	   
+=begin	   
 			#Abfrage Informix Datenbank Baan ERP
 			Meiser.foreach_baan("SELECT t_wght, t_verzink, t_dicke FROM ttibde915120 where t_load = ? and t_bund = ?",[delivery, bund]) do |bund|
 				# get weight bundle
@@ -38,10 +38,7 @@ class BundleInfoJob < Struct.new(:meiser_bundle_tag_id)
 			#Abfrage Oracle Datenbank Infor LN
 			#Lieferung wird zu Bund ID
 			#Bundnummer wird Enterprise unit
-		  
-			if bund == '120'
-			
-			
+=end		  
 				oracle = OCI8.new(ENV["ORACLE_USER"], ENV["ORACLE_PASSWORD"], ENV["ORACLE_URL"])
 
 				oracle.exec("SELECT t$wght, t$verzink, t$dicke FROM ln61.ttibde915101 where t$ncmp = :1 and t$load = :2", bund, delivery) do |b|
@@ -65,8 +62,7 @@ class BundleInfoJob < Struct.new(:meiser_bundle_tag_id)
 					
 					
 				end
-			
-			end
+
 		end   
 	
 

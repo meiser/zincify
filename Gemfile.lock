@@ -7,14 +7,6 @@ GIT
       net-ldap (>= 0.3.1, < 0.6.0)
 
 GIT
-  remote: git://github.com/meiser/meiser-rails.git
-  revision: 03418fe1bcd150498d577798e2499da1022604f5
-  specs:
-    meiser-rails (0.0.1)
-      ibm_db (~> 2.5.10)
-      rails (>= 3.1.0)
-
-GIT
   remote: git://github.com/tigrish/devise-i18n.git
   revision: 969c3af4d19477711e15e0f643fea47333de6759
   specs:
@@ -85,10 +77,6 @@ GEM
     gravatar_image_tag (1.2.0)
     hike (1.2.3)
     i18n (0.6.11)
-    ibm_db (2.5.18)
-      activerecord (>= 1.15.1)
-    ibm_db (2.5.18-x86-mingw32)
-      activerecord (>= 1.15.1)
     journey (1.0.4)
     jquery-rails (3.1.2)
       railties (>= 3.0, < 5.0)
@@ -204,10 +192,8 @@ DEPENDENCIES
   devise_ldap_authenticatable!
   extr
   gravatar_image_tag
-  ibm_db
   jquery-rails
   jquery-ui-rails
-  meiser-rails!
   net-ldap
   netzke-basepack (= 0.8.4)
   netzke-core (= 0.8.4)

@@ -24,9 +24,9 @@ gem 'jquery-ui-rails'
 
 gem 'net-ldap'
 
-gem 'meiser-rails', :git => 'git://github.com/meiser/meiser-rails.git'
+#gem 'meiser-rails', :git => 'git://github.com/meiser/meiser-rails.git'
 
-gem 'ibm_db'
+#gem 'ibm_db'
 gem 'validates_timeliness', '~> 3.0'
 gem 'gravatar_image_tag'
 gem 'rails-i18n'
