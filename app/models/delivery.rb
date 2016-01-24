@@ -7,7 +7,7 @@ class Delivery < ActiveRecord::Base
   belongs_to :cash_payer
   belongs_to :customer
 
-  default_scope order("indate DESC")
+  default_scope {order("indate DESC")}
   
   #has_one :commission
   has_many :bookings
