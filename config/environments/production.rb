@@ -62,6 +62,8 @@ Zincify::Application.configure do
   config.active_support.deprecation = :notify
   
   config.eager_load = true
+  
+  config.log_level = :info
 
   # Log the query plan for queries taking more than this (works
   # with SQLite, MySQL, and PostgreSQL)
