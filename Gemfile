@@ -1,6 +1,6 @@
 source 'http://rubygems.org'
 
-gem 'rails', '4.2.5'
+gem 'rails', '4.1.14'
 gem 'rails-observers'
 #gem 'strong_parameters'
 gem 'protected_attributes'
@@ -36,7 +36,7 @@ gem 'jquery-ui-rails'
 #gem 'ibm_db'
 gem 'validates_timeliness', '~> 3.0'
 #gem 'gravatar_image_tag'
-gem 'rails-i18n', github: 'svenfuchs/rails-i18n', branch: 'master' # For 4.x
+gem 'rails-i18n'#, github: 'svenfuchs/rails-i18n', branch: 'master' # For 4.x
 
 #gem 'linguistics'
 
@@ -46,7 +46,7 @@ gem 'delayed_job_active_record'
 
 # SUPPORT SQL_SERVER
 gem 'tiny_tds'
-gem 'activerecord-sqlserver-adapter', :git => 'git://github.com/rails-sqlserver/activerecord-sqlserver-adapter.git'
+gem 'activerecord-sqlserver-adapter', '4.1.2'#, :git => 'git://github.com/rails-sqlserver/activerecord-sqlserver-adapter.git'
 gem 'activerecord-session_store'
 # Authentification
 #gem 'devise'
@@ -54,8 +54,9 @@ gem 'activerecord-session_store'
 #gem 'devise_ldap_authenticatable', :git => 'git://github.com/cschiewek/devise_ldap_authenticatable.git'
 
 # Sencha
-gem 'netzke-core'#, '0.8.4' #, :git => "git://github.com/netzke/netzke-core.git"
-gem 'netzke-basepack'#, '0.8.4' #, :git => "git://github.com/netzke/netzke-basepack.git"
+gem 'netzke', '0.12.0'
+#gem 'netzke-core'#, '0.8.4' #, :git => "git://github.com/netzke/netzke-core.git"
+#gem 'netzke-basepack'#, '0.8.4' #, :git => "git://github.com/netzke/netzke-basepack.git"
 gem 'extr'#, :path => "../extr"
 
 gem 'spreadsheet'

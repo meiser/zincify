@@ -66,7 +66,7 @@ module Zincify
     config.assets.version = '1.0'
 	
 	# Delayed Job Engine Active Job
-	config.active_job.queue_adapter = :delayed_job	
+	#config.active_job.queue_adapter = :delayed_job	
   end
 end
 

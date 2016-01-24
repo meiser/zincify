@@ -3,7 +3,7 @@ Netzke::Core.setup do |config|
    config.ext_uri = "http://cdn.sencha.com/ext-4.1.1a-gpl" if ENV['EXTJS_SRC'] == 'cdn'
 
   # feedback delay
-   config.js_feedback_delay = 8000
+  # config.js_feedback_delay = 8000
  end
  
  unless Rails.env.production?
