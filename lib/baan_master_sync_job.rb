@@ -8,7 +8,7 @@
 		oracle.exec("select t$item, t$dsca from ln61.ttcibd001280") do |row|
 			#nur Artikel Verzinkung beginnen mit V im Normteil Artikelcode
 			if row[0][9] == 'V'
-				item = ItemBaseData.find_or_initialize_by_item(row[0])
+				item = ItemBaseData.find_or_initialize_by(:item => row[0])
 				item.description = row[1]
 				item.save
 			end

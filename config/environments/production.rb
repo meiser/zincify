@@ -9,13 +9,19 @@ Zincify::Application.configure do
   config.action_controller.perform_caching = true
 
   # Disable Rails's static asset server (Apache or nginx will already do this)
+  #config.serve_static_assets = true
   config.serve_static_files = true
 
+  config.serve_static_assets = true
+
+  config.static_cache_control = 'public, max-age=3600'
+
+  
   # Compress JavaScripts and CSS
   config.assets.compress = false
 
   # Don't fallback to assets pipeline if a precompiled asset is missed
-  config.assets.compile = false
+  config.assets.compile = true
 
   # Generate digests for assets URLs
   config.assets.digest = false
@@ -63,7 +69,7 @@ Zincify::Application.configure do
   
   config.eager_load = true
   
-  config.log_level = :info
+  config.log_level = :debug
 
   # Log the query plan for queries taking more than this (works
   # with SQLite, MySQL, and PostgreSQL)

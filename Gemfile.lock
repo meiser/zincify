@@ -42,7 +42,7 @@ GEM
     coffee-script (2.4.1)
       coffee-script-source
       execjs
-    coffee-script-source (1.10.0)
+    coffee-script-source (1.8.0)
     concurrent-ruby (1.0.0)
     daemons (1.2.3)
     delayed_job (4.1.1)
@@ -160,6 +160,7 @@ DEPENDENCIES
   activerecord-session_store
   activerecord-sqlserver-adapter (= 4.1.2)
   coffee-rails
+  coffee-script-source (= 1.8.0)
   delayed_job
   delayed_job_active_record
   extr
