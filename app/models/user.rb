@@ -1,7 +1,7 @@
 class User < ActiveRecord::Base
   attr_accessible :login, :default_printer
   
-  devise :ldap_authenticatable
+  #devise :ldap_authenticatable
   
   serialize :preferences, OpenStruct
   
@@ -9,7 +9,7 @@ class User < ActiveRecord::Base
   
   
   def get_login
-	self.login = Devise::LdapAdapter.get_ldap_param(self.email,"sAMAccountName")
+	#self.login = Devise::LdapAdapter.get_ldap_param(self.email,"sAMAccountName")
   end
   
   
