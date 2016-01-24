@@ -7,7 +7,7 @@ Ext.define('Pandora.model.Station', {
         url: 'data/stations.json',
         reader: {
             type: 'json',
-            root: 'results'
+            rootProperty: 'results'
         }
     }
 });

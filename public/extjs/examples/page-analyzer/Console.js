@@ -16,8 +16,6 @@ Ext.define('PageAnalyzer.Console', {
     initComponent: function () {
         var me = this;
 
-        me.addEvents('rawdataupdate');
-
         me.pathTpl = new Ext.XTemplate('{test} ({env} - {build})');
         me.samples = [];
 

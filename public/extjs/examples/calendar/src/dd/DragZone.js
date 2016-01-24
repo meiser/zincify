@@ -37,7 +37,7 @@ Ext.define('Ext.calendar.dd.DragZone', {
 
         // If not dragging an event then we are dragging on
         // the calendar to add a new event
-        t = this.view.getDayAt(e.getPageX(), e.getPageY());
+        t = this.view.getDayAt(e.getX(), e.getY());
         if (t.el) {
             return {
                 type: 'caldrag',

@@ -8,7 +8,7 @@ Ext.define('SimpleTasks.view.tasks.Grid', {
     xtype: 'taskGrid',
     requires: [
         'SimpleTasks.ux.DragDrop',
-        'SimpleTasks.ux.CheckColumn',
+        'SimpleTasks.ux.StatusColumn',
         'SimpleTasks.ux.ReminderColumn',
         'Ext.grid.plugin.CellEditing',
         'Ext.grid.column.Action',
@@ -49,6 +49,39 @@ Ext.define('SimpleTasks.view.tasks.Grid', {
         }
     ],
 
+    /**
+     * @event editclick
+     * Fires when an edit icon is clicked
+     * @param {Ext.grid.View} view
+     * @param {Number} rowIndex
+     * @param {Number} colIndex
+     * @param {Ext.grid.column.Action} column
+     * @param {EventObject} e
+     */
+
+    /**
+     * @event deleteclick
+     * Fires when a delete icon is clicked
+     * @param {Ext.grid.View} view
+     * @param {Number} rowIndex
+     * @param {Number} colIndex
+     * @param {Ext.grid.column.Action} column
+     * @param {EventObject} e
+     */
+
+    /**
+     * @event edit
+     * Fires when a record is edited using the CellEditing plugin or the statuscolumn
+     * @param {SimpleTasks.model.Task} task     The task record that was edited
+     */
+
+    /**
+     * @event reminderselect
+     * Fires when a reminder time is selected from the reminder column's dropdown menu
+     * @param {SimpleTasks.model.Task} task    the underlying record of the row that was clicked to show the reminder menu
+     * @param {String|Number} value      The value that was selected
+     */
+
     initComponent: function() {
         var me = this,
             cellEditingPlugin = Ext.create('Ext.grid.plugin.CellEditing'),
@@ -74,7 +107,7 @@ Ext.define('SimpleTasks.view.tasks.Grid', {
             },
             items: [
                 {
-                    xtype: 'checkcolumn',
+                    xtype: 'statuscolumn',
                     dataIndex: 'done',
                     cls: 'tasks-icon-column-header tasks-done-column-header',
                     width: 24,
@@ -110,7 +143,7 @@ Ext.define('SimpleTasks.view.tasks.Grid', {
                     xtype: 'datecolumn',
                     text: 'Due Date',
                     dataIndex: 'due',
-                    width: 90,
+                    width: 100,
                     editor: 'datefield',
                     format: 'n/j/Y',
                     emptyCellText: ''
@@ -156,45 +189,6 @@ Ext.define('SimpleTasks.view.tasks.Grid', {
 
         me.callParent(arguments);
 
-        me.addEvents(
-            /**
-             * @event editclick
-             * Fires when an edit icon is clicked
-             * @param {Ext.grid.View} view
-             * @param {Number} rowIndex
-             * @param {Number} colIndex
-             * @param {Ext.grid.column.Action} column
-             * @param {EventObject} e
-             */
-            'editclick',
-
-            /**
-             * @event deleteclick
-             * Fires when a delete icon is clicked
-             * @param {Ext.grid.View} view
-             * @param {Number} rowIndex
-             * @param {Number} colIndex
-             * @param {Ext.grid.column.Action} column
-             * @param {EventObject} e
-             */
-            'deleteclick',
-
-            /**
-             * @event edit
-             * Fires when a record is edited using the CellEditing plugin or the checkcolumn
-             * @param {SimpleTasks.model.Task} task     The task record that was edited
-             */
-            'recordedit',
-            
-            /**
-             * @event reminderselect
-             * Fires when a reminder time is selected from the reminder column's dropdown menu
-             * @param {SimpleTasks.model.Task} task    the underlying record of the row that was clicked to show the reminder menu
-             * @param {String|Number} value      The value that was selected
-             */
-            'reminderselect'
-        );
-
         cellEditingPlugin.on('edit', me.handleCellEdit, this);
 
     },
@@ -230,7 +224,7 @@ Ext.define('SimpleTasks.view.tasks.Grid', {
     /**
      * Handles a "checkchange" event on the "done" column
      * @private
-     * @param {SimpleTasks.ux.CheckColumn} column
+     * @param {SimpleTasks.ux.StatusColumn} column
      * @param {Number} rowIndex
      * @param {Boolean} checked
      */
@@ -259,22 +253,6 @@ Ext.define('SimpleTasks.view.tasks.Grid', {
     },
 
     /**
-     * Reapplies the store's current filters. This is needed because when data in the store is modified
-     * after filters have been applied, the filters do not automatically get applied to the new data.
-     */
-    refreshFilters: function() {
-        var store = this.store,
-            filters = store.filters;
-
-        // save a reference to the existing task filters before clearing them
-        filters = filters.getRange(0, filters.getCount() - 1);
-
-        // clear the tasks store's filters and reapply them.
-        store.clearFilter();
-        store.filter(filters);
-    },
-
-    /**
      * Renderer for the list column
      * @private
      * @param {Number} value
@@ -287,7 +265,7 @@ Ext.define('SimpleTasks.view.tasks.Grid', {
      */
     renderList: function(value, metaData, task, rowIndex, colIndex, store, view) {
         var listsStore = Ext.getStore('Lists'),
-            node = value ? listsStore.getNodeById(value) : listsStore.getRootNode();
+            node = value ? listsStore.getNodeById(value) : listsStore.getRoot();
 
         return node.get('name');
     },

@@ -1,24 +1,25 @@
+<!DOCTYPE html>
 <html>
 <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Infinite Scroll Grid Example</title>
+    <title>Buffer Rendered Locking Grid</title>
 
-    <link rel="stylesheet" type="text/css" href="../../resources/css/ext-all.css"/>
     <link rel="stylesheet" type="text/css" href="../shared/example.css" />
 
     <!-- GC -->
 
-    <script type="text/javascript" src="../../ext-all.js"></script>
+    <script type="text/javascript" src="../../examples/shared/include-ext.js"></script>
+    <script type="text/javascript" src="../../examples/shared/options-toolbar.js"></script>
 
     <script type="text/javascript" src="locking-infinite-scroll.js"></script>
 </head>
 <body>
-    <h1>Infinite Scrolling</h1>
-    <p>Ext JS 4's brand new grid supports infinite scrolling, which enables you to load any number of records into a grid without paging.</p>
-    <p>The new grid uses a virtualized scrolling system to handle potentially infinite data sets without any impact on client side performance.</p>
-    <p>The code is not minified, see <a href="infinite-scroll.js">infinite-scroll.js</a></p>
-    <p>The grid's <code>viewSize</code> is configured as 50 which means that only 50 data rows are rendered at any time.
-    As the edge of the rendered data scrolls towards being in view, the table is refreshed, and repositioned to maintain
-    visual scroll position.</p>
+    <h1>Buffer Rendered Locking Grid</h1>
+    <p>Ext JS's grid supports buffered rendering, which enables you to load large numbers of records into a grid without paging.</p>
+    <p>Only the <b>visible</b> portions of the loaded store are rendered into the DOM. As the edge of the rendered data scrolls towards being in
+        view, the table has new rows appended just in time, and rows removed from the receding side.</p>
+    <p>It is not possible to lock <i>all</i> columns using the user interface. The side unlocked must always contain at least one column.</p>
+    <p>The code is not minified, see <a href="locking-infinite-scroll.js">locking-infinite-scroll.js</a></p>
 </body>
 </html>

@@ -23,31 +23,23 @@ Ext.define('Ext.calendar.view.DayBody', {
     //private
     dayColumnElIdDelimiter: '-day-col-',
 
-    //private
-    initComponent: function() {
-        this.callParent(arguments);
+    /**
+     * @event eventresize
+     * Fires after the user drags the resize handle of an event to resize it
+     * @param {Ext.calendar.view.DayBody} this
+     * @param {Ext.calendar.EventRecord} rec The {@link Ext.calendar.EventRecord record} for the event that was resized
+     * containing the updated start and end dates
+     */
 
-        this.addEvents({
-            /**
-             * @event eventresize
-             * Fires after the user drags the resize handle of an event to resize it
-             * @param {Ext.calendar.view.DayBody} this
-             * @param {Ext.calendar.EventRecord} rec The {@link Ext.calendar.EventRecord record} for the event that was resized
-             * containing the updated start and end dates
-             */
-            eventresize: true,
-            /**
-             * @event dayclick
-             * Fires after the user clicks within the day view container and not on an event element
-             * @param {Ext.calendar.view.DayBody} this
-             * @param {Date} dt The date/time that was clicked on
-             * @param {Boolean} allday True if the day clicked on represents an all-day box, else false. Clicks within the 
-             * DayBodyView always return false for this param.
-             * @param {Ext.core.Element} el The Element that was clicked on
-             */
-            dayclick: true
-        });
-    },
+    /**
+     * @event dayclick
+     * Fires after the user clicks within the day view container and not on an event element
+     * @param {Ext.calendar.view.DayBody} this
+     * @param {Date} dt The date/time that was clicked on
+     * @param {Boolean} allday True if the day clicked on represents an all-day box, else false. Clicks within the 
+     * DayBodyView always return false for this param.
+     * @param {Ext.core.Element} el The Element that was clicked on
+     */
 
     //private
     initDD: function() {
@@ -360,6 +352,7 @@ Ext.define('Ext.calendar.view.DayBody', {
             }
             markup = this.getEventTemplate().apply(evt);
             target = this.id + '-day-col-' + Ext.Date.format(evts[i].date, 'Ymd');
+            Ext.get(target).select('*').destroy();
 
             Ext.core.DomHelper.append(target, markup);
         }
@@ -410,7 +403,7 @@ Ext.define('Ext.calendar.view.DayBody', {
             timeX = x;
 
         if (el) {
-            timeX = el.getLeft();
+            timeX = el.getX();
         }
 
         return {

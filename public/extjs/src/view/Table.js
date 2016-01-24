@@ -13,25 +13,137 @@
  */
 Ext.define('Ext.view.Table', {
     extend: 'Ext.view.View',
-    alias: 'widget.tableview',
-    uses: [
+    xtype: [ 'tableview', 'gridview' ],
+    alternateClassName: 'Ext.grid.View',
+    requires: [
+        'Ext.grid.CellContext',
         'Ext.view.TableLayout',
-        'Ext.view.TableChunker',
+        'Ext.grid.locking.RowSynchronizer',
+        'Ext.view.NodeCache',
         'Ext.util.DelayedTask',
         'Ext.util.MixedCollection'
     ],
+
+    /*
+     * @property {Boolean}
+     * `true` in this class to identify an object as an instantiated Ext.view.TableView, or subclass thereof.
+     */
+    isTableView: true,
+
+    config: {
+        selectionModel: {
+            type: 'rowmodel'
+        }
+    },
+    
+    inheritableStatics: {
+        // Events a TableView may fire.
+        // Used by Ext.grid.locking.View to relay view events to user code
+        events: [
+            "blur",
+            "focus",
+            "move",
+            "resize",
+            "destroy",
+            "beforedestroy",
+            "boxready",
+            "afterrender",
+            "render",
+            "beforerender",
+            "removed",
+            "hide",
+            "beforehide",
+            "show",
+            "beforeshow",
+            "enable",
+            "disable",
+            "added",
+            "deactivate",
+            "beforedeactivate",
+            "activate",
+            "beforeactivate",
+            "cellkeydown",
+            "beforecellkeydown",
+            "cellmouseup",
+            "beforecellmouseup",
+            "cellmousedown",
+            "beforecellmousedown",
+            "cellcontextmenu",
+            "beforecellcontextmenu",
+            "celldblclick",
+            "beforecelldblclick",
+            "cellclick",
+            "beforecellclick",
+            "refresh",
+            "itemremove",
+            "itemadd",
+            "itemupdate",
+            "viewready",
+            "beforerefresh",
+            "unhighlightitem",
+            "highlightitem",
+            "focuschange",
+            "deselect",
+            "select",
+            "beforedeselect",
+            "beforeselect",
+            "selectionchange",
+            "containerkeydown",
+            "containercontextmenu",
+            "containerdblclick",
+            "containerclick",
+            "containermouseout",
+            "containermouseover",
+            "containermouseup",
+            "containermousedown",
+            "beforecontainerkeydown",
+            "beforecontainercontextmenu",
+            "beforecontainerdblclick",
+            "beforecontainerclick",
+            "beforecontainermouseout",
+            "beforecontainermouseover",
+            "beforecontainermouseup",
+            "beforecontainermousedown",
+            "itemkeydown",
+            "itemcontextmenu",
+            "itemdblclick",
+            "itemclick",
+            "itemmouseleave",
+            "itemmouseenter",
+            "itemmouseup",
+            "itemmousedown",
+            "rowclick",
+            "rowcontextmenu",
+            "rowdblclick",
+            "rowkeydown",
+            "rowmouseup",
+            "rowmousedown",
+            "rowkeydown",
+            "beforeitemkeydown",
+            "beforeitemcontextmenu",
+            "beforeitemdblclick",
+            "beforeitemclick",
+            "beforeitemmouseleave",
+            "beforeitemmouseenter",
+            "beforeitemmouseup",
+            "beforeitemmousedown",
+            "statesave",
+            "beforestatesave",
+            "staterestore",
+            "beforestaterestore",
+            "uievent",
+            "groupcollapse",
+            "groupexpand"
+        ]
+    },
+
+    scrollable: true,
 
     componentLayout: 'tableview',
 
     baseCls: Ext.baseCSSPrefix + 'grid-view',
 
-    // row
-    itemSelector: 'tr.' + Ext.baseCSSPrefix + 'grid-row',
-    // cell
-    cellSelector: 'td.' + Ext.baseCSSPrefix + 'grid-cell',
-
-    // keep a separate rowSelector, since we may need to select the actual row elements
-    rowSelector: 'tr.' + Ext.baseCSSPrefix + 'grid-row',
+    unselectableCls: Ext.baseCSSPrefix + 'unselectable',
 
     /**
      * @cfg {String} [firstCls='x-grid-cell-first']
@@ -47,15 +159,18 @@ Ext.define('Ext.view.Table', {
      */
     lastCls: Ext.baseCSSPrefix + 'grid-cell-last',
 
-    headerRowSelector: 'tr.' + Ext.baseCSSPrefix + 'grid-header-row',
-
-    selectedItemCls: Ext.baseCSSPrefix + 'grid-row-selected',
+    itemCls: Ext.baseCSSPrefix + 'grid-item',
+    selectedItemCls: Ext.baseCSSPrefix + 'grid-item-selected',
     selectedCellCls: Ext.baseCSSPrefix + 'grid-cell-selected',
-    focusedItemCls: Ext.baseCSSPrefix + 'grid-row-focused',
-    overItemCls: Ext.baseCSSPrefix + 'grid-row-over',
-    altRowCls:   Ext.baseCSSPrefix + 'grid-row-alt',
-    rowClsRe: new RegExp('(?:^|\\s*)' + Ext.baseCSSPrefix + 'grid-row-(first|last|alt)(?:\\s+|$)', 'g'),
-    cellRe: new RegExp(Ext.baseCSSPrefix + 'grid-cell-([^\\s]+) ', ''),
+    focusedItemCls: Ext.baseCSSPrefix + 'grid-item-focused',
+    overItemCls: Ext.baseCSSPrefix + 'grid-item-over',
+    altRowCls:   Ext.baseCSSPrefix + 'grid-item-alt',
+    dirtyCls: Ext.baseCSSPrefix + 'grid-dirty-cell',
+    rowClsRe: new RegExp('(?:^|\\s*)' + Ext.baseCSSPrefix + 'grid-item-alt(?:\\s+|$)', 'g'),
+    cellRe: new RegExp(Ext.baseCSSPrefix + 'grid-cell-([^\\s]+)(?:\\s|$)', ''),
+    positionBody: true,
+    positionCells: false,
+    stripeOnUpdate: null,
 
     // cfg docs inherited
     trackOver: true,
@@ -92,7 +207,7 @@ Ext.define('Ext.view.Table', {
      * modifier, or which uses a CSS selector of higher specificity.
      */
     stripeRows: true,
-    
+
     /**
      * @cfg {Boolean} markDirty
      * True to show the dirty cell indicator when a cell has been modified.
@@ -103,51 +218,485 @@ Ext.define('Ext.view.Table', {
      * @cfg {Boolean} enableTextSelection
      * True to enable text selections.
      */
+     
+    ariaRole: 'grid',
+
+    /**
+     * @property {Ext.view.Table} ownerGrid
+     * A reference to the top-level owning grid component. This is actually the TablePanel
+     * so it could be a tree.
+     * @readonly
+     * @private
+     * @since 5.0.0
+     */
+
+    /**
+     * @method disable
+     * Disable this view.
+     *
+     * Disables interaction with, and masks this view.
+     *
+     * Note that the encapsulating {@link Ext.panel.Table} panel is *not* disabled, and other *docked*
+     * components such as the panel header, the column header container, and docked toolbars will still be enabled.
+     * The panel itself can be disabled if that is required, or individual docked components could be disabled.
+     *
+     * See {@link Ext.panel.Table #disableColumnHeaders disableColumnHeaders} and {@link Ext.panel.Table #enableColumnHeaders enableColumnHeaders}.
+     *
+     * @param {Boolean} [silent=false] Passing `true` will suppress the `disable` event from being fired.
+     * @since 1.1.0
+     */
 
     /**
      * @private
-     * Simple initial tpl for TableView just to satisfy the validation within AbstractView.initComponent.
+     * Outer tpl for TableView just to satisfy the validation within AbstractView.initComponent.
      */
-    initialTpl: '<div></div>',
+    tpl: [
+        '{%',
+            'view = values.view;',
+            'if (!(columns = values.columns)) {',
+                'columns = values.columns = view.ownerCt.getVisibleColumnManager().getColumns();',
+            '}',
+            'values.fullWidth = 0;',
+            // Stamp cellWidth into the columns
+            'for (i = 0, len = columns.length; i < len; i++) {',
+                'column = columns[i];',
+                'values.fullWidth += (column.cellWidth = column.lastBox ? column.lastBox.width : column.width || column.minWidth);',
+            '}',
+
+            // Add the row/column line classes to the container element.
+            'tableCls=values.tableCls=[];',
+        '%}',
+        '<div class="' + Ext.baseCSSPrefix + 'grid-item-container" style="width:{fullWidth}px">',
+            '{[view.renderTHead(values, out, parent)]}',
+            '{%',
+                'view.renderRows(values.rows, values.columns, values.viewStartIndex, out);',
+            '%}',
+            '{[view.renderTFoot(values, out, parent)]}',
+        '</div>',
+        {
+            definitions: 'var view, tableCls, columns, i, len, column;',
+            priority: 0
+        }
+    ],
+
+    outerRowTpl: [
+        '<table id="{rowId}" ',
+            'data-boundView="{view.id}" ',
+            'data-recordId="{record.internalId}" ',
+            'data-recordIndex="{recordIndex}" ',
+            'class="{[values.itemClasses.join(" ")]}" cellPadding="0" cellSpacing="0" {ariaTableAttr} style="{itemStyle};width:0">',
+
+                // Do NOT emit a <TBODY> tag in case the nextTpl has to emit a <COLGROUP> column sizer element.
+                // Browser will create a tbody tag when it encounters the first <TR>
+                '{%',
+                    'this.nextTpl.applyOut(values, out, parent)',
+                '%}',
+        '</table>', {
+            priority: 9999
+        }
+    ],
+
+    rowTpl: [
+        '{%',
+            'var dataRowCls = values.recordIndex === -1 ? "" : " ' + Ext.baseCSSPrefix + 'grid-row";',
+        '%}',
+        '<tr class="{[values.rowClasses.join(" ")]} {[dataRowCls]}" {rowAttr:attributes} {ariaRowAttr}>',
+            '<tpl for="columns">' +
+                '{%',
+                    'parent.view.renderCell(values, parent.record, parent.recordIndex, parent.rowIndex, xindex - 1, out, parent)',
+                 '%}',
+            '</tpl>',
+        '</tr>',
+        {
+            priority: 0
+        }
+    ],
+
+    cellTpl: [
+        '<td class="{tdCls}" {tdAttr} {[Ext.aria ? "id=\\"" + Ext.id() + "\\"" : ""]} style="width:{column.cellWidth}px;<tpl if="tdStyle">{tdStyle}</tpl>" tabindex="-1" {ariaCellAttr} data-columnid="{[values.column.getItemId()]}">',
+            '<div {unselectableAttr} class="' + Ext.baseCSSPrefix + 'grid-cell-inner {innerCls}" ',
+                'style="text-align:{align};<tpl if="style">{style}</tpl>" {ariaCellInnerAttr}>{value}</div>',
+        '</td>', {
+            priority: 0
+        }
+    ],
+
+    /**
+     * @private
+     * Flag to disable refreshing SelectionModel on view refresh. Table views render rows with selected CSS class already added if necessary.
+     */
+    refreshSelmodelOnRefresh: false,
+
+    tableValues: {},
+
+    // Private properties used during the row and cell render process.
+    // They are allocated here on the prototype, and cleared/re-used to avoid GC churn during repeated rendering.
+    rowValues: {
+        itemClasses: [],
+        rowClasses: []
+    },
+    cellValues: {
+        classes: [
+            Ext.baseCSSPrefix + 'grid-cell ' + Ext.baseCSSPrefix + 'grid-td' // for styles shared between cell and rowwrap
+        ]
+    },
+
+     /**
+      * @event beforecellclick
+      * Fired before the cell click is processed. Return false to cancel the default action.
+      * @param {Ext.view.Table} this
+      * @param {HTMLElement} td The TD element for the cell.
+      * @param {Number} cellIndex
+      * @param {Ext.data.Model} record
+      * @param {HTMLElement} tr The TR element for the cell.
+      * @param {Number} rowIndex
+      * @param {Ext.event.Event} e
+      * @param {Ext.grid.CellContext} e.position A CellContext object which defines the target cell.
+      */
+
+     /**
+      * @event cellclick
+      * Fired when table cell is clicked.
+      * @param {Ext.view.Table} this
+      * @param {HTMLElement} td The TD element for the cell.
+      * @param {Number} cellIndex
+      * @param {Ext.data.Model} record
+      * @param {HTMLElement} tr The TR element for the cell.
+      * @param {Number} rowIndex
+      * @param {Ext.event.Event} e
+      * @param {Ext.grid.CellContext} e.position A CellContext object which defines the target cell.
+      */
+
+     /**
+      * @event beforecelldblclick
+      * Fired before the cell double click is processed. Return false to cancel the default action.
+      * @param {Ext.view.Table} this
+      * @param {HTMLElement} td The TD element for the cell.
+      * @param {Number} cellIndex
+      * @param {Ext.data.Model} record
+      * @param {HTMLElement} tr The TR element for the cell.
+      * @param {Number} rowIndex
+      * @param {Ext.event.Event} e
+      * @param {Ext.grid.CellContext} e.position A CellContext object which defines the target cell.
+      */
+
+     /**
+      * @event celldblclick
+      * Fired when table cell is double clicked.
+      * @param {Ext.view.Table} this
+      * @param {HTMLElement} td The TD element for the cell.
+      * @param {Number} cellIndex
+      * @param {Ext.data.Model} record
+      * @param {HTMLElement} tr The TR element for the cell.
+      * @param {Number} rowIndex
+      * @param {Ext.event.Event} e
+      * @param {Ext.grid.CellContext} e.position A CellContext object which defines the target cell.
+      */
+
+     /**
+      * @event beforecellcontextmenu
+      * Fired before the cell right click is processed. Return false to cancel the default action.
+      * @param {Ext.view.Table} this
+      * @param {HTMLElement} td The TD element for the cell.
+      * @param {Number} cellIndex
+      * @param {Ext.data.Model} record
+      * @param {HTMLElement} tr The TR element for the cell.
+      * @param {Number} rowIndex
+      * @param {Ext.event.Event} e
+      * @param {Ext.grid.CellContext} e.position A CellContext object which defines the target cell.
+      */
+
+     /**
+      * @event cellcontextmenu
+      * Fired when table cell is right clicked.
+      * @param {Ext.view.Table} this
+      * @param {HTMLElement} td The TD element for the cell.
+      * @param {Number} cellIndex
+      * @param {Ext.data.Model} record
+      * @param {HTMLElement} tr The TR element for the cell.
+      * @param {Number} rowIndex
+      * @param {Ext.event.Event} e
+      * @param {Ext.grid.CellContext} e.position A CellContext object which defines the target cell.
+      */
+
+     /**
+      * @event beforecellmousedown
+      * Fired before the cell mouse down is processed. Return false to cancel the default action.
+      * @param {Ext.view.Table} this
+      * @param {HTMLElement} td The TD element for the cell.
+      * @param {Number} cellIndex
+      * @param {Ext.data.Model} record
+      * @param {HTMLElement} tr The TR element for the cell.
+      * @param {Number} rowIndex
+      * @param {Ext.event.Event} e
+      * @param {Ext.grid.CellContext} e.position A CellContext object which defines the target cell.
+      */
+
+     /**
+      * @event cellmousedown
+      * Fired when the mousedown event is captured on the cell.
+      * @param {Ext.view.Table} this
+      * @param {HTMLElement} td The TD element for the cell.
+      * @param {Number} cellIndex
+      * @param {Ext.data.Model} record
+      * @param {HTMLElement} tr The TR element for the cell.
+      * @param {Number} rowIndex
+      * @param {Ext.event.Event} e
+      * @param {Ext.grid.CellContext} e.position A CellContext object which defines the target cell.
+      */
+
+     /**
+      * @event beforecellmouseup
+      * Fired before the cell mouse up is processed. Return false to cancel the default action.
+      * @param {Ext.view.Table} this
+      * @param {HTMLElement} td The TD element for the cell.
+      * @param {Number} cellIndex
+      * @param {Ext.data.Model} record
+      * @param {HTMLElement} tr The TR element for the cell.
+      * @param {Number} rowIndex
+      * @param {Ext.event.Event} e
+      * @param {Ext.grid.CellContext} e.position A CellContext object which defines the target cell.
+      */
+
+     /**
+      * @event cellmouseup
+      * Fired when the mouseup event is captured on the cell.
+      * @param {Ext.view.Table} this
+      * @param {HTMLElement} td The TD element for the cell.
+      * @param {Number} cellIndex
+      * @param {Ext.data.Model} record
+      * @param {HTMLElement} tr The TR element for the cell.
+      * @param {Number} rowIndex
+      * @param {Ext.event.Event} e
+      * @param {Ext.grid.CellContext} e.position A CellContext object which defines the target cell.
+      */
+
+     /**
+      * @event beforecellkeydown
+      * Fired before the cell key down is processed. Return false to cancel the default action.
+      * @param {Ext.view.Table} this
+      * @param {HTMLElement} td The TD element for the cell.
+      * @param {Number} cellIndex
+      * @param {Ext.data.Model} record
+      * @param {HTMLElement} tr The TR element for the cell.
+      * @param {Number} rowIndex
+      * @param {Ext.event.Event} e
+      * @param {Ext.grid.CellContext} e.position A CellContext object which defines the target cell.
+      */
+
+     /**
+      * @event cellkeydown
+      * Fired when the keydown event is captured on the cell.
+      * @param {Ext.view.Table} this
+      * @param {HTMLElement} td The TD element for the cell.
+      * @param {Number} cellIndex
+      * @param {Ext.data.Model} record
+      * @param {HTMLElement} tr The TR element for the cell.
+      * @param {Number} rowIndex
+      * @param {Ext.event.Event} e
+      * @param {Ext.grid.CellContext} e.position A CellContext object which defines the target cell.
+      */
+
+     /**
+      * @event rowclick
+      * Fired when table cell is clicked.
+      * @param {Ext.view.Table} this
+      * @param {Ext.data.Model} record
+      * @param {HTMLElement} tr The TR element for the cell.
+      * @param {Number} rowIndex
+      * @param {Ext.event.Event} e
+      * @param {Ext.grid.CellContext} e.position A CellContext object which defines the target cell.
+      */
+
+     /**
+      * @event rowdblclick
+      * Fired when table cell is double clicked.
+      * @param {Ext.view.Table} this
+      * @param {Ext.data.Model} record
+      * @param {HTMLElement} tr The TR element for the cell.
+      * @param {Number} rowIndex
+      * @param {Ext.event.Event} e
+      * @param {Ext.grid.CellContext} e.position A CellContext object which defines the target cell.
+      */
+
+     /**
+      * @event rowcontextmenu
+      * Fired when table cell is right clicked.
+      * @param {Ext.view.Table} this
+      * @param {Ext.data.Model} record
+      * @param {HTMLElement} tr The TR element for the cell.
+      * @param {Number} rowIndex
+      * @param {Ext.event.Event} e
+      * @param {Ext.grid.CellContext} e.position A CellContext object which defines the target cell.
+      */
+
+     /**
+      * @event rowmousedown
+      * Fired when the mousedown event is captured on the cell.
+      * @param {Ext.view.Table} this
+      * @param {Ext.data.Model} record
+      * @param {HTMLElement} tr The TR element for the cell.
+      * @param {Number} rowIndex
+      * @param {Ext.event.Event} e
+      * @param {Ext.grid.CellContext} e.position A CellContext object which defines the target cell.
+      */
+
+     /**
+      * @event rowmouseup
+      * Fired when the mouseup event is captured on the cell.
+      * @param {Ext.view.Table} this
+      * @param {Ext.data.Model} record
+      * @param {HTMLElement} tr The TR element for the cell.
+      * @param {Number} rowIndex
+      * @param {Ext.event.Event} e
+      * @param {Ext.grid.CellContext} e.position A CellContext object which defines the target cell.
+      */
+
+     /**
+      * @event rowkeydown
+      * Fired when the keydown event is captured on the cell.
+      * @param {Ext.view.Table} this
+      * @param {Ext.data.Model} record
+      * @param {HTMLElement} tr The TR element for the cell.
+      * @param {Number} rowIndex
+      * @param {Ext.event.Event} e
+      * @param {Ext.grid.CellContext} e.position A CellContext object which defines the target cell.
+      */
+
+    constructor: function(config) {
+        // Adjust our base class if we are inside a TreePanel
+        if (config.grid.isTree) {
+            config.baseCls = Ext.baseCSSPrefix + 'tree-view';
+        }
+        this.callParent([config]);
+    },
+
+    /**
+     * @private
+     * Returns `true` if this view has been configured with variableRowHeight (or this has been set by a plugin/feature)
+     * which might insert arbitrary markup into a grid item. Or if at least one visible column has been configured
+     * with variableRowHeight. Or if the store is grouped.
+     */
+    hasVariableRowHeight: function(fromLockingPartner) {
+        var me = this;
+        return me.variableRowHeight || me.store.isGrouped() || me.getVisibleColumnManager().hasVariableRowHeight() ||
+            // If not already called from a locking partner, and there is a locking partner,
+            // and the partner has variableRowHeight, then WE have variableRowHeight too.
+            (!fromLockingPartner && me.lockingPartner && me.lockingPartner.hasVariableRowHeight(true));
+    },
 
     initComponent: function() {
-        var me = this,
-            scroll = me.scroll;
+        var me = this;
+
+        if (me.columnLines) {
+            me.addCls(me.grid.colLinesCls);
+        }
+        if (me.rowLines) {
+            me.addCls(me.grid.rowLinesCls);
+        }
 
         /**
          * @private
-         * @property {Ext.dom.AbstractElement.Fly} table
-         * A flyweight Ext.Element which encapsulates a reference to the transient `<table>` element within this View.
+         * @property {Ext.dom.Fly} body
+         * A flyweight Ext.Element which encapsulates a reference to the view's main row containing element.
          * *Note that the `dom` reference will not be present until the first data refresh*
          */
-        me.table = new Ext.dom.Element.Fly();
-        me.table.id = me.id + 'gridTable';
+        me.body = new Ext.dom.Fly();
+        me.body.id = me.id + 'gridBody';
 
-        // Scrolling within a TableView is controlled by the scroll config of its owning GridPanel
-        // It must see undefined in this property in order to leave the scroll styles alone at afterRender time
-        me.autoScroll = undefined;
-
-        // Convert grid scroll config to standard Component scrolling configurations.
-        if (scroll === true || scroll === 'both') {
-            me.autoScroll = true;
-        } else if (scroll === 'horizontal') {
-            me.overflowX = 'auto';
-        } else if (scroll === 'vertical') {
-            me.overflowY = 'auto';
+        // If trackOver has been turned off, null out the overCls because documented behaviour
+        // in AbstractView is to turn trackOver on if overItemCls is set.
+        if (!me.trackOver) {
+            me.overItemCls = null;
         }
-        me.selModel.view = me;
+
         me.headerCt.view = me;
-        me.headerCt.markDirty = me.markDirty;
 
         // Features need a reference to the grid.
+        // Grid needs an immediate reference to its view so that the view can reliably be got from the grid during initialization
+        me.grid.view = me;
         me.initFeatures(me.grid);
-        delete me.grid;
 
-        // The real tpl is generated, but AbstractView.initComponent insists upon the presence of a fully instantiated XTemplate at construction time.
-        me.tpl = me.getTpl('initialTpl');
+        me.itemSelector = me.getItemSelector();
+        me.all = new Ext.view.NodeCache(me);
+
         me.callParent();
     },
-    
+
+    // Private
+    // Create a config object for this view's selection model based upon the passed grid's configurations
+    applySelectionModel: function(selModel, oldSelModel) {
+        var me = this,
+            grid = me.ownerGrid,
+            defaultType = selModel.type;
+
+        // If this is the initial configuration, pull overriding configs in from the owning TablePanel.
+        if (!oldSelModel) {
+            // Favour a passed instance
+            if (!(selModel && selModel.isSelectionModel)) {
+                selModel = grid.selModel || selModel;
+            }
+        }
+
+        if (selModel) {
+            if (selModel.isSelectionModel) {
+                selModel.allowDeselect = grid.allowDeselect || selModel.selectionMode !== 'SINGLE';
+                selModel.locked = grid.disableSelection;
+            } else {
+                if (typeof selModel === 'string') {
+                    selModel = {
+                        type: selModel
+                    };
+                }
+                // Copy obsolete selType property to type property now that selection models are Factoryable
+                // TODO: Remove selType config after deprecation period
+                else {
+                    selModel.type = grid.selType || selModel.selType || selModel.type || defaultType;
+                }
+                if (!selModel.mode) {
+                    if (grid.simpleSelect) {
+                        selModel.mode = 'SIMPLE';
+                    } else if (grid.multiSelect) {
+                        selModel.mode = 'MULTI';
+                    }
+                }
+                selModel = Ext.Factory.selection(Ext.apply({
+                    allowDeselect: grid.allowDeselect,
+                    locked: grid.disableSelection
+                }, selModel));
+            }
+        }
+        return selModel;
+    },
+
+    updateSelectionModel: function(selModel, oldSelModel) {
+        var me = this;
+
+        if (oldSelModel) {
+            oldSelModel.un('selectionchange', me.updateBindSelection, me);
+            Ext.destroy(me.selModelRelayer);
+        }
+        me.selModelRelayer = me.relayEvents(selModel, [
+            'selectionchange', 'beforeselect', 'beforedeselect', 'select', 'deselect', 'focuschange'
+        ]);
+        selModel.on('selectionchange', me.updateBindSelection, me);
+        me.selModel = selModel;
+    },
+
+    getVisibleColumnManager: function() {
+        return this.ownerCt.getVisibleColumnManager();
+    },
+
+    getColumnManager: function() {
+        return this.ownerCt.getColumnManager();
+    },
+
+    getTopLevelVisibleColumnManager: function() {
+        // ownerGrid refers to the topmost responsible Ext.panel.Grid.
+        // This could be this view's ownerCt, or if part of a locking arrangement, the locking grid
+        return this.ownerGrid.getVisibleColumnManager();
+    },
+
     /**
      * @private
      * Move a grid column from one position to another
@@ -157,70 +706,100 @@ Ext.define('Ext.view.Table', {
      */
     moveColumn: function(fromIdx, toIdx, colsToMove) {
         var me = this,
-            fragment = (colsToMove > 1) ? document.createDocumentFragment() : undefined,
+            multiMove = colsToMove > 1,
+            range = multiMove && document.createRange ? document.createRange() : null,
+            fragment = multiMove && !range ? document.createDocumentFragment() : null,
             destinationCellIdx = toIdx,
             colCount = me.getGridColumns().length,
-            lastIdx = colCount - 1,
-            doFirstLastClasses = (me.firstCls || me.lastCls) && (toIdx === 0 || toIdx == colCount || fromIdx === 0 || fromIdx == lastIdx),
+            lastIndex = colCount - 1,
+            doFirstLastClasses = (me.firstCls || me.lastCls) && (toIdx === 0 || toIdx === colCount || fromIdx === 0 || fromIdx === lastIndex),
             i,
             j,
-            rows, len, tr, headerRows;
+            rows, len, tr, cells,
+            colGroups;
 
-        if (me.rendered) {
-            // Use select here. In most cases there will only be one row. In
-            // the case of a grouping grid, each group also has a header.
-            headerRows = me.el.query(me.headerRowSelector);
+        // Dragging between locked and unlocked side first refreshes the view, and calls onHeaderMoved with
+        // fromIndex and toIndex the same.
+        if (me.rendered && toIdx !== fromIdx) {
+            // Grab all rows which have column cells in.
+            // That is data rows.
             rows = me.el.query(me.rowSelector);
 
             if (toIdx > fromIdx && fragment) {
-                destinationCellIdx -= colsToMove;
-            }
-
-            // Move the column sizing header to match
-            for (i = 0, len = headerRows.length; i < len; ++i) {
-                tr = headerRows[i];
-                if (fragment) {
-                    for (j = 0; j < colsToMove; j++) {
-                        fragment.appendChild(tr.cells[fromIdx]);
-                    }
-                    tr.insertBefore(fragment, tr.cells[destinationCellIdx] || null);
-                } else {
-                    tr.insertBefore(tr.cells[fromIdx], tr.cells[destinationCellIdx] || null);
-                }
+                destinationCellIdx -= 1;
             }
 
             for (i = 0, len = rows.length; i < len; i++) {
                 tr = rows[i];
+                cells = tr.childNodes;
 
                 // Keep first cell class and last cell class correct *only if needed*
                 if (doFirstLastClasses) {
 
+                    if (cells.length === 1) {
+                        Ext.fly(cells[0]).addCls(me.firstCls);
+                        Ext.fly(cells[0]).addCls(me.lastCls);
+                        continue;
+                    }
                     if (fromIdx === 0) {
-                        Ext.fly(tr.cells[0]).removeCls(me.firstCls);
-                        Ext.fly(tr.cells[1]).addCls(me.firstCls);
-                    } else if (fromIdx === lastIdx) {
-                        Ext.fly(tr.cells[lastIdx]).removeCls(me.lastCls);
-                        Ext.fly(tr.cells[lastIdx - 1]).addCls(me.lastCls);
+                        Ext.fly(cells[0]).removeCls(me.firstCls);
+                        Ext.fly(cells[1]).addCls(me.firstCls);
+                    } else if (fromIdx === lastIndex) {
+                        Ext.fly(cells[lastIndex]).removeCls(me.lastCls);
+                        Ext.fly(cells[lastIndex - 1]).addCls(me.lastCls);
                     }
                     if (toIdx === 0) {
-                        Ext.fly(tr.cells[0]).removeCls(me.firstCls);
-                        Ext.fly(tr.cells[fromIdx]).addCls(me.firstCls);
+                        Ext.fly(cells[0]).removeCls(me.firstCls);
+                        Ext.fly(cells[fromIdx]).addCls(me.firstCls);
                     } else if (toIdx === colCount) {
-                        Ext.fly(tr.cells[lastIdx]).removeCls(me.lastCls);
-                        Ext.fly(tr.cells[fromIdx]).addCls(me.lastCls);
+                        Ext.fly(cells[lastIndex]).removeCls(me.lastCls);
+                        Ext.fly(cells[fromIdx]).addCls(me.lastCls);
                     }
                 }
 
-                if (fragment) {
-                    for (j = 0; j < colsToMove; j++) {
-                        fragment.appendChild(tr.cells[fromIdx]);
+                // Move multi using the best technique.
+                // Extract a range straight into a fragment if possible.
+                if (multiMove) {
+                    if (range) {
+                        range.setStartBefore(cells[fromIdx]);
+                        range.setEndAfter(cells[fromIdx + colsToMove - 1]);
+                        fragment = range.extractContents();
                     }
-                    tr.insertBefore(fragment, tr.cells[destinationCellIdx] || null);
+                    else {
+                        for (j = 0; j < colsToMove; j++) {
+                            fragment.appendChild(cells[fromIdx]);
+                        }
+                    }
+                    tr.insertBefore(fragment, cells[destinationCellIdx] || null);
                 } else {
-                    tr.insertBefore(tr.cells[fromIdx], tr.cells[destinationCellIdx] || null);
+                    tr.insertBefore(cells[fromIdx], cells[destinationCellIdx] || null);
                 }
             }
-            me.setNewTemplate();
+
+            // Shuffle the <col> elements in all <colgroup>s
+            colGroups = me.el.query('colgroup');
+            for (i = 0, len = colGroups.length; i < len; i++) {
+                // Extract the colgroup
+                tr = colGroups[i];
+
+                // Move multi using the best technique.
+                // Extract a range straight into a fragment if possible.
+                if (multiMove) {
+                    if (range) {
+                        range.setStartBefore(tr.childNodes[fromIdx]);
+                        range.setEndAfter(tr.childNodes[fromIdx + colsToMove - 1]);
+                        fragment = range.extractContents();
+                    }
+                    else {
+                        for (j = 0; j < colsToMove; j++) {
+                            fragment.appendChild(tr.childNodes[fromIdx]);
+                        }
+                    }
+                    tr.insertBefore(fragment, tr.childNodes[destinationCellIdx] || null);
+                } else {
+                    tr.insertBefore(tr.childNodes[fromIdx], tr.childNodes[destinationCellIdx] || null);
+                }
+            }
         }
     },
 
@@ -238,12 +817,11 @@ Ext.define('Ext.view.Table', {
     },
 
     /**
-     * Get the columns used for generating a template via TableChunker.
-     * See {@link Ext.grid.header.Container#getGridColumns}.
+     * Get the leaf columns used for rendering the grid rows.
      * @private
      */
     getGridColumns: function() {
-        return this.headerCt.getGridColumns();
+        return this.ownerCt.getVisibleColumnManager().getColumns();
     },
 
     /**
@@ -253,7 +831,7 @@ Ext.define('Ext.view.Table', {
      * @param {Number} index The index
      */
     getHeaderAtIndex: function(index) {
-        return this.headerCt.getHeaderAtIndex(index);
+        return this.ownerCt.getVisibleColumnManager().getHeaderAtIndex(index);
     },
 
     /**
@@ -263,7 +841,7 @@ Ext.define('Ext.view.Table', {
      * @private
      */
     getCell: function(record, column) {
-        var row = this.getNode(record);
+        var row = this.getRow(record);
         return Ext.fly(row).down(column.getCellSelector());
     },
 
@@ -279,6 +857,18 @@ Ext.define('Ext.view.Table', {
         }
     },
 
+    // @private
+    // Finds a features by ftype in the features array
+    findFeature: function(ftype) {
+        if (this.features) {
+            return Ext.Array.findBy(this.features, function(feature) {
+                if (feature.ftype === ftype) {
+                    return true;
+                }
+            });
+        }
+    },
+
     /**
      * Initializes each feature and bind it to this view.
      * @private
@@ -290,6 +880,16 @@ Ext.define('Ext.view.Table', {
             feature,
             len;
 
+        // Row container element emitted by tpl
+        me.tpl             = Ext.XTemplate.getTpl(this, 'tpl');
+
+        // The rowTpl emits a <div>
+        me.rowTpl          = Ext.XTemplate.getTpl(this, 'rowTpl');
+        me.addRowTpl(Ext.XTemplate.getTpl(this, 'outerRowTpl'));
+
+        // Each cell is emitted by the cellTpl
+        me.cellTpl        = Ext.XTemplate.getTpl(this, 'cellTpl');
+
         me.featuresMC = new Ext.util.MixedCollection();
         features = me.features = me.constructFeatures();
         len = features ? features.length : 0;
@@ -300,18 +900,118 @@ Ext.define('Ext.view.Table', {
             feature.view = me;
             feature.grid = grid;
             me.featuresMC.add(feature);
-            feature.init();
+            feature.init(grid);
+        }
+    },
+
+    renderTHead: function(values, out, parent) {
+        var headers = values.view.headerFns,
+            len, i;
+
+        if (headers) {
+            for (i = 0, len = headers.length; i < len; ++i) {
+                headers[i].call(this, values, out, parent);
+            }
+        }
+    },
+
+    // Currently, we don't have ordering support for header/footer functions,
+    // they will be pushed on at construction time. If the need does arise,
+    // we can add this functionality in the future, but for now it's not
+    // really necessary since currently only the summary feature uses this.
+    addHeaderFn: function(fn) {
+        var headers = this.headerFns;
+        if (!headers) {
+            headers = this.headerFns = [];
+        }
+        headers.push(fn);
+    },
+
+    renderTFoot: function(values, out, parent){
+        var footers = values.view.footerFns,
+            len, i;
+
+        if (footers) {
+            for (i = 0, len = footers.length; i < len; ++i) {
+                footers[i].call(this, values, out, parent);
+            }
+        }
+    },
+
+    addFooterFn: function(fn) {
+        var footers = this.footerFns;
+        if (!footers) {
+            footers = this.footerFns = [];
+        }
+        footers.push(fn);
+    },
+
+    addTpl: function(newTpl) {
+        return this.insertTpl('tpl', newTpl);
+    },
+
+    addRowTpl: function(newTpl) {
+        return this.insertTpl('rowTpl', newTpl);
+    },
+
+    addCellTpl: function(newTpl) {
+        return this.insertTpl('cellTpl', newTpl);
+    },
+
+    insertTpl: function(which, newTpl) {
+        var me = this,
+            tpl,
+            prevTpl;
+
+        // Clone an instantiated XTemplate
+        if (newTpl.isTemplate) {
+            newTpl = Ext.Object.chain(newTpl);
+        }
+        // If we have been passed an object of the form
+        // {
+        //      before: fn
+        //      after: fn
+        // }
+        // Create a template from it using the object as the member configuration
+        else {
+            newTpl = new Ext.XTemplate('{%this.nextTpl.applyOut(values, out, parent);%}', newTpl);
+        }
+
+        // Stop at the first TPL who's priority is less than the passed rowTpl
+        for (tpl = me[which]; newTpl.priority < tpl.priority; tpl = tpl.nextTpl) {
+            prevTpl = tpl;
+        }
+
+        // If we had skipped over some, link the previous one to the passed rowTpl
+        if (prevTpl) {
+            prevTpl.nextTpl = newTpl;
+        }
+        // First one
+        else {
+            me[which] = newTpl;
+        }
+        newTpl.nextTpl = tpl;
+        return newTpl;
+    },
+
+    tplApplyOut: function(values, out, parent) {
+        if (this.before) {
+            if (this.before(values, out, parent) === false) {
+                return;
+            }
+        }
+        this.nextTpl.applyOut(values, out, parent);
+        if (this.after) {
+            this.after(values, out, parent);
         }
     },
 
     /**
      * @private
      * Converts the features array as configured, into an array of instantiated Feature objects.
-     * 
-     * This is borrowed by Lockable which clones and distributes Features to both child grids of a locking grid.
-     * 
+     *
      * Must have no side effects other than Feature instantiation.
-     * 
+     *
      * MUST NOT update the this.features property, and MUST NOT update the instantiated Features.
      */
     constructFeatures: function() {
@@ -320,7 +1020,7 @@ Ext.define('Ext.view.Table', {
             feature,
             result,
             i = 0, len;
-        
+
         if (features) {
             result = [];
             len = features.length;
@@ -335,124 +1035,115 @@ Ext.define('Ext.view.Table', {
         return result;
     },
 
-    /**
-     * Gives features an injection point to attach events to the markup that
-     * has been created for this view.
-     * @private
-     */
-    attachEventsForFeatures: function() {
-        var features = this.features,
-            ln       = features.length,
-            i        = 0;
-
-        for (; i < ln; i++) {
-            if (features[i].isFeature) {
-                features[i].attachEvents();
-            }
-        }
-    },
-
-    afterRender: function() {
+    beforeRender: function() {
         var me = this;
         me.callParent();
 
         if (!me.enableTextSelection) {
-            me.el.unselectable();
+            me.protoEl.unselectable();
         }
-        me.attachEventsForFeatures();
     },
+    
+    onBindStore: function(store) {
+        var me = this,
+            bufferedRenderer = me.bufferedRenderer;
 
-    // Private template method implemented starting at the AbstractView class.
-    onViewScroll: function(e, t) {
-        this.callParent(arguments);
-        this.fireEvent('bodyscroll', e, t);
-    },
+        if (bufferedRenderer && bufferedRenderer.store !== store) {
+            bufferedRenderer.bindStore(store);
+        }
 
-    /**
-     * Uses the headerCt (Which is the repository of all information relating to Column definitions)
-     * to transform data from dataIndex keys in a record to headerId keys in each header and then run
-     * them through each feature to get additional data for variables they have injected into the view template.
-     * @private
-     */
-    prepareData: function(data, idx, record) {
-        var me       = this,
-            result   = me.headerCt.prepareData(data, idx, record, me, me.ownerCt),
-            features = me.features,
-            ln       = features.length,
-            i        = 0,
-            feature;
-
-        for (; i < ln; i++) {
-            feature = features[i];
-            if (feature.isFeature) {
-                Ext.apply(result, feature.getAdditionalData(data, idx, record, result, me));
+        // Reset virtual scrolling.
+        if (me.all && me.all.getCount()) {
+            if (bufferedRenderer) {
+                bufferedRenderer.setBodyTop(0);
             }
+            me.clearViewEl();
         }
+        me.callParent(arguments);
+    },
 
+    getStoreListeners: function() {
+        var result = this.callParent();
+        result.beforepageremove = this.beforePageRemove;
         return result;
     },
 
-    // TODO: Refactor headerCt dependency here to colModel
-    collectData: function(records, startIndex) {
-        var me = this,
-            preppedRecords = me.callParent(arguments),
-            headerCt  = me.headerCt,
-            fullWidth = headerCt.getFullWidth(),
-            features  = me.features,
-            ln = features.length,
-            o = {
-                rows: preppedRecords,
-                fullWidth: fullWidth
-            },
-            i  = 0,
-            feature,
-            j = 0,
-            jln,
-            rowParams,
-            rec,
-            cls;
+    beforePageRemove: function(pageMap, pageNumber) {
+        var rows = this.all,
+            pageSize = pageMap.getPageSize();
 
-        jln = preppedRecords.length;
-        // process row classes, rowParams has been deprecated and has been moved
-        // to the individual features that implement the behavior.
-        if (me.getRowClass) {
-            for (; j < jln; j++) {
-                rowParams = {};
-                rec = preppedRecords[j];
-                cls = rec.rowCls || '';
-                rec.rowCls = this.getRowClass(records[j], j, rowParams, me.store) + ' ' + cls;
-                //<debug>
-                if (rowParams.alt) {
-                    Ext.Error.raise("The getRowClass alt property is no longer supported.");
-                }
-                if (rowParams.tstyle) {
-                    Ext.Error.raise("The getRowClass tstyle property is no longer supported.");
-                }
-                if (rowParams.cells) {
-                    Ext.Error.raise("The getRowClass cells property is no longer supported.");
-                }
-                if (rowParams.body) {
-                    Ext.Error.raise("The getRowClass body property is no longer supported. Use the getAdditionalData method of the rowbody feature.");
-                }
-                if (rowParams.bodyStyle) {
-                    Ext.Error.raise("The getRowClass bodyStyle property is no longer supported.");
-                }
-                if (rowParams.cols) {
-                    Ext.Error.raise("The getRowClass cols property is no longer supported.");
-                }
-                //</debug>
+        // If the rendered block needs the page, access it which moves it to the end of the LRU cache, and veto removal.
+        if (rows.startIndex >= (pageNumber - 1) * pageSize && rows.endIndex <= (pageNumber * pageSize - 1)) {
+            pageMap.get(pageNumber);
+            return false;
+        }
+    },
+
+    // Private template method implemented starting at the AbstractView class.
+    onViewScroll: function(scroller, x, y) {
+        // We ignore scrolling caused by focusing
+        if (!this.ignoreScroll) {
+            this.callParent([scroller, x, y]);
+        }
+    },
+
+    // private
+    // Create the DOM element which enapsulates the passed record.
+    // Used when updating existing rows, so drills down into resulting structure .
+    createRowElement: function(record, index, updateColumns) {
+        var me = this,
+            div = me.renderBuffer,
+            tplData = me.collectData([record], index);
+
+        tplData.columns = updateColumns;
+        me.tpl.overwrite(div, tplData);
+        // Return first element within node containing element
+        return Ext.fly(div).down(me.getNodeContainerSelector(), true).firstChild;
+    },
+
+    // private
+    // Override so that we can use a quicker way to access the row nodes.
+    // They are simply all child nodes of the nodeContainer element.
+    bufferRender: function(records, index) {
+        var me = this,
+            div = me.renderBuffer,
+            result,
+            range = document.createRange ? document.createRange() : null;
+
+        me.tpl.overwrite(div, me.collectData(records, index));
+        div = Ext.fly(div).down(me.getNodeContainerSelector(), true);
+        if (range) {
+            range.selectNodeContents(div);
+            result = range.extractContents();
+        } else {
+            result = document.createDocumentFragment();
+            while (div.firstChild) {
+                result.appendChild(div.firstChild);
             }
         }
-        // currently only one feature may implement collectData. This is to modify
-        // what's returned to the view before its rendered
-        for (; i < ln; i++) {
-            feature = features[i];
-            if (feature.isFeature && feature.collectData && !feature.disabled) {
-                o = feature.collectData(records, preppedRecords, startIndex, fullWidth, o);
-                break;
-            }
-        }
-        return o;
+        result.childrenArray = Ext.Array.toArray(result.childNodes);
+        return  result;
+    },
+
+    collectData: function(records, startIndex) {
+        var me = this;
+
+        me.rowValues.view = me;
+
+        me.tableValues.view = me;
+        me.tableValues.rows = records;
+        me.tableValues.columns = null;
+        me.tableValues.viewStartIndex = startIndex;
+        me.tableValues.touchScroll = me.touchScroll;
+        me.tableValues.tableStyle = 'width:' + me.headerCt.getTableWidth() + 'px';
+        return me.tableValues;
+    },
+
+    // Overridden implementation.
+    // Called by refresh to collect the view item nodes.
+    // Note that these may be wrapping rows which *contain* rows which map to records
+    collectNodes: function(targetEl) {
+        this.all.fill(this.getNodeContainer().childNodes, this.all.startIndex);
     },
 
     // Private. Called when the table changes height.
@@ -461,54 +1152,502 @@ Ext.define('Ext.view.Table', {
     // because it may have to accommodate (or cease to accommodate) a vertical scrollbar.
     // Only do this on platforms which have a space-consuming scrollbar.
     // Only do it when vertical scrolling is enabled.
-    refreshSize: function() {
+    refreshSize: function(forceLayout) {
         var me = this,
-            cmp;
+            bodySelector = me.getBodySelector();
 
-        // On every update of the layout system due to data update, capture the table's DOM in our private flyweight
-        me.table.attach(me.el.child('table', true));
+        // On every update of the layout system due to data update, capture the view's main element in our private flyweight.
+        // IF there *is* a main element. Some TplFactories emit naked rows.
+        if (bodySelector) {
+            // use "down" instead of "child" because the grid table element is not a direct
+            // child of the view element when a touch scroller is in use.
+            me.body.attach(me.el.down(bodySelector, true));
+        }
 
         if (!me.hasLoadingHeight) {
-            cmp = me.up('tablepanel');
-
             // Suspend layouts in case the superclass requests a layout. We might too, so they
-            // must be coalescsed.
+            // must be coalesced.
             Ext.suspendLayouts();
 
-            me.callParent();
+            me.callParent(arguments);
 
-            // If the OS displays scrollbars, and we are overflowing vertically, ensure the
-            // HeaderContainer accounts for the scrollbar.
-            if (cmp && Ext.getScrollbarSize().width && (me.autoScroll || me.overflowY)) {
-                cmp.updateLayout();
+            // We only need to adjust for height changes in the data if we, or any visible columns have been configured with
+            // variableRowHeight: true
+            // OR, if we are being passed the forceUpdate flag which is passed when the view's item count changes.
+            if (forceLayout || (me.hasVariableRowHeight() && me.dataSource.getCount())) {
+                me.grid.updateLayout();
             }
 
             Ext.resumeLayouts(true);
         }
     },
 
-    /**
-     * Set a new template based on the current columns displayed in the grid.
-     * @private
-     */
-    setNewTemplate: function() {
+    clearViewEl: function(leaveNodeContainer) {
         var me = this,
-            columns = me.headerCt.getColumnsForTpl(true);
+            all = me.all,
+            store = me.getStore(),
+            i, item, nodeContainer, targetEl;
+        
+        // The purpose of this is to allow boilerplate HTML nodes to remain in place inside a View
+        // while the transient, templated data can be discarded and recreated.
+        // 
+        // In particular, this is used in infinite grid scrolling: A very tall "stretcher" element is
+        // inserted into the View's element to create a scrollbar of the correct proportion.
+        //
+        // Also we must ensure that the itemremove event is fired EVERY time an item is removed from the
+        // view. This is so that widgets rendered into a view by a WidgetColumn can be recycled.
 
-        // Template generation requires the rowCount as well as the column definitions and features.
-        me.tpl = me.getTableChunker().getTableTpl({
-            rowCount: me.store.getCount(),
-            columns: columns,
-            features: me.features,
-            enableTextSelection: me.enableTextSelection
-        });
+        for (i = all.startIndex; i <= all.endIndex; i++) {
+            item = all.item(i, true);  
+            me.fireEvent('itemremove', store.getByInternalId(item.getAttribute('data-recordId')), i, item, me);
+        }
+
+        // AbstractView will clear the view correctly
+        // It also resets the scrollrange.
+        me.callParent();
+
+        nodeContainer = Ext.fly(me.getNodeContainer());
+        if (nodeContainer && !leaveNodeContainer) {
+            targetEl = me.getTargetEl();
+            if (targetEl.dom !== nodeContainer.dom) {
+                nodeContainer.destroy();
+            }
+        }
+    },
+
+    getMaskTarget: function() {
+        // Masking a TableView masks its IMMEDIATE parent GridPanel's body.
+        // Disabling/enabling a locking view relays the call to both child views.
+        return this.ownerCt.body;
+    },
+
+    statics: {
+        getBoundView: function(node) {
+            return Ext.getCmp(node.getAttribute('data-boundView'));
+        }
+    },
+
+    getRecord: function(node) {
+        var me = this,
+            recordIndex;
+
+        // If store.destroy has been called before some delayed event fires on a node, we must ignore the event.
+        if (me.store.isDestroyed) {
+            return;
+        }
+        if (node.isModel) {
+            return node;
+        }
+
+        node = me.getNode(node);
+        if (node) {
+            // The indices may be off because of collapsed groups (if we're grouping) or row wrapping, so just grab it by id.
+            if (!me.hasActiveFeature()) {
+                recordIndex = node.getAttribute('data-recordIndex');
+                if (recordIndex) {
+                    recordIndex = parseInt(recordIndex, 10);
+                    if (recordIndex > -1) {
+                        // The index is the index in the original Store, not in a GroupStore
+                        // The Grouping Feature increments the index to skip over unrendered records in collapsed groups
+                        return me.store.data.getAt(recordIndex);
+                    }
+                }
+            }
+            return me.dataSource.getByInternalId(node.getAttribute('data-recordId'));
+        }
+    },
+
+    indexOf: function(node) {
+        node = this.getNode(node);
+        if (!node && node !== 0) {
+            return -1;
+        }
+        return this.all.indexOf(node);
+    },
+
+    indexInStore: function(node) {
+        // We cannot use the stamped in data-recordindex because that is the index in the original configured store
+        // NOT the index in the dataSource that is being used - that may be a GroupStore.
+        return node ? this.dataSource.indexOf(this.getRecord(node)) : -1;
+    },
+
+    renderRows: function(rows, columns, viewStartIndex, out) {
+        var rowValues = this.rowValues,
+            rowCount = rows.length,
+            i;
+
+        rowValues.view = this;
+        rowValues.columns = columns;
+
+        for (i = 0; i < rowCount; i++, viewStartIndex++) {
+            rowValues.itemClasses.length = rowValues.rowClasses.length = 0;
+            this.renderRow(rows[i], viewStartIndex, out);
+        }
+
+        // Dereference objects since rowValues is a persistent on our prototype
+        rowValues.view = rowValues.columns = rowValues.record = null;
+    },
+
+    /* Alternative column sizer element renderer.
+    renderTHeadColumnSizer: function(values, out) {
+        var columns = this.getGridColumns(),
+            len = columns.length, i,
+            column, width;
+
+        out.push('<thead><tr class="' + Ext.baseCSSPrefix + 'grid-header-row">');
+        for (i = 0; i < len; i++) {
+            column = columns[i];
+            width = column.lastBox ? column.lastBox.width : Ext.grid.header.Container.prototype.defaultWidth;
+            out.push('<th class="', Ext.baseCSSPrefix, 'grid-cell-', columns[i].getItemId(), '" style="width:' + width + 'px"></th>');
+        }
+        out.push('</tr></thead>');
+    },
+    */
+
+    renderColumnSizer: function(values, out) {
+        var columns = values.columns || this.getGridColumns(),
+            len = columns.length, i,
+            column, width;
+
+        out.push('<colgroup role="presentation">');
+        for (i = 0; i < len; i++) {
+            column = columns[i];
+            width = column.cellWidth ? column.cellWidth : Ext.grid.header.Container.prototype.defaultWidth;
+            out.push('<col role="presentation" class="', Ext.baseCSSPrefix, 'grid-cell-', columns[i].getItemId(), '" style="width:' + width + 'px">');
+        }
+        out.push('</colgroup>');
     },
 
     /**
-     * Returns the configured chunker or default of Ext.view.TableChunker
+     * @private
+     * Renders the HTML markup string for a single row into the passed array as a sequence of strings, or
+     * returns the HTML markup for a single row.
+     *
+     * @param {Ext.data.Model} record The record to render.
+     * @param {String[]} [out] A string array onto which to append the resulting HTML string. If omitted,
+     * the resulting HTML string is returned.
+     * @return {String} **only when the out parameter is omitted** The resulting HTML string.
      */
-    getTableChunker: function() {
-        return this.chunker || Ext.view.TableChunker;
+    renderRow: function(record, rowIdx, out) {
+        var me = this,
+            isMetadataRecord = rowIdx === -1,
+            selModel = me.selectionModel,
+            rowValues = me.rowValues,
+            itemClasses = rowValues.itemClasses,
+            rowClasses = rowValues.rowClasses,
+            itemCls = me.itemCls,
+            cls,
+            rowTpl = me.rowTpl;
+
+        // Define the rowAttr object now. We don't want to do it in the treeview treeRowTpl because anything
+        // this is processed in a deferred callback (such as deferring initial view refresh in gridview) could
+        // poke rowAttr that are then shared in tableview.rowTpl. See EXTJSIV-9341.
+        //
+        // For example, the following shows the shared ref between a treeview's rowTpl nextTpl and the superclass
+        // tableview.rowTpl:
+        //
+        //      tree.view.rowTpl.nextTpl === grid.view.rowTpl
+        //
+        rowValues.rowAttr = {};
+
+        // Set up mandatory properties on rowValues
+        rowValues.record = record;
+        rowValues.recordId = record.internalId;
+
+        // recordIndex is index in true store (NOT the data source - possibly a GroupStore)
+        rowValues.recordIndex = me.store.indexOf(record);
+
+        // rowIndex is the row number in the view.
+        rowValues.rowIndex = rowIdx;
+        rowValues.rowId = me.getRowId(record);
+        rowValues.itemCls = rowValues.rowCls = '';
+        if (!rowValues.columns) {
+            rowValues.columns = me.ownerCt.getVisibleColumnManager().getColumns();
+        }
+
+        itemClasses.length = rowClasses.length = 0;
+
+        // If it's a metadata record such as a summary record.
+        // So do not decorate it with the regular CSS.
+        // The Feature which renders it must know how to decorate it.
+        if (!isMetadataRecord) {
+            itemClasses[0] = itemCls;
+
+            if (!me.ownerCt.disableSelection && selModel.isRowSelected) {
+                // Selection class goes on the outermost row, so it goes into itemClasses
+                if (selModel.isRowSelected(record)) {
+                    itemClasses.push(me.selectedItemCls);
+                }
+            }
+
+            if (me.stripeRows && rowIdx % 2 !== 0) {
+                itemClasses.push(me.altRowCls);
+            }
+
+            if (me.getRowClass) {
+                cls = me.getRowClass(record, rowIdx, null, me.dataSource);
+                if (cls) {
+                    rowClasses.push(cls);
+                }
+            }
+        }
+
+        if (out) {
+            rowTpl.applyOut(rowValues, out, me.tableValues);
+        } else {
+            return rowTpl.apply(rowValues, me.tableValues);
+        }
+    },
+
+    /**
+     * @private
+     * Emits the HTML representing a single grid cell into the passed output stream (which is an array of strings).
+     *
+     * @param {Ext.grid.column.Column} column The column definition for which to render a cell.
+     * @param {Number} recordIndex The row index (zero based within the {@link #store}) for which to render the cell.
+     * @param {Number} rowIndex The row index (zero based within this view for which to render the cell.
+     * @param {Number} columnIndex The column index (zero based) for which to render the cell.
+     * @param {String[]} out The output stream into which the HTML strings are appended.
+     */
+    renderCell: function (column, record, recordIndex, rowIndex, columnIndex, out) {
+        var me = this,
+            fullIndex,
+            selModel = me.selectionModel,
+            cellValues = me.cellValues,
+            classes = cellValues.classes,
+            fieldValue = record.data[column.dataIndex],
+            cellTpl = me.cellTpl,
+            value, clsInsertPoint,
+            lastFocused = me.navigationModel.getPosition();
+
+        cellValues.record = record;
+        cellValues.column = column;
+        cellValues.recordIndex = recordIndex;
+        cellValues.rowIndex = rowIndex;
+        cellValues.columnIndex = columnIndex;
+        cellValues.cellIndex = columnIndex;
+        cellValues.align = column.align;
+        cellValues.innerCls = column.innerCls;
+        cellValues.tdCls = cellValues.tdStyle = cellValues.tdAttr = cellValues.style = "";
+        cellValues.unselectableAttr = me.enableTextSelection ? '' : 'unselectable="on"';
+
+        // Begin setup of classes to add to cell
+        classes[1] = column.getCellId();
+
+        // On IE8, array[len] = 'foo' is twice as fast as array.push('foo')
+        // So keep an insertion point and use assignment to help IE!
+        clsInsertPoint = 2;
+
+        if (column.renderer && column.renderer.call) {
+            fullIndex = me.ownerCt.columnManager.getHeaderIndex(column);
+            value = column.renderer.call(column.usingDefaultRenderer ? column : column.scope || me.ownerCt, fieldValue, cellValues, record, recordIndex, fullIndex, me.dataSource, me);
+            if (cellValues.css) {
+                // This warning attribute is used by the compat layer
+                // TODO: remove when compat layer becomes deprecated
+                record.cssWarning = true;
+                cellValues.tdCls += ' ' + cellValues.css;
+                cellValues.css = null;
+            }
+
+            // Add any tdCls which was added to the cellValues by the renderer.
+            if (cellValues.tdCls) {
+                classes[clsInsertPoint++] = cellValues.tdCls;
+            }
+        } else {
+            value = fieldValue;
+        }
+
+        cellValues.value = (value == null || value === '') ? column.emptyCellText : value;
+
+        if (column.tdCls) {
+            classes[clsInsertPoint++] = column.tdCls;
+        }
+        if (me.markDirty && record.dirty && record.isModified(column.dataIndex)) {
+            classes[clsInsertPoint++] = me.dirtyCls;
+        }
+        if (column.isFirstVisible) {
+            classes[clsInsertPoint++] = me.firstCls;
+        }
+        if (column.isLastVisible) {
+            classes[clsInsertPoint++] = me.lastCls;
+        }
+        if (!me.enableTextSelection) {
+            classes[clsInsertPoint++] = me.unselectableCls;
+        }
+        if (selModel && (selModel.isCellModel || selModel.isSpreadsheetModel) && selModel.isCellSelected(me, recordIndex, column)) {
+            classes[clsInsertPoint++] = me.selectedCellCls;
+        }
+        if (lastFocused && lastFocused.record.id === record.id && lastFocused.column === column) {
+            classes[clsInsertPoint++] = me.focusedItemCls;
+        }
+
+        // Chop back array to only what we've set
+        classes.length = clsInsertPoint;
+
+        cellValues.tdCls = classes.join(' ');
+
+        cellTpl.applyOut(cellValues, out);
+
+        // Dereference objects since cellValues is a persistent var in the XTemplate's scope chain
+        cellValues.column = null;
+    },
+
+    /**
+     * Returns the table row given the passed Record, or index or node.
+     * @param {HTMLElement/String/Number/Ext.data.Model} nodeInfo The node or record, or row index.
+     * to return the top level row.
+     * @return {HTMLElement} The node or null if it wasn't found
+     */
+    getRow: function(nodeInfo) {
+        var fly;
+
+        if ((!nodeInfo && nodeInfo !== 0) || !this.rendered) {
+            return null;
+        }
+
+        // An event
+        if (nodeInfo.target) {
+            nodeInfo = nodeInfo.target;
+        }
+        // An id
+        if (Ext.isString(nodeInfo)) {
+            return Ext.fly(nodeInfo).down(this.rowSelector,true);
+        }
+        // Row index
+        if (Ext.isNumber(nodeInfo)) {
+            fly = this.all.item(nodeInfo);
+            return fly && fly.down(this.rowSelector, true);
+        }
+        // Record
+        if (nodeInfo.isModel) {
+            return this.getRowByRecord(nodeInfo);
+        }
+        fly = Ext.fly(nodeInfo);
+        
+        // Passed an item, go down and get the row
+        if (fly.is(this.itemSelector)) {
+            return this.getRowFromItem(fly);
+        }
+
+        // Passed a child element of a row
+        return fly.findParent(this.rowSelector, this.getTargetEl()); // already an HTMLElement
+    },
+
+    getRowId: function(record){
+        return this.id + '-record-' + record.internalId;
+    },
+
+    constructRowId: function(internalId){
+        return this.id + '-record-' + internalId;
+    },
+
+    getNodeById: function(id){
+        id = this.constructRowId(id);
+        return this.retrieveNode(id, false);
+    },
+
+    getRowById: function(id){
+        id = this.constructRowId(id);
+        return this.retrieveNode(id, true);
+    },
+
+    getNodeByRecord: function(record) {
+        return this.retrieveNode(this.getRowId(record), false);
+    },
+
+    getRowByRecord: function(record) {
+        return this.retrieveNode(this.getRowId(record), true);
+    },
+
+    getRowFromItem: function(item) {
+        var rows = Ext.getDom(item).tBodies[0].childNodes,
+            len = rows.length,
+            i;
+
+        for (i = 0; i < len; i++) {
+            if (Ext.fly(rows[i]).is(this.rowSelector)) {
+                return rows[i];
+            }
+        }
+    },
+
+    retrieveNode: function(id, dataRow){
+        var result = this.el.getById(id, true);
+
+        if (dataRow && result) {
+            return Ext.fly(result).down(this.rowSelector, true);
+        }
+        return result;
+    },
+
+    // Links back from grid rows are installed by the XTemplate as data attributes
+    updateIndexes: Ext.emptyFn,
+
+    // Outer table
+    bodySelector: 'div.' + Ext.baseCSSPrefix + 'grid-item-container',
+
+    // Element which contains rows
+    nodeContainerSelector: 'div.' + Ext.baseCSSPrefix + 'grid-item-container',
+
+    // view item. This wraps a data row
+    itemSelector: 'table.' + Ext.baseCSSPrefix + 'grid-item',
+
+    // Grid row which contains cells as opposed to wrapping item.
+    rowSelector: 'tr.' + Ext.baseCSSPrefix + 'grid-row',
+
+    // cell
+    cellSelector: 'td.' + Ext.baseCSSPrefix + 'grid-cell',
+
+    // Select column sizers and cells.
+    // This may target `<COL>` elements as well as `<TD>` elements
+    // `<COLGROUP>` element is inserted if the first row does not have the regular cell patten (eg is a colspanning group header row)
+    sizerSelector: '.' + Ext.baseCSSPrefix + 'grid-cell',
+
+    innerSelector: 'div.' + Ext.baseCSSPrefix + 'grid-cell-inner',
+
+    /**
+     * Returns a CSS selector which selects the outermost element(s) in this view.
+     */
+    getBodySelector: function() {
+        return this.bodySelector;
+    },
+
+    /**
+     * Returns a CSS selector which selects the element(s) which define the width of a column.
+     *
+     * This is used by the {@link Ext.view.TableLayout} when resizing columns.
+     *
+     */
+    getColumnSizerSelector: function(header) {
+        var selector = this.sizerSelector + '-' + header.getItemId();
+
+        return 'td' + selector + ',col' + selector;
+    },
+
+    /**
+     * Returns a CSS selector which selects items of the view rendered by the outerRowTpl
+     */
+    getItemSelector: function() {
+        return this.itemSelector;
+    },
+
+    /**
+     * Returns a CSS selector which selects a particular column if the desired header is passed,
+     * or a general cell selector is no parameter is passed.
+     *
+     * @param {Ext.grid.column.Column} [header] The column for which to return the selector. If
+     * omitted, the general cell selector which matches **ant cell** will be returned.
+     *
+     */
+    getCellSelector: function(header) {
+        return header ? header.getCellSelector() : this.cellSelector; 
+    },
+
+    /*
+     * Returns a CSS selector which selects the content carrying element within cells.
+     */
+    getCellInnerSelector: function(header) {
+        return this.getCellSelector(header) + ' ' + this.innerSelector;
     },
 
     /**
@@ -518,7 +1657,7 @@ Ext.define('Ext.view.Table', {
      * @param {String} cls
      */
     addRowCls: function(rowInfo, cls) {
-        var row = this.getNode(rowInfo);
+        var row = this.getRow(rowInfo);
         if (row) {
             Ext.fly(row).addCls(cls);
         }
@@ -531,29 +1670,42 @@ Ext.define('Ext.view.Table', {
      * @param {String} cls
      */
     removeRowCls: function(rowInfo, cls) {
-        var row = this.getNode(rowInfo);
+        var row = this.getRow(rowInfo);
         if (row) {
             Ext.fly(row).removeCls(cls);
         }
     },
 
     // GridSelectionModel invokes onRowSelect as selection changes
-    onRowSelect : function(rowIdx) {
-        this.addRowCls(rowIdx, this.selectedItemCls);
+    onRowSelect: function(rowIdx) {
+        var me = this;
+
+        me.addItemCls(rowIdx, me.selectedItemCls);
+
+        //<feature legacyBrowser>
+        if (Ext.isIE8) {
+            me.repaintBorder(rowIdx + 1);
+        }
+        //</feature>
     },
 
     // GridSelectionModel invokes onRowDeselect as selection changes
-    onRowDeselect : function(rowIdx) {
+    onRowDeselect: function(rowIdx) {
         var me = this;
 
-        me.removeRowCls(rowIdx, me.selectedItemCls);
-        me.removeRowCls(rowIdx, me.focusedItemCls);
+        me.removeItemCls(rowIdx, me.selectedItemCls);
+
+        //<feature legacyBrowser>
+        if (Ext.isIE8) {
+            me.repaintBorder(rowIdx + 1);
+        }
+        //</feature>
     },
 
     onCellSelect: function(position) {
-        var cell = this.getCellByPosition(position, true);
+        var cell = this.getCellByPosition(position);
         if (cell) {
-            Ext.fly(cell).addCls(this.selectedCellCls);
+            cell.addCls(this.selectedCellCls);
         }
     },
 
@@ -562,23 +1714,118 @@ Ext.define('Ext.view.Table', {
         if (cell) {
             Ext.fly(cell).removeCls(this.selectedCellCls);
         }
-
     },
 
-    onCellFocus: function(position) {
-        this.focusCell(position);
+    // Old API. Used by tests now to test coercion of navigation from hidden column to closest visible.
+    // Position.column includes all columns including hidden ones.
+    getCellInclusive: function(position, returnDom) {
+        if (position) {
+            var row   = this.getRow(position.row),
+                header = this.ownerCt.getColumnManager().getHeaderAtIndex(position.column);
+
+            if (header && row) {
+                return Ext.fly(row).down(this.getCellSelector(header), returnDom);
+            }
+        }
+        return false;
     },
 
     getCellByPosition: function(position, returnDom) {
         if (position) {
-            var node   = this.getNode(position.row),
-                header = this.headerCt.getHeaderAtIndex(position.column);
+            var view = position.view || this,
+                row   = view.getRow(position.record || position.row),
+                header = position.column.isColumn ? position.column : view.getVisibleColumnManager().getHeaderAtIndex(position.column);
 
-            if (header && node) {
-                return Ext.fly(node).down(header.getCellSelector(), returnDom);
+            if (header && row) {
+                return Ext.fly(row).down(view.getCellSelector(header), returnDom);
             }
         }
         return false;
+    },
+
+    onFocusEnter: function(e) {
+        var me = this,
+            targetView,
+            navigationModel = me.getNavigationModel(),
+            lastFocused,
+            focusPosition,
+            br = me.bufferedRenderer,
+            firstRecord,
+            focusTarget;
+
+        // The underlying DOM event
+        e = e.event;
+
+        // We can only focus if there are rows in the row cache to focus *and* records
+        // in the store to back them. Buffered Stores can produce a state where
+        // the view is not cleared on the leading end of a reload operation, but the
+        // store can be empty.
+        if (!me.cellFocused && me.all.getCount() && me.dataSource.getCount()) {
+            focusTarget = e.getTarget(null, null, true);
+
+            // If what is being focused an interior element, but is not a cell, allow it to proceed.
+            // The position silently restores to what it was when we were focused last.
+            if (focusTarget && me.el.contains(focusTarget) && focusTarget !== me.el && !focusTarget.is(me.getCellSelector())) {
+                if (navigationModel.lastFocused) {
+                    navigationModel.position = navigationModel.lastFocused;
+                }
+                me.cellFocused = true;
+            } else {
+                lastFocused = focusPosition = me.getLastFocused();
+
+                // Default to the first cell if the NavigationModel has never focused anything
+                if (!focusPosition) {
+                    targetView = me.isLockingView ? (me.lockedGrid.isVisible() ? me.lockedView : me.normalView) : me;
+                    firstRecord = me.dataSource.getAt(br ? br.getFirstVisibleRowIndex() : 0);
+
+                    // A non-row producing record like a collapsed placeholder.
+                    // We cannot focus these yet.
+                    if (!firstRecord.isNonData) {
+                        focusPosition = new Ext.grid.CellContext(targetView).setPosition({
+                            row: firstRecord,
+                            column: 0
+                        });
+                    }
+                }
+
+                // Not a descendant which we allow to carry focus. Blur it.
+                if (!focusPosition) {
+                    e.stopEvent();
+                    e.getTarget().blur();
+                    return;
+                }
+                navigationModel.setPosition(focusPosition, null, e, null, true);
+
+                // We now contain focus is that was successful
+                me.cellFocused = !!navigationModel.getPosition();
+            }
+        }
+        
+        if (me.cellFocused) {
+            me.el.dom.setAttribute('tabindex', '-1');
+        }
+    },
+
+    onFocusLeave: function(e) {
+        var me = this;
+
+        // Ignore this event if we do not actually contain focus.
+        // CellEditors are rendered into the view's encapculating element,
+        // So focusleave will fire when they are programatically blurred.
+        // We will not have focus at that point.
+        if (me.cellFocused) {
+
+            // Blur the focused cell unless we are navigating into a locking partner,
+            // in which case, the focus of that will setPosition to the target
+            // without an intervening position to null.
+            if (e.toComponent !== me.lockingPartner) {
+                me.getNavigationModel().setPosition(null, null, e.event, null, true);
+            }
+
+            me.cellFocused = false;
+            me.focusEl = me.el;
+            me.focusEl.dom.setAttribute('tabindex', 0);
+        }
     },
 
     // GridSelectionModel invokes onRowFocus to 'highlight'
@@ -587,257 +1834,635 @@ Ext.define('Ext.view.Table', {
         var me = this;
 
         if (highlight) {
-            me.addRowCls(rowIdx, me.focusedItemCls);
+            me.addItemCls(rowIdx, me.focusedItemCls);
             if (!supressFocus) {
                 me.focusRow(rowIdx);
             }
             //this.el.dom.setAttribute('aria-activedescendant', row.id);
         } else {
-            me.removeRowCls(rowIdx, me.focusedItemCls);
+            me.removeItemCls(rowIdx, me.focusedItemCls);
         }
+
+        //<feature legacyBrowser>
+        if (Ext.isIE8) {
+            me.repaintBorder(rowIdx + 1);
+        }
+        //</feature>
     },
 
     /**
      * Focuses a particular row and brings it into view. Will fire the rowfocus event.
-     * @param {HTMLElement/String/Number/Ext.data.Model} rowIdx
-     * An HTMLElement template node, index of a template node, the id of a template node or the
+     * @param {HTMLElement/String/Number/Ext.data.Model} row An HTMLElement template node, index of a template node, the id of a template node or the
+     * @param {Boolean/Number} [delay] Delay the focus this number of milliseconds (true for 10 milliseconds).
      * record associated with the node.
      */
-    focusRow: function(rowIdx) {
-        var me         = this,
-            row        = me.getNode(rowIdx),
-            el         = me.el,
-            adjustment = 0,
-            panel      = me.ownerCt,
-            rowRegion,
-            elTop,
-            elBottom,
-            record;
+    focusRow: function(row, delay) {
+        var me = this,
+            focusTask = me.getFocusTask();
 
-        if (row && el) {
-            // Viewable region must not include scrollbars, so use
-            // DOM clientHeight to determine height
-            elTop = el.getY();
-            elBottom = elTop + el.dom.clientHeight;
-            rowRegion = Ext.fly(row).getRegion();
-            // row is above
-            if (rowRegion.top < elTop) {
-                adjustment = rowRegion.top - elTop;
-            // row is below
-            } else if (rowRegion.bottom > elBottom) {
-                adjustment = rowRegion.bottom - elBottom;
-            }
-            record = me.getRecord(row);
-            rowIdx = me.store.indexOf(record);
+        if (delay) {
+            focusTask.delay(Ext.isNumber(delay) ? delay : 10, me.focusRow, me, [row, false]);
+            return;
+        }
 
-            if (adjustment) {
-                panel.scrollByDeltaY(adjustment);
-            }
-            me.fireEvent('rowfocus', record, row, rowIdx);
+        // An immediate focus call must cancel any outstanding delayed focus calls.
+        focusTask.cancel();
+
+        // Do not attempt to focus if hidden or within collapsed Panel.
+        if (me.isVisible(true)) {
+            me.getNavigationModel().setPosition(me.getRecord(row));
         }
     },
 
-    focusCell: function(position) {
-        var me          = this,
-            cell        = me.getCellByPosition(position),
-            el          = me.el,
-            adjustmentY = 0,
-            adjustmentX = 0,
-            elRegion    = el.getRegion(),
-            panel       = me.ownerCt,
-            cellRegion,
-            record;
+    // Override the version in Ext.view.View because the focusable elements are the grid cells.
+    /**
+     * @override
+     * Focuses a particular row and brings it into view. Will fire the rowfocus event.
+     * @param {HTMLElement/String/Number/Ext.data.Model} row An HTMLElement template node, index of a template node, the id of a template node or the
+     * @param {Boolean/Number} [delay] Delay the focus this number of milliseconds (true for 10 milliseconds).
+     * record associated with the node.
+     */
+    focusNode: function(row, delay) {
+        this.focusRow(row, delay);
+    },
 
-        // Viewable region must not include scrollbars, so use
-        // DOM client dimensions
-        elRegion.bottom = elRegion.top + el.dom.clientHeight;
-        elRegion.right = elRegion.left + el.dom.clientWidth;
-        if (cell) {
-            cellRegion = cell.getRegion();
-            // cell is above
-            if (cellRegion.top < elRegion.top) {
-                adjustmentY = cellRegion.top - elRegion.top;
-            // cell is below
-            } else if (cellRegion.bottom > elRegion.bottom) {
-                adjustmentY = cellRegion.bottom - elRegion.bottom;
-            }
-
-            // cell is left
-            if (cellRegion.left < elRegion.left) {
-                adjustmentX = cellRegion.left - elRegion.left;
-            // cell is right
-            } else if (cellRegion.right > elRegion.right) {
-                adjustmentX = cellRegion.right - elRegion.right;
-            }
-
-            if (adjustmentY) {
-                panel.scrollByDeltaY(adjustmentY);
-            }
-            if (adjustmentX) {
-                panel.scrollByDeltaX(adjustmentX);
-            }
-            el.focus();
-            me.fireEvent('cellfocus', record, cell, position);
+    scrollRowIntoView: function(row, animate) {
+        row = this.getRow(row);
+        if (row) {
+            this.scrollElIntoView(row, false, animate);
         }
     },
 
     /**
-     * Scrolls by delta. This affects this individual view ONLY and does not
-     * synchronize across views or scrollers.
-     * @param {Number} delta
-     * @param {String} [dir] Valid values are scrollTop and scrollLeft. Defaults to scrollTop.
-     * @private
+     * Focuses a particular cell and brings it into view. Will fire the rowfocus event.
+     * @param {Ext.grid.CellContext} pos The cell to select
+     * @param {Boolean/Number} [delay] Delay the focus this number of milliseconds (true for 10 milliseconds).
      */
-    scrollByDelta: function(delta, dir) {
-        dir = dir || 'scrollTop';
-        var elDom = this.el.dom;
-        elDom[dir] = (elDom[dir] += delta);
-    },
-
-    // private
-    onUpdate : function(store, record, operation, changedFieldNames) {
+    focusCell: function(position, delay) {
         var me = this,
-            index,
-            newRow, newAttrs, attLen, i, attName, oldRow, oldRowDom,
-            oldCells, newCells, len, i,
-            columns, overItemCls,
-            isHovered, row,
-            // See if an editing plugin is active.
-            isEditing = me.editingPlugin && me.editingPlugin.editing;
+            cell,
+            focusTask = me.getFocusTask();
 
-        if (me.viewReady) {
+        if (delay) {
+            focusTask.delay(Ext.isNumber(delay) ? delay : 10, me.focusCell, me, [position, false]);
+            return;
+        }
 
-            index = me.store.indexOf(record);
-            columns = me.headerCt.getGridColumns();
-            overItemCls = me.overItemCls;
+        // An immediate focus call must cancel any outstanding delayed focus calls.
+        focusTask.cancel();
 
-            // If we have columns which may *need* updating (think lockable grid child with all columns either locked or unlocked)
-            // and the changed record is within our view, then update the view
-            if (columns.length && index > -1) {
-                newRow = me.bufferRender([record], index)[0];
-                oldRow = me.all.item(index);
-                if (oldRow) {
-                    oldRowDom = oldRow.dom;
-                    isHovered = oldRow.hasCls(overItemCls);
-
-                    // Copy new row attributes across. Use IE-specific method if possible.
-                    if (oldRowDom.mergeAttributes) {
-                        oldRowDom.mergeAttributes(newRow, true);
-                    } else {
-                        newAttrs = newRow.attributes;
-                        attLen = newAttrs.length;
-                        for (i = 0; i < attLen; i++) {
-                            attName = newAttrs[i].name;
-                            if (attName !== 'id') {
-                                oldRowDom.setAttribute(attName, newAttrs[i].value);
-                            }
-                        }
-                    }
-
-                    if (isHovered) {
-                        oldRow.addCls(overItemCls);
-                    }
-
-                    // Replace changed cells in the existing row structure with the new version from the rendered row.
-                    oldCells = oldRow.query(me.cellSelector);
-                    newCells = Ext.fly(newRow).query(me.cellSelector);
-                    len = newCells.length;
-                    // row is the element that contains the cells.  This will be a different element from oldRow when using a rowwrap feature     
-                    row = oldCells[0].parentNode;
-                    for (i = 0; i < len; i++) {
-                        // If the field at this column index was changed, or column has a custom renderer
-                        // (which means value could rely on any other changed field) the update the cell's content.
-                        if (me.shouldUpdateCell(columns[i], changedFieldNames)) {
-                            // If an editor plugin is active, we carefully replace just the *contents* of the cell.
-                            if (isEditing) {
-                                Ext.fly(oldCells[i]).syncContent(newCells[i]);
-                            }
-                            // Otherwise, we simply replace whole TDs with a new version
-                            else {
-                                row.insertBefore(newCells[i], oldCells[i]);
-                                row.removeChild(oldCells[i]);
-                            }
-                        }
-                    }
-                }
-                me.fireEvent('itemupdate', record, index, newRow);
-            }
+        // Do not attempt to focus if hidden or within collapsed Panel
+        // Maintainer: Note that to avoid an unnecessary call to me.getCellByPosition if not visible, or another, nested if test,
+        // the assignment of the cell var is embedded inside the condition expression.
+        if (me.isVisible(true) && (cell = me.getCellByPosition(position))) {
+            me.getNavigationModel().setPosition(position);
         }
     },
     
-    shouldUpdateCell: function(column, changedFieldNames){
-        // Though this may not be the most efficient, a renderer could be dependent on any field in the
-        // store, so we must always update the cell
-        if (column.hasCustomRenderer) {
-            return true;
-        }
-        return !changedFieldNames || Ext.Array.contains(changedFieldNames, column.dataIndex);
-    },
-
-    /**
-     * Refreshes the grid view. Saves and restores the scroll state, generates a new template, stripes rows and
-     * invalidates the scrollers.
-     */
-    refresh: function() {
-        var me = this;
-        me.setNewTemplate();
-        me.callParent(arguments);
-        me.doStripeRows(0);
-        me.headerCt.setSortState();
-    },
-
-    clearViewEl: function() {
-        this.callParent();
-        delete this.table.dom;
-    },
-
-    processItemEvent: function(record, row, rowIndex, e) {
+    getLastFocused: function() {
         var me = this,
-            cell = e.getTarget(me.cellSelector, row),
-            cellIndex = cell ? cell.cellIndex : -1,
-            map = me.statics().EventMap,
-            selModel = me.getSelectionModel(),
-            type = e.type,
-            result;
+            lastFocused = me.lastFocused;
 
-        if (type == 'keydown' && !cell && selModel.getCurrentPosition) {
-            // CellModel, otherwise we can't tell which cell to invoke
-            cell = me.getCellByPosition(selModel.getCurrentPosition());
-            if (cell) {
-                cell = cell.dom;
-                cellIndex = cell.cellIndex;
+        if (lastFocused && lastFocused.record && lastFocused.column) {
+
+            // If the last focused record or column has gone away, or the record is no longer in the visible rendered block, we have no lastFocused
+            if (me.dataSource.indexOf(lastFocused.record) !== -1 && me.getVisibleColumnManager().indexOf(lastFocused.column) !== -1 && me.getNode(lastFocused.record)) {
+                return lastFocused;
+            }
+        }
+    },
+
+    scrollCellIntoView: function(cell, animate) {
+        if (cell.isCellContext) {
+            cell = this.getCellByPosition(cell);
+        }
+        if (cell) {
+            this.scrollElIntoView(cell, null, animate);
+        }
+    },
+
+    scrollElIntoView: function(el, hscroll, animate) {
+        var scroller = this.getScrollable();
+
+        if (scroller) {
+            scroller.scrollIntoView(el, hscroll, animate);
+        }
+    },
+
+    syncRowHeightBegin: function () {
+        var me = this,
+            itemEls = me.all,
+            ln = itemEls.count,
+            synchronizer = [],
+            RowSynchronizer = Ext.grid.locking.RowSynchronizer,
+            i, j, rowSync;
+
+        for (i = 0, j = itemEls.startIndex; i < ln; i++, j++) {
+            synchronizer[i] = rowSync = new RowSynchronizer(me, itemEls.elements[j]);
+            rowSync.reset();
+        }
+
+        return synchronizer;
+    },
+
+    syncRowHeightClear: function (synchronizer) {
+        var me = this,
+            itemEls = me.all,
+            ln = itemEls.count,
+            i;
+
+        for (i = 0; i < ln; i++) {
+            synchronizer[i].reset();
+        }
+    },
+
+    syncRowHeightMeasure: function (synchronizer) {
+        var ln = synchronizer.length,
+            i;
+
+        for (i = 0; i < ln; i++) {
+            synchronizer[i].measure();
+        }
+    },
+
+    syncRowHeightFinish: function (synchronizer, otherSynchronizer) {
+        var ln = synchronizer.length,
+            i;
+
+        for (i = 0; i < ln; i++) {
+            synchronizer[i].finish(otherSynchronizer[i]);
+        }
+    },
+
+    // private
+    handleUpdate: function(store, record, operation, changedFieldNames) {
+        var me = this,
+            rowTpl = me.rowTpl,
+            markDirty = me.markDirty,
+            dirtyCls = me.dirtyCls,
+            columnsToUpdate = [],
+            hasVariableRowHeight = me.variableRowHeight,
+            updateTypeFlags = 0,
+            ownerCt = me.ownerCt,
+            oldItem, oldItemDom, oldDataRow,
+            newItemDom,
+            newAttrs, attLen, attName, attrIndex,
+            overItemCls,
+            columns,
+            column,
+            len, i,
+            cellUpdateFlag,
+            cell,
+            fieldName,
+            value,
+            defaultRenderer,
+            scope,
+            elData;
+
+        if (me.viewReady) {
+            // Table row being updated
+            oldItemDom = me.getNodeByRecord(record);
+
+            // Row might not be rendered due to buffered rendering or being part of a collapsed group...
+            if (oldItemDom) {
+                overItemCls = me.overItemCls;
+                columns = me.ownerCt.getVisibleColumnManager().getColumns();
+
+                // Collect an array of the columns which must be updated.
+                // If the field at this column index was changed, or column has a custom renderer
+                // (which means value could rely on any other changed field) we include the column.
+                for (i = 0, len = columns.length; i < len; i++) {
+                    column = columns[i];
+
+                    // 0 = Column doesn't need update.
+                    // 1 = Column needs update, and renderer has > 1 argument; We need to render a whole new HTML item.
+                    // 2 = Column needs update, but renderer has 1 argument or column uses an updater.
+                    cellUpdateFlag = me.shouldUpdateCell(record, column, changedFieldNames);
+
+                    if (cellUpdateFlag) {
+                        // Track if any of the updating columns yields a flag with the 1 bit set.
+                        // This means that there is a custom renderer involved and a new TableView item
+                        // will need rendering.
+                        updateTypeFlags = updateTypeFlags | cellUpdateFlag;
+
+                        columnsToUpdate[columnsToUpdate.length] = column;
+                        hasVariableRowHeight = hasVariableRowHeight || column.variableRowHeight;
+                    }
+                }
+
+                // If there's no data row (some other rowTpl has been used; eg group header)
+                //  or one or more columns has a custom renderer
+                //  or there's more than one <TR>, we must use the full render pathway to create a whole new TableView item
+                if (!me.getRowFromItem(oldItemDom) || (updateTypeFlags & 1) || (oldItemDom.tBodies[0].childNodes.length > 1)) {
+                    oldItem = Ext.fly(oldItemDom, '_internal');
+                    elData = oldItemDom._extData;
+                    newItemDom = me.createRowElement(record, me.dataSource.indexOf(record), columnsToUpdate);
+                    if (oldItem.hasCls(overItemCls)) {
+                        Ext.fly(newItemDom).addCls(overItemCls);
+                    }
+
+                    // Copy new row attributes across. Use IE-specific method if possible.
+                    // In IE10, there is a problem where the className will not get updated
+                    // in the view, even though the className on the dom element is correct.
+                    // See EXTJSIV-9462
+                    if (Ext.isIE9m && oldItemDom.mergeAttributes) {
+                        oldItemDom.mergeAttributes(newItemDom, true);
+                    } else {
+                        newAttrs = newItemDom.attributes;
+                        attLen = newAttrs.length;
+                        for (attrIndex = 0; attrIndex < attLen; attrIndex++) {
+                            attName = newAttrs[attrIndex].name;
+                            if (attName !== 'id') {
+                                oldItemDom.setAttribute(attName, newAttrs[attrIndex].value);
+                            }
+                        }
+                    }
+                    
+                    // The element's data is no longer synchronized. We just overwrite it in the DOM
+                    if (elData) {
+                        elData.isSynchronized = false;
+                    }
+
+                    // If we have columns which may *need* updating (think locked side of lockable grid with all columns unlocked)
+                    // and the changed record is within our view, then update the view.
+                    if (columns.length && (oldDataRow = me.getRow(oldItemDom))) {
+                        me.updateColumns(oldDataRow, Ext.fly(newItemDom).down(me.rowSelector, true), columnsToUpdate);
+                    }
+
+                    // Loop thru all of rowTpls asking them to sync the content they are responsible for if any.
+                    while (rowTpl) {
+                        if (rowTpl.syncContent) {
+                            // *IF* we are selectively updating columns (have been passed changedFieldNames), then pass the column set, else
+                            // pass null, and it will sync all content.
+                            if (rowTpl.syncContent(oldItemDom, newItemDom, changedFieldNames ? columnsToUpdate : null) === false) {
+                                break;
+                            }
+                        }
+                        rowTpl = rowTpl.nextTpl;
+                    }
+                }
+
+                // No custom renderers found in columns to be updated, we can simply update the existing cells.
+                else {
+                    
+                    // Flyweight for manipulation of the update cell
+                    if (!me.cellFly) {
+                        me.cellFly = new Ext.dom.Fly();
+                    }
+
+                    // Loop through columns which need updating.
+                    for (i = 0, len = columnsToUpdate.length; i < len; i++) {
+                        column = columnsToUpdate[i];
+
+                        // The dataIndex of the column is the field name
+                        fieldName = column.dataIndex;
+
+                        value = record.get(fieldName);
+                        cell = oldItemDom.firstChild.firstChild.childNodes[column.getVisibleIndex()];
+
+                        // Mark the field's dirty status if we are configured to do so (defaults to true)
+                        if (markDirty) {
+                            me.cellFly.attach(cell);
+                            if (record.isModified(column.dataIndex)) {
+                                me.cellFly.addCls(dirtyCls);
+                            } else {
+                                me.cellFly.removeCls(dirtyCls);
+                            }
+                        }
+
+                        defaultRenderer = column.usingDefaultRenderer;
+                        scope = defaultRenderer ? column : column.scope;
+
+                        // Call the column updater which gets passed the TD element
+                        if (column.updater) {
+                            Ext.callback(column.updater, scope, [cell, value, record, me, me.dataSource], 0, column, ownerCt);
+                        }
+                        else {
+                            if (column.renderer) {
+                                value = Ext.callback(column.renderer, scope,
+                                        [value, null, record, 0, 0, me.dataSource, me], 0, column, ownerCt);
+                            }
+
+                            // Update the value of the cell's inner in the best way.
+                            // We only use innerHTML of the cell's inner DIV if the renderer produces HTML
+                            // Otherwise we change the value of the single text node within the inner DIV
+                            if (column.producesHTML) {
+                                cell.childNodes[0].innerHTML = value;
+                            } else {
+                                cell.childNodes[0].childNodes[0].data = value;
+                            }
+                        }
+
+                        // Add the highlight class if there is one
+                        if (me.highlightClass) {
+                            Ext.fly(cell).addCls(me.highlightClass);
+
+                            // Start up a DelayedTask which will purge the changedCells stack, removing the highlight class
+                            // after the expiration time
+                            if (!me.changedCells) {
+                                me.self.prototype.changedCells = [];
+                                me.prototype.clearChangedTask = new Ext.util.DelayedTask(me.clearChangedCells, me.prototype);
+                                me.clearChangedTask.delay(me.unhighlightDelay);
+                            }
+
+                            // Post a changed cell to the stack along with expiration time
+                            me.changedCells.push({
+                                cell: cell,
+                                cls: me.highlightClass,
+                                expires: Ext.Date.now() + 1000
+                            });
+                        }
+                    }
+
+                    // If we have a commit or a reject, some fields may no longer be dirty but may
+                    // not appear in the modified field names. Remove all the dirty class here to be sure.
+                    if (markDirty && !record.dirty) {
+                        Ext.fly(oldItemDom, '_internal').select('.' + dirtyCls).removeCls(dirtyCls);
+                    }
+                }
+
+                // Coalesce any layouts which happen due to any itemupdate handlers (eg Widget columns) with the final refreshSize layout.
+                if (hasVariableRowHeight) {
+                    Ext.suspendLayouts();
+                }
+
+                // Since we don't actually replace the row, we need to fire the event with the old row
+                // because it's the thing that is still in the DOM
+                me.fireEvent('itemupdate', record, me.store.indexOf(record), oldItemDom);
+
+                // We only need to update the layout if any of the columns can change the row height.
+                if (hasVariableRowHeight) {
+                    if (me.bufferedRenderer) {
+                        me.bufferedRenderer.refreshSize();
+
+                        // Must climb to ownerGrid in case we've only updated one field in one side of a lockable assembly.
+                        // ownerGrid is always the topmost GridPanel.
+                        me.ownerGrid.updateLayout();
+                    } else {
+                        me.refreshSize();
+                    }
+
+                    // Ensure any layouts queued by itemupdate handlers and/or the refreshSize call are executed.
+                    Ext.resumeLayouts(true);
+                }
+            }
+        }
+    },
+
+    clearChangedCells: function() {
+        var me = this,
+            now = Ext.Date.now(),
+            changedCell;
+
+        for (var i = 0, len = me.changedCells.length; i < len; ) {
+            changedCell = me.changedCells[i];
+            if (changedCell.expires <= now) {
+                Ext.fly(changedCell.cell).removeCls(changedCell.highlightClass);
+                Ext.Array.erase(me.changedCells, i, 1);
+                len--;
+            } else {
+                break;
             }
         }
 
-        result = me.fireEvent('uievent', type, me, cell, rowIndex, cellIndex, e, record, row);
+        // Keep repeating the delay until all highlighted cells have been cleared
+        if (len) {
+            me.clearChangedTask.delay(me.unhighlightDelay);
+        }
+    },
 
-        if (result === false || me.callParent(arguments) === false) {
+    updateColumns: function(oldRowDom, newRowDom, columnsToUpdate) {
+        var me = this,
+            newAttrs, attLen, attName, attrIndex,
+            colCount = columnsToUpdate.length,
+            colIndex,
+            column,
+            oldCell, newCell,
+            cellSelector = me.getCellSelector();
+
+            // Copy new row attributes across. Use IE-specific method if possible.
+            // Must do again at this level because the row DOM passed here may be the nested row in a row wrap.
+            if (oldRowDom.mergeAttributes) {
+                oldRowDom.mergeAttributes(newRowDom, true);
+            } else {
+                newAttrs = newRowDom.attributes;
+                attLen = newAttrs.length;
+                for (attrIndex = 0; attrIndex < attLen; attrIndex++) {
+                    attName = newAttrs[attrIndex].name;
+                    if (attName !== 'id') {
+                        oldRowDom.setAttribute(attName, newAttrs[attrIndex].value);
+                    }
+                }
+            }
+
+        // Replace changed cells in the existing row structure with the new version from the rendered row.
+        for (colIndex = 0; colIndex < colCount; colIndex++) {
+            column = columnsToUpdate[colIndex];
+
+            // Pluck out cells using the column's unique cell selector.
+            // Becuse in a wrapped row, there may be several TD elements.
+            cellSelector = me.getCellSelector(column);
+            oldCell = Ext.fly(oldRowDom).selectNode(cellSelector);
+            newCell = Ext.fly(newRowDom).selectNode(cellSelector);
+
+            // Carefully replace just the *contents* of the cell.
+            Ext.fly(oldCell).syncContent(newCell);
+        }
+    },
+
+    /**
+     * @private
+     * Decides whether the column needs updating
+     * @return {Number} 0 = Doesn't need update.
+     * 1 = Column needs update, and renderer has > 1 argument; We need to render a whole new HTML item.
+     * 2 = Column needs update, but renderer has 1 argument or column uses an updater.
+     */
+    shouldUpdateCell: function(record, column, changedFieldNames) {
+        // We should not update certain columns (widget column)
+        if (!column.preventUpdate) {
+
+            // The passed column has a renderer which peeks and pokes at other data.
+            // Return 1 which means that a whole new TableView item must be rendered.
+            if (column.hasCustomRenderer) {
+                return 1;
+            }
+
+            // If there is a changed field list, and it's NOT a custom column renderer
+            // (meaning it doesn't peek at other data, but just uses the raw field value)
+            // We only have to update it if the column's field is amobg those changes.
+            if (changedFieldNames) {
+                var len = changedFieldNames.length,
+                    i, field;
+
+                for (i = 0; i < len; ++i) {
+                    field = changedFieldNames[i];
+                    if (field === column.dataIndex || field === record.idProperty) {
+                        return 2;
+                    }
+                }
+            } else {
+                return 2;
+            }
+        }
+        return 0;
+    },
+
+    /**
+     * Refreshes the grid view. Sets the sort state and focuses the previously focused row.
+     */
+    refresh: function() {
+        var me = this,
+            scroller;
+
+        me.callParent(arguments);
+
+        me.headerCt.setSortState();
+
+        // Create horizontal stretcher element if no records in view and there is overflow of the header container.
+        // Element will be transient and destroyed by the next refresh.
+        if (me.touchScroll && me.el && !me.all.getCount() && me.headerCt && me.headerCt.tooNarrow) {
+            scroller = me.getScrollable();
+            if (scroller) {
+                scroller.setSize({
+                    x: me.headerCt.getTableWidth(),
+                    y: scroller.getSize().y
+                });
+            }
+        }
+    },
+
+    processContainerEvent: function(e) {
+        // If we find a component & it belongs to our grid, don't fire the event.
+        // For example, grid editors resolve to the parent grid
+        var cmp = Ext.ComponentManager.byElement(e.target.parentNode);
+        if (cmp && cmp.up(this.ownerCt)) {
+            return false;
+        } 
+    },
+
+    processItemEvent: function(record, item, rowIndex, e) {
+        var me = this,
+            self = me.self,
+            map = self.EventMap,
+            type = e.type,
+            row, cell, selModel,
+            features = me.features,
+            len = features.length,
+            i, cellIndex, result, feature, column,
+            navModel = me.getNavigationModel(),
+            focusPosition,
+            eventPosition = e.position = me.eventPosition || (me.eventPosition = new Ext.grid.CellContext());
+
+        // IE has a bug whereby if you mousedown in a cell editor in one side of a locking grid and then
+        // drag out of that, and mouseup in *the other side*, the mousedowned side still receives the event!
+        // Even though the mouseup target is *not* within it! Ignore the mouseup in this case.
+        if (Ext.isIE && type === 'mouseup' && !e.within(me.el)) {
             return false;
         }
 
-        // Don't handle cellmouseenter and cellmouseleave events for now
-        if (type == 'mouseover' || type == 'mouseout') {
-            return true;
-        }
+        // Only process the event if it occurred within an item which maps to a record in the store
+        if (me.indexInStore(item) !== -1) {
+            row = eventPosition.rowElement = Ext.fly(item).down(me.rowSelector, true);
 
-        if(!cell) {
+            // For key events, pull context from NavigationModel
+            if (Ext.String.startsWith(e.type, 'key') && (focusPosition = navModel.getPosition())) {
+                cell = (cell = navModel.getCell()) && cell.dom;
+                column = focusPosition.column;
+            }
+
+            // Even with a NavigationModel, synthetic click events might be recieved before focus
+            // is received, so attempt to access the cell from the target.
+            if (!cell) {
+                cell = e.getTarget(me.getCellSelector(), row);
+            }
+
+            type = self.TouchEventMap[type] || type;
+
+            if (cell) {
+                if (!cell.parentNode) {
+                    // If we have no parentNode, the td has been removed from the DOM, probably via an update,
+                    // so just jump out since the target for the event isn't valid
+                    return false;
+                }
+                if (!column) {
+                    column = me.getHeaderByCell(cell);
+                }
+
+                // Find the index of the header in the *full* (including hidden columns) leaf column set.
+                // Because In 4.0.0 we rendered hidden cells, and the cellIndex included the hidden ones.
+                cellIndex = me.ownerCt.getColumnManager().getHeaderIndex(column);
+            } else {
+                cellIndex = -1;
+            }
+            eventPosition.setAll(
+                me,
+                rowIndex,
+                column ? me.getVisibleColumnManager().getHeaderIndex(column) : -1,
+                record,
+                column
+            );
+            eventPosition.cellElement = cell;
+
+            result = me.fireEvent('uievent', type, me, cell, rowIndex, cellIndex, e, record, row);
+
+            // If the event has been stopped by a handler, tell the selModel (if it is interested) and return early.
+            // For example, action columns by default will stop event propagation by returning `false` from its
+            // 'uievent' event handler.
+            if ((result === false || me.callParent(arguments) === false)) {
+                selModel = me.getSelectionModel();
+                if (selModel.onVetoUIEvent) {
+                    selModel.onVetoUIEvent(type, me, cell, rowIndex, cellIndex, e, record, row);
+                }
+                return false;
+            }
+
+            for (i = 0; i < len; ++i) {
+                feature = features[i];
+                // In some features, the first/last row might be wrapped to contain extra info,
+                // such as grouping or summary, so we may need to stop the event
+                if (feature.wrapsItem) {
+                    if (feature.vetoEvent(record, row, rowIndex, e) === false) {
+                        // If the feature is vetoing the event, there's a good chance that
+                        // it's for some feature action in the wrapped row.
+                        me.processSpecialEvent(e);
+                        // Prevent focus/selection here until proper focus handling is added for non-data rows
+                        // This should probably be removed once this is implemented.
+                        e.preventDefault();
+                        return false;
+                    }
+                }
+            }
+
             // if the element whose event is being processed is not an actual cell (for example if using a rowbody
             // feature and the rowbody element's event is being processed) then do not fire any "cell" events
-            return true;
-        }
+            // Don't handle cellmouseenter and cellmouseleave events for now
+            if (cell && type !== 'mouseover' && type !== 'mouseout') {
+                result = !(
+                    // We are adding cell and feature events
+                    (me['onBeforeCell' + map[type]](cell, cellIndex, record, row, rowIndex, e) === false) ||
+                    (me.fireEvent('beforecell' + type, me, cell, cellIndex, record, row, rowIndex, e) === false) ||
+                    (me['onCell' + map[type]](cell, cellIndex, record, row, rowIndex, e) === false) ||
+                    (me.fireEvent('cell' + type, me, cell, cellIndex, record, row, rowIndex, e) === false)
+                );
+            }
+            if (result !== false) {
+                result = me.fireEvent('row' + type, me, record, row, rowIndex, e);
+            }
 
-        return !(
-            // We are adding cell and feature events
-            (me['onBeforeCell' + map[type]](cell, cellIndex, record, row, rowIndex, e) === false) ||
-            (me.fireEvent('beforecell' + type, me, cell, cellIndex, record, row, rowIndex, e) === false) ||
-            (me['onCell' + map[type]](cell, cellIndex, record, row, rowIndex, e) === false) ||
-            (me.fireEvent('cell' + type, me, cell, cellIndex, record, row, rowIndex, e) === false)
-        );
+            return result;
+
+        } else {
+            // If it's not in the store, it could be a feature event, so check here
+            this.processSpecialEvent(e);
+            // Prevent focus/selection here until proper focus handling is added for non-data rows
+            // This should probably be removed once this is implemented.
+            e.preventDefault();
+            return false;
+        }
     },
 
     processSpecialEvent: function(e) {
         var me = this,
-            map = me.statics().EventMap,
             features = me.features,
             ln = features.length,
             type = e.type,
@@ -851,6 +2476,7 @@ Ext.define('Ext.view.Table', {
             return;
         }
 
+        type = me.self.TouchEventMap[type] || type;
         for (i = 0; i < ln; i++) {
             feature = features[i];
             if (feature.hasFeatureEvent) {
@@ -881,28 +2507,49 @@ Ext.define('Ext.view.Table', {
     },
 
     onCellMouseDown: Ext.emptyFn,
+    onCellLongPress: Ext.emptyFn,
     onCellMouseUp: Ext.emptyFn,
     onCellClick: Ext.emptyFn,
     onCellDblClick: Ext.emptyFn,
     onCellContextMenu: Ext.emptyFn,
     onCellKeyDown: Ext.emptyFn,
+    onCellKeyUp: Ext.emptyFn,
+    onCellKeyPress: Ext.emptyFn,
     onBeforeCellMouseDown: Ext.emptyFn,
+    onBeforeCellLongPress: Ext.emptyFn,
     onBeforeCellMouseUp: Ext.emptyFn,
     onBeforeCellClick: Ext.emptyFn,
     onBeforeCellDblClick: Ext.emptyFn,
     onBeforeCellContextMenu: Ext.emptyFn,
     onBeforeCellKeyDown: Ext.emptyFn,
+    onBeforeCellKeyUp: Ext.emptyFn,
+    onBeforeCellKeyPress: Ext.emptyFn,
 
     /**
      * Expands a particular header to fit the max content width.
-     * This will ONLY expand, not contract.
-     * @private
+     * @deprecated Use {@link #autoSizeColumn} instead.
      */
     expandToFit: function(header) {
+        this.autoSizeColumn(header);
+    },
+
+    /**
+     * Sizes the passed header to fit the max content width.
+     * *Note that group columns shrinkwrap around the size of leaf columns. Auto sizing a group column
+     * autosizes descendant leaf columns.*
+     * @param {Ext.grid.column.Column/Number} header The header (or index of header) to auto size.
+     */
+    autoSizeColumn: function(header) {
+        if (Ext.isNumber(header)) {
+            header = this.getGridColumns[header];
+        }
         if (header) {
-            var maxWidth = this.getMaxContentWidth(header);
+            if (header.isGroupHeader) {
+                header.autoSize();
+                return;
+            }
             delete header.flex;
-            header.setWidth(maxWidth);
+            header.setWidth(this.getMaxContentWidth(header));
         }
     },
 
@@ -912,19 +2559,53 @@ Ext.define('Ext.view.Table', {
      * @private
      */
     getMaxContentWidth: function(header) {
-        var cellSelector = header.getCellInnerSelector(),
-            cells        = this.el.query(cellSelector),
+        var me = this,
+            cells = me.el.query(header.getCellInnerSelector()),
+            originalWidth = header.getWidth(),
             i = 0,
             ln = cells.length,
-            maxWidth = header.el.dom.scrollWidth,
-            scrollWidth;
+            columnSizer = me.body.select(me.getColumnSizerSelector(header)),
+            max = Math.max,
+            widthAdjust = 0,
+            maxWidth;
 
-        for (; i < ln; i++) {
-            scrollWidth = cells[i].scrollWidth;
-            if (scrollWidth > maxWidth) {
-                maxWidth = scrollWidth;
+        if (ln > 0) {
+            if (Ext.supports.ScrollWidthInlinePaddingBug) {
+                widthAdjust += me.getCellPaddingAfter(cells[0]);
+            }
+            if (me.columnLines) {
+                widthAdjust += Ext.fly(cells[0].parentNode).getBorderWidth('lr');
             }
         }
+
+        // Set column width to 1px so we can detect the content width by measuring scrollWidth
+        columnSizer.setWidth(1);
+
+        // We are about to measure the offsetWidth of the textEl to determine how much
+        // space the text occupies, but it will not report the correct width if the titleEl
+        // has text-overflow:ellipsis.  Set text-overflow to 'clip' before proceeding to
+        // ensure we get the correct measurement.
+        header.titleEl.setStyle('text-overflow', 'clip');
+
+        // Allow for padding round text of header
+        maxWidth = header.textEl.dom.offsetWidth + header.titleEl.getPadding('lr');
+
+        // revert to using text-overflow defined by the stylesheet
+        header.titleEl.setStyle('text-overflow', '');
+
+        for (; i < ln; i++) {
+            maxWidth = max(maxWidth, cells[i].scrollWidth);
+        }
+
+        // in some browsers, the "after" padding is not accounted for in the scrollWidth
+        maxWidth += widthAdjust;
+
+        // 40 is the minimum column width.  TODO: should this be configurable?
+        maxWidth = max(maxWidth, 40);
+
+        // Set column width back to original width
+        columnSizer.setWidth(originalWidth);
+
         return maxWidth;
     },
 
@@ -940,10 +2621,7 @@ Ext.define('Ext.view.Table', {
 
     getHeaderByCell: function(cell) {
         if (cell) {
-            var m = cell.className.match(this.cellRe);
-            if (m && m[1]) {
-                return Ext.getCmp(m[1]);
-            }
+            return this.ownerCt.getVisibleColumnManager().getHeaderById(cell.getAttribute('data-columnId'));
         }
         return false;
     },
@@ -955,15 +2633,12 @@ Ext.define('Ext.view.Table', {
      * - column - The column index
      *
      * @param {String} direction 'up', 'down', 'right' and 'left'
-     * @param {Ext.EventObject} e event
+     * @param {Ext.event.Event} e event
      * @param {Boolean} preventWrap Set to true to prevent wrap around to the next or previous row.
      * @param {Function} verifierFn A function to verify the validity of the calculated position.
      * When using this function, you must return true to allow the newPosition to be returned.
      * @param {Object} scope Scope to run the verifierFn in
-     * @returns {Object} newPosition An object containing the following properties:
-     *
-     * - row - The row index
-     * - column - The column index
+     * @returns {Ext.grid.CellContext} An object encapsulating the unique cell position.
      *
      * @private
      */
@@ -972,20 +2647,26 @@ Ext.define('Ext.view.Table', {
         // Caller (probably CellModel) had no current position. This can happen
         // if the main el is focused and any navigation key is presssed.
         if (!pos) {
-            return;
+            return false;
         }
 
-        var me       = this,
-            row      = pos.row,
-            column   = pos.column,
-            rowCount = me.store.getCount(),
-            firstCol = me.getFirstVisibleColumnIndex(),
-            lastCol  = me.getLastVisibleColumnIndex(),
-            newPos   = {row: row, column: column},
-            activeHeader = me.headerCt.getHeaderAtIndex(column);
+        var me           = this,
+
+            // Use original, documented row/column properties if passed.
+            // The object should be a CellContext with rowIdx & colIdx
+            row          = typeof pos.row    === 'number' ? pos.row    : pos.rowIdx,
+            column       = typeof pos.column === 'number' ? pos.column : pos.colIdx,
+
+            rowCount     = me.dataSource.getCount(),
+            columns      = me.ownerCt.getVisibleColumnManager(),
+            firstIndex   = columns.getHeaderIndex(columns.getFirst()),
+            lastIndex    = columns.getHeaderIndex(columns.getLast()),
+            newRow       = row,
+            newColumn    = column,
+            activeHeader = columns.getHeaderAtIndex(column);
 
         // no active header or its currently hidden
-        if (!activeHeader || activeHeader.hidden) {
+        if (!activeHeader || activeHeader.hidden || !rowCount) {
             return false;
         }
 
@@ -994,44 +2675,48 @@ Ext.define('Ext.view.Table', {
         switch (direction) {
             case 'right':
                 // has the potential to wrap if its last
-                if (column === lastCol) {
+                if (column === lastIndex) {
                     // if bottom row and last column, deny right
                     if (preventWrap || row === rowCount - 1) {
                         return false;
                     }
                     if (!e.ctrlKey) {
                         // otherwise wrap to nextRow and firstCol
-                        newPos.row = row + 1;
-                        newPos.column = firstCol;
+                        newRow = me.walkRows(row, 1);
+                        if (newRow !== row) {
+                            newColumn = firstIndex;
+                        }
                     }
                 // go right
                 } else {
                     if (!e.ctrlKey) {
-                        newPos.column = column + me.getRightGap(activeHeader);
+                        newColumn = columns.getHeaderIndex(columns.getNextSibling(activeHeader));
                     } else {
-                        newPos.column = lastCol;
+                        newColumn = lastIndex;
                     }
                 }
                 break;
 
             case 'left':
                 // has the potential to wrap
-                if (column === firstCol) {
+                if (column === firstIndex) {
                     // if top row and first column, deny left
                     if (preventWrap || row === 0) {
                         return false;
                     }
                     if (!e.ctrlKey) {
-                        // otherwise wrap to prevRow and lastCol
-                        newPos.row = row - 1;
-                        newPos.column = lastCol;
+                        // otherwise wrap to prevRow and lastIndex
+                        newRow = me.walkRows(row, -1);
+                        if (newRow !== row) {
+                            newColumn = lastIndex;
+                        }
                     }
                 // go left
                 } else {
                     if (!e.ctrlKey) {
-                        newPos.column = column + me.getLeftGap(activeHeader);
+                        newColumn = columns.getHeaderIndex(columns.getPreviousSibling(activeHeader));
                     } else {
-                        newPos.column = firstCol;
+                        newColumn = firstIndex;
                     }
                 }
                 break;
@@ -1043,9 +2728,10 @@ Ext.define('Ext.view.Table', {
                 // go up
                 } else {
                     if (!e.ctrlKey) {
-                        newPos.row = row - 1;
+                        newRow = me.walkRows(row, -1);
                     } else {
-                        newPos.row = 0;
+                        // Go to first row by walking down from row -1
+                        newRow = me.walkRows(-1, 1);
                     }
                 }
                 break;
@@ -1057,112 +2743,257 @@ Ext.define('Ext.view.Table', {
                 // go down
                 } else {
                     if (!e.ctrlKey) {
-                        newPos.row = row + 1;
+                        newRow = me.walkRows(row, 1);
                     } else {
-                        newPos.row = rowCount - 1;
+                        // Go to first row by walking up from beyond the last row
+                        newRow = me.walkRows(rowCount, -1);
                     }
                 }
                 break;
         }
 
-        if (verifierFn && verifierFn.call(scope || window, newPos) !== true) {
+        if (verifierFn && verifierFn.call(scope || me, {row: newRow, column: newColumn}) !== true) {
             return false;
-        } else {
-            return newPos;
         }
-    },
-    getFirstVisibleColumnIndex: function() {
-        var firstVisibleHeader = this.getHeaderCt().getVisibleGridColumns()[0];
 
-        return firstVisibleHeader ? firstVisibleHeader.getIndex() : -1;
+        newColumn = columns.getHeaderAtIndex(newColumn);
+        return new Ext.grid.CellContext(me).setPosition(newRow, newColumn);
     },
 
-    getLastVisibleColumnIndex: function() {
-        var visHeaders = this.getHeaderCt().getVisibleGridColumns(),
-            lastHeader = visHeaders[visHeaders.length - 1];
+    /**
+     * Increments the passed row index by the passed increment which may be +ve or -ve
+     *
+     * Skips hidden rows.
+     *
+     * If no row is visible in the specified direction, returns the input row index unchanged.
+     * @param {Number} startRow The zero-based row index to start from.
+     * @param {Number} distance The distance to move the row by. May be +ve or -ve.
+     */
+    walkRows: function(startRow, distance) {
+        // Note that we use the **dataSource** here because row indices mean view row indices
+        // so records in collapsed groups must be omitted.
+        var me = this,
+            store = me.dataSource,
+            moved = 0,
+            lastValid = startRow,
+            node,
+            limit = (distance < 0) ? 0 : (store.isBufferedStore ? store.getTotalCount() : store.getCount()) - 1,
+            increment = limit ? 1 : -1,
+            result = startRow;
 
-        return lastHeader.getIndex();
+        do {
+            // Walked off the end: return the last encountered valid row
+            if (limit ? result >= limit : result <= limit) {
+                return lastValid || limit;
+            }
+
+            // Move the result pointer on by one position. We have to count intervening VISIBLE nodes
+            result += increment;
+
+            // Stepped onto VISIBLE record: Increment the moved count.
+            // We must not count stepping onto a non-rendered record as a move.
+            if ((node = Ext.fly(me.getRow(result))) && node.isVisible(true)) {
+                moved += increment;
+                lastValid = result;
+            }
+        } while (moved !== distance);
+        return result;
+    },
+
+    /**
+     * Navigates from the passed record by the passed increment which may be +ve or -ve
+     *
+     * Skips hidden records.
+     *
+     * If no record is visible in the specified direction, returns the starting record index unchanged.
+     * @param {Ext.data.Model} startRec The Record to start from.
+     * @param {Number} distance The distance to move from the record. May be +ve or -ve.
+     */
+    walkRecs: function(startRec, distance) {
+        // Note that we use the **store** to access the records by index because the dataSource omits records in collapsed groups.
+        // This is used by selection models which use the **store**
+        var me = this,
+            store = me.dataSource,
+            moved = 0,
+            lastValid = startRec,
+            node,
+            limit = (distance < 0) ? 0 : (store.isBufferedStore ? store.getTotalCount() : store.getCount()) - 1,
+            increment = limit ? 1 : -1,
+            testIndex = store.indexOf(startRec),
+            rec;
+
+        do {
+            // Walked off the end: return the last encountered valid record
+            if (limit ? testIndex >= limit : testIndex <= limit) {
+                return lastValid;
+            }
+
+            // Move the result pointer on by one position. We have to count intervening VISIBLE nodes
+            testIndex += increment;
+
+            // Stepped onto VISIBLE record: Increment the moved count.
+            // We must not count stepping onto a non-rendered record as a move.
+            rec = store.getAt(testIndex);
+            if (!rec.isCollapsedPlaceholder && (node = Ext.fly(me.getNodeByRecord(rec))) && node.isVisible(true)) {
+                moved += increment;
+                lastValid = rec;
+            }
+        } while (moved !== distance);
+        return lastValid;
+    },
+    
+    /**
+     * Returns the index of the first row in your table view deemed to be visible.
+     * @return {Number}
+     * @private
+     */
+    getFirstVisibleRowIndex: function() {
+        var me = this,
+            count = (me.dataSource.isBufferedStore ? me.dataSource.getTotalCount() : me.dataSource.getCount()),
+            result = me.indexOf(me.all.first()) - 1;
+
+        do {
+            result += 1;
+            if (result === count) {
+                return;
+            }
+        } while (!Ext.fly(me.getRow(result)).isVisible(true));
+        return result;
+    },
+
+    
+    /**
+     * Returns the index of the last row in your table view deemed to be visible.
+     * @return {Number}
+     * @private
+     */
+    getLastVisibleRowIndex: function() {
+        var me = this,
+            result = me.indexOf(me.all.last());
+
+        do {
+            result -= 1;
+            if (result === -1) {
+                return;
+            }
+        } while (!Ext.fly(me.getRow(result)).isVisible(true));
+        return result;
     },
 
     getHeaderCt: function() {
         return this.headerCt;
     },
 
-    // TODO: have this use the new Ext.grid.CellContext class
     getPosition: function(record, header) {
+        return new Ext.grid.CellContext(this).setPosition(record, header);
+    },
+
+    onDestroy: function() {
         var me = this,
-            store = me.store,
-            gridCols = me.headerCt.getGridColumns();
+            features = me.featuresMC,
+            len,
+            i;
 
-        return {
-            row: store.indexOf(record),
-            column: Ext.Array.indexOf(gridCols, header)
-        };
-    },
-
-    /**
-     * Determines the 'gap' between the closest adjacent header to the right
-     * that is not hidden.
-     * @private
-     */
-    getRightGap: function(activeHeader) {
-        var headerCt        = this.getHeaderCt(),
-            headers         = headerCt.getGridColumns(),
-            activeHeaderIdx = Ext.Array.indexOf(headers, activeHeader),
-            i               = activeHeaderIdx + 1,
-            nextIdx;
-
-        for (; i <= headers.length; i++) {
-            if (!headers[i].hidden) {
-                nextIdx = i;
-                break;
+        if (features) {
+            for (i = 0, len = features.getCount(); i < len; ++i) {
+                features.getAt(i).destroy();
             }
         }
-
-        return nextIdx - activeHeaderIdx;
+        me.cellFly = me.featuresMC = null;
+        me.callParent(arguments);
     },
 
-    beforeDestroy: function() {
-        if (this.rendered) {
-            this.el.removeAllListeners();
+    // Private.
+    // Respond to store replace event which is fired by GroupStore group expand/collapse operations.
+    // This saves a layout because a remove and add operation are coalesced in this operation.
+    onReplace: function(store, startIndex, oldRecords, newRecords) {
+        var me = this,
+            bufferedRenderer = me.bufferedRenderer;
+
+        // If there's a buffered renderer and the removal range falls inside the current view...
+        if (me.rendered && bufferedRenderer) {
+            bufferedRenderer.onReplace(store, startIndex, oldRecords, newRecords);
+        } else {
+            me.callParent(arguments);
         }
-        this.callParent(arguments);
-    },
-
-    /**
-     * Determines the 'gap' between the closest adjacent header to the left
-     * that is not hidden.
-     * @private
-     */
-    getLeftGap: function(activeHeader) {
-        var headerCt        = this.getHeaderCt(),
-            headers         = headerCt.getGridColumns(),
-            activeHeaderIdx = Ext.Array.indexOf(headers, activeHeader),
-            i               = activeHeaderIdx - 1,
-            prevIdx;
-
-        for (; i >= 0; i--) {
-            if (!headers[i].hidden) {
-                prevIdx = i;
-                break;
-            }
-        }
-
-        return prevIdx - activeHeaderIdx;
+        me.setPendingStripe(startIndex);
     },
 
     // after adding a row stripe rows from then on
-    onAdd: function(ds, records, index) {
-        this.callParent(arguments);
-        this.doStripeRows(index);
+    onAdd: function(store, records, index) {
+        var me = this,
+            bufferedRenderer = me.bufferedRenderer;
+
+        if (me.rendered && bufferedRenderer) {
+             bufferedRenderer.onReplace(store, index, [], records);
+        } else {
+            me.callParent(arguments);
+        }
+        me.setPendingStripe(index);
     },
-    
+
     // after removing a row stripe rows from then on
-    onRemove: function(ds, records, index) {
-        this.callParent(arguments);
-        this.doStripeRows(index);
+    onRemove: function(store, records, index) {
+        var me = this,
+            bufferedRenderer = me.bufferedRenderer;
+
+        // If there's a BufferedRenderer...
+        if (me.rendered && bufferedRenderer) {
+            bufferedRenderer.onReplace(store, index, records, []);
+        } else {
+            me.callParent(arguments);
+        }
+        me.setPendingStripe(index);
     },
     
+    // When there's a buffered renderer present, store refresh events cause TableViews to go to scrollTop:0
+    onDataRefresh: function() {
+        var me = this,
+            owner = me.ownerCt;
+
+        // If triggered during an animation, refresh once we're done
+        if (owner && owner.isCollapsingOrExpanding === 2) {
+            owner.on('expand', me.onDataRefresh, me, {single: true});
+            return;
+        }
+
+        me.callParent();
+    },
+
+    getViewRange: function() {
+        var me = this;
+
+        if (me.bufferedRenderer) {
+            return me.bufferedRenderer.getViewRange();
+        }
+        return me.callParent();
+    },
+
+    setPendingStripe: function(index) {
+        var current = this.stripeOnUpdate;
+        if (current === null) {
+            current = index; 
+        } else {
+            current = Math.min(current, index);
+        }
+        this.stripeOnUpdate = current;
+    },
+    
+    onEndUpdate: function() {
+        var me = this,
+            stripeOnUpdate = me.stripeOnUpdate,
+            startIndex = me.all.startIndex;
+        
+        if (me.rendered && (stripeOnUpdate || stripeOnUpdate === 0)) {
+            if (stripeOnUpdate < startIndex) {
+              stripeOnUpdate = startIndex;
+            }
+            me.doStripeRows(stripeOnUpdate);
+            me.stripeOnUpdate = null;
+        }
+        me.callParent(arguments);
+    },
+
     /**
      * Stripes rows from a particular row index.
      * @param {Number} startRow
@@ -1176,11 +3007,11 @@ Ext.define('Ext.view.Table', {
             rowsLn,
             i,
             row;
-            
+
         // ensure stripeRows configuration is turned on
         if (me.rendered && me.stripeRows) {
             rows = me.getNodes(startRow, endRow);
-                
+
             for (i = 0, rowsLn = rows.length; i < rowsLn; i++) {
                 row = rows[i];
                 // Remove prior applied row classes.
@@ -1192,6 +3023,28 @@ Ext.define('Ext.view.Table', {
                 }
             }
         }
+    },
+
+    hasActiveFeature: function(){
+        return (this.isGrouping && this.store.isGrouped()) || this.isRowWrapped;
+    },
+
+    getCellPaddingAfter: function(cell) {
+        return Ext.fly(cell).getPadding('r');
+    },
+
+    privates: {
+        refreshScroll: function () {
+            var me = this,
+                bufferedRenderer = me.bufferedRenderer;
+
+            // If there is a BufferedRenderer, we must refresh the scroller using BufferedRenderer methods
+            // which take account of the full virtual scroll range.
+            if (bufferedRenderer) {
+                bufferedRenderer.refreshSize();
+            } else {
+                me.callParent();
+            }
+        }
     }
- 
 });

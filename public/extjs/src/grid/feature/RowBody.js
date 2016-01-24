@@ -5,7 +5,7 @@
  * This is useful to to associate additional information with a particular
  * record in a grid.
  *
- * Rowbodies are initially hidden unless you override getAdditionalData.
+ * Rowbodies are initially hidden unless you override setupRowData.
  *
  * Will expose additional events on the gridview with the prefix of 'rowbody'.
  * For example: 'rowbodyclick', 'rowbodydblclick', 'rowbodycontextmenu'.
@@ -17,7 +17,7 @@
  *         extend: 'Ext.data.Model',
  *         fields: ['name', 'latin', 'desc']
  *     });
- * 
+ *
  *     Ext.create('Ext.grid.Panel', {
  *         width: 400,
  *         height: 300,
@@ -46,55 +46,156 @@
  *         }],
  *         features: [{
  *             ftype: 'rowbody',
- *             getAdditionalData: function(data, rowIndex, record, orig) {
+ *             setupRowData: function(record, rowIndex, rowValues) {
  *                 var headerCt = this.view.headerCt,
  *                     colspan = headerCt.getColumnCount();
+ *
  *                 // Usually you would style the my-body-class in CSS file
- *                 return {
+ *                 Ext.apply(rowValues, {
  *                     rowBody: '<div style="padding: 1em">'+record.get("desc")+'</div>',
  *                     rowBodyCls: "my-body-class",
  *                     rowBodyColspan: colspan
- *                 };
+ *                 });
  *             }
  *         }]
  *     });
+ *
+ *  # Cell Editing and Cell Selection Model
+ *
+ * Note that if {@link Ext.grid.plugin.CellEditing cell editing} or the {@link Ext.selection.CellModel cell selection model} are going
+ * to be used, then the {@link Ext.grid.feature.RowWrap RowWrap} feature, or {@link Ext.grid.plugin.RowExpander RowExpander} plugin MUST
+ * be used for intra-cell navigation to be correct.
+ *
  */
 Ext.define('Ext.grid.feature.RowBody', {
     extend: 'Ext.grid.feature.Feature',
     alias: 'feature.rowbody',
+
+    rowBodyCls: Ext.baseCSSPrefix + 'grid-row-body',
     rowBodyHiddenCls: Ext.baseCSSPrefix + 'grid-row-body-hidden',
-    rowBodyTrCls: Ext.baseCSSPrefix + 'grid-rowbody-tr',
-    rowBodyTdCls: Ext.baseCSSPrefix + 'grid-cell-rowbody',
-    rowBodyDivCls: Ext.baseCSSPrefix + 'grid-rowbody',
-
+    rowBodyTdSelector: 'td.' + Ext.baseCSSPrefix + 'grid-cell-rowbody',
     eventPrefix: 'rowbody',
-    eventSelector: '.' + Ext.baseCSSPrefix + 'grid-rowbody-tr',
-    
-    getRowBody: function(values) {
-        return [
-            '<tr class="' + this.rowBodyTrCls + ' {rowBodyCls}">',
-                '<td class="' + this.rowBodyTdCls + '" colspan="{rowBodyColspan}">',
-                    '<div class="' + this.rowBodyDivCls + '">{rowBody}</div>',
-                '</td>',
-            '</tr>'
-        ].join('');
-    },
-    
-    // injects getRowBody into the metaRowTpl.
-    getMetaRowTplFragments: function() {
-        return {
-            getRowBody: this.getRowBody,
-            rowBodyTrCls: this.rowBodyTrCls,
-            rowBodyTdCls: this.rowBodyTdCls,
-            rowBodyDivCls: this.rowBodyDivCls
-        };
+    eventSelector: 'tr.' + Ext.baseCSSPrefix + 'grid-rowbody-tr',
+
+    colSpanDecrement: 0,
+
+    /**
+     * @cfg {Boolean} [bodyBefore=false]
+     * Configure as `true` to put the row expander body *before* the data row.
+     * 
+     */
+    bodyBefore: false,
+
+    outerTpl: {
+        fn: function(out, values, parent) {
+            var view = values.view,
+                rowValues = view.rowValues;
+
+            this.rowBody.setup(values.rows, rowValues);
+            this.nextTpl.applyOut(values, out, parent);
+            this.rowBody.cleanup(values.rows, rowValues);
+        },
+        priority: 100
     },
 
-    mutateMetaRowTpl: function(metaRowTpl) {
-        metaRowTpl.push('{[this.getRowBody(values)]}');
+    extraRowTpl: [
+        '{%',
+            'if(this.rowBody.bodyBefore) {',
+                // MUST output column sizing elements because the first row in this table
+                // contains one colspanning TD, and that overrides subsequent column width settings.
+                'values.view.renderColumnSizer(values, out);',
+            '} else {',
+                'this.nextTpl.applyOut(values, out, parent);',
+            '}',
+            'values.view.rowBodyFeature.setupRowData(values.record, values.recordIndex, values);',
+        '%}',
+        '<tr class="' + Ext.baseCSSPrefix + 'grid-rowbody-tr {rowBodyCls}" {ariaRowAttr}>',
+            '<td class="' + Ext.baseCSSPrefix + 'grid-td ' + Ext.baseCSSPrefix + 'grid-cell-rowbody" colspan="{rowBodyColspan}" {ariaCellAttr}>',
+                '<div class="' + Ext.baseCSSPrefix + 'grid-rowbody {rowBodyDivCls}" {ariaCellInnerAttr}>{rowBody}</div>',
+            '</td>',
+        '</tr>',
+        '{%',
+            'if(this.rowBody.bodyBefore) {',
+                'this.nextTpl.applyOut(values, out, parent);',
+            '}',
+        '%}', {
+            priority: 100,
+
+            beginRowSync: function (rowSync) {
+                rowSync.add('rowBody', this.owner.eventSelector);
+            },
+
+            syncContent: function(destRow, sourceRow, columnsToUpdate) {
+                var owner = this.owner,
+                    destRowBody = Ext.fly(destRow).down(owner.eventSelector, true),
+                    sourceRowBody;
+
+                // Sync the heights of row body elements in each row if they need it.
+                if (destRowBody && (sourceRowBody = Ext.fly(sourceRow).down(owner.eventSelector, true))) {
+                    Ext.fly(destRowBody).syncContent(sourceRowBody);
+                }
+            }
+        }
+    ],
+
+    init: function(grid) {
+        var me = this,
+            view = me.view = grid.getView();
+
+        // The extra data means variableRowHeight
+        grid.variableRowHeight = view.variableRowHeight = true;
+        view.rowBodyFeature = me;
+
+        grid.mon(view, {
+            element: 'el',
+            click: me.onClick,
+            scope: me
+        });
+
+        view.headerCt.on({
+            columnschanged: me.onColumnsChanged,
+            scope: me
+        });
+        view.addTpl(me.outerTpl).rowBody = me;
+        view.addRowTpl(Ext.XTemplate.getTpl(this, 'extraRowTpl')).rowBody = me;
+        me.callParent(arguments);
+    },
+
+    // Needed to select the data row when clicked on the body row.
+    onClick: function(e) {
+        var me = this,
+            tableRow = e.getTarget(me.eventSelector);
+
+        // If we have clicked on a row body TR and its previous (or next - we can put the body first) sibling is a grid row,
+        // pass that onto the view for processing
+        if (tableRow && Ext.fly(tableRow = (tableRow.previousSibling || tableRow.nextSibling)).is(me.view.rowSelector)) {
+            e.target = tableRow;
+            me.view.handleEvent(e);
+        }
+    },
+
+    getSelectedRow: function(view, rowIndex) {
+        var selectedRow = view.getNode(rowIndex);
+        if (selectedRow) {
+            return Ext.fly(selectedRow).down(this.eventSelector);
+        }
+        return null;
+    },
+
+    // When columns added/removed, keep row body colspan in sync with number of columns.
+    onColumnsChanged: function(headerCt) {
+        var items = this.view.el.query(this.rowBodyTdSelector),
+            colspan = headerCt.getVisibleGridColumns().length,
+            len = items.length,
+            i;
+
+        for (i = 0; i < len; ++i) {
+            items[i].setAttribute('colSpan', colspan);
+        }
     },
 
     /**
+     * @method getAdditionalData
      * Provides additional data to the prepareData call within the grid view.
      * The rowbody feature adds 3 additional variables into the grid view's template.
      * These are rowBodyCls, rowBodyColspan, and rowBody.
@@ -103,14 +204,18 @@ Ext.define('Ext.grid.feature.RowBody', {
      * @param {Ext.data.Model} record The record instance
      * @param {Object} orig The original result from the prepareData call to massage.
      */
-    getAdditionalData: function(data, idx, record, orig) {
-        var headerCt = this.view.headerCt,
-            colspan  = headerCt.getColumnCount();
+    setupRowData: function(record, rowIndex, rowValues) {
+        if (this.getAdditionalData) {
+            Ext.apply(rowValues, this.getAdditionalData(record.data, rowIndex, record, rowValues));
+        }
+    },
 
-        return {
-            rowBody: "",
-            rowBodyCls: this.rowBodyCls,
-            rowBodyColspan: colspan
-        };
+    setup: function(rows, rowValues) {
+        rowValues.rowBodyCls = this.rowBodyCls;
+        rowValues.rowBodyColspan = this.view.headerCt.visibleColumnManager.getColumns().length - this.colSpanDecrement;
+    },
+
+    cleanup: function(rows, rowValues) {
+        rowValues.rowBodyCls = rowValues.rowBodyColspan = rowValues.rowBody = null;
     }
 });

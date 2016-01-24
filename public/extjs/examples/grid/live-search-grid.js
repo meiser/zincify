@@ -93,40 +93,40 @@ Ext.onReady(function() {
             {
                 text     : 'Company',
                 flex     : 1,
-                sortable : false, 
+                sortable : false,
                 dataIndex: 'company'
             },
             {
-                text     : 'Price', 
-                width    : 75, 
-                sortable : true, 
-                renderer : 'usMoney', 
+                text     : 'Price',
+                width    : 75,
+                sortable : true,
+                formatter: 'usMoney',
                 dataIndex: 'price'
             },
             {
-                text     : 'Change', 
-                width    : 75, 
-                sortable : true, 
+                text     : 'Change',
+                width    : 86,
+                sortable : true,
                 dataIndex: 'change',
                 renderer: change
             },
             {
-                text     : '% Change', 
-                width    : 75, 
-                sortable : true, 
+                text     : '% Change',
+                width    : 110,
+                sortable : true,
                 dataIndex: 'pctChange',
                 renderer: pctChange
             },
             {
-                xtype    : 'datecolumn',
-                text     : 'Last Updated', 
-                width    : 85, 
-                sortable : true, 
+                text     : 'Last Updated',
+                width    : 126,
+                sortable : true,
+                formatter: 'date',
                 dataIndex: 'lastChange'
             }
         ],
         height: 350,
-        width: 600,
+        width: Ext.themeName === 'neptune-touch' || Ext.themeName === 'crisp' ? 700 : 670,
         title: 'Live Search Grid',
         renderTo: 'grid-example',
         viewConfig: {

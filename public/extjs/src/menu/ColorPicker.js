@@ -18,20 +18,16 @@
  *     });
  *
  *     Ext.create('Ext.menu.Menu', {
- *         width: 100,
- *         height: 90,
- *         floating: false,  // usually you want this set to True (default)
- *         renderTo: Ext.getBody(),  // usually rendered by it's containing component
  *         items: [{
- *             text: 'choose a color',
+ *             text: 'Choose a color',
  *             menu: colorPicker
  *         },{
  *             iconCls: 'add16',
- *             text: 'icon item'
+ *             text: 'Icon item'
  *         },{
- *             text: 'regular item'
+ *             text: 'Regular item'
  *         }]
- *     });
+ *     }).showAt([5, 5]);
  */
  Ext.define('Ext.menu.ColorPicker', {
      extend: 'Ext.menu.Menu',
@@ -44,7 +40,7 @@
 
     /**
      * @cfg {Boolean} hideOnClick
-     * False to continue showing the menu after a date is selected.
+     * False to continue showing the menu after a color is selected.
      */
     hideOnClick : true,
 
@@ -78,8 +74,10 @@
         Ext.apply(me, {
             plain: true,
             showSeparator: false,
+            bodyPadding: 0,
             items: Ext.applyIf({
                 cls: Ext.baseCSSPrefix + 'menu-color-item',
+                margin: 0,
                 id: me.pickerId,
                 xtype: 'colorpicker'
             }, cfg)

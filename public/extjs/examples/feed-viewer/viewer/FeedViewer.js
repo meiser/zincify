@@ -13,7 +13,6 @@ Ext.define('FeedViewer.App', {
     extend: 'Ext.container.Viewport',
     
     initComponent: function(){
-        
         Ext.define('Feed', {
             extend: 'Ext.data.Model',
             fields: ['title', 'url']
@@ -21,10 +20,38 @@ Ext.define('FeedViewer.App', {
 
         Ext.define('FeedItem', {
             extend: 'Ext.data.Model',
-            fields: ['title', 'author', {
+            fields: ['title', 'author', 'link', {
                 name: 'pubDate',
                 type: 'date'
-            }, 'link', 'description', 'content']
+            }, {
+                // Some feeds return the description as the main content
+                // Others return description as a summary. Figure this out here
+                name: 'description',
+                mapping: function(raw) {
+                    var DQ = Ext.dom.Query,
+                        content = DQ.selectNode('content', raw),
+                        key;
+
+                    if (content && DQ.getNodeValue(content)) {
+                        key = 'description';
+                    } else {
+                        key = 'title';
+                    }
+                    return DQ.selectValue(key, raw);
+
+                }
+            }, {
+                name: 'content',
+                mapping: function(raw) {
+                    var DQ = Ext.dom.Query,
+                        content = DQ.selectNode('content', raw);
+
+                    if (!content || !DQ.getNodeValue(content)) {
+                        content = DQ.selectNode('description', raw);
+                    }
+                    return DQ.getNodeValue(content, '');
+                }
+            }]
         });
         
         Ext.apply(this, {

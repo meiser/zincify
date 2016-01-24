@@ -14,17 +14,24 @@ Ext.define('Ext.chooser.Window', {
         'Ext.layout.container.Border',
         'Ext.form.field.Text',
         'Ext.form.field.ComboBox',
-        'Ext.toolbar.TextItem'
+        'Ext.toolbar.TextItem',
+        'Ext.layout.container.Fit'
     ],
     
     height: 400,
-    width : 600,
+    width : 700,
     title : 'Choose an Image',
     closeAction: 'hide',
     layout: 'border',
     // modal: true,
     border: false,
     bodyBorder: false,
+
+    /**
+     * @event selected
+     * Fired whenever the user selects an image by double clicked it or clicking the window's OK button
+     * @param {Ext.data.Model} image The image that was selected
+     */
     
     /**
      * initComponent is a great place to put any code that needs to be run when a new instance of a component is
@@ -36,10 +43,10 @@ Ext.define('Ext.chooser.Window', {
             {
                 xtype: 'panel',
                 region: 'center',
-                autoScroll: true,
-                
+                layout: 'fit',
                 items: {
                     xtype: 'iconbrowser',
+                    scrollable: true,
                     id: 'img-chooser-view',
                     listeners: {
                         scope: this,
@@ -54,30 +61,29 @@ Ext.define('Ext.chooser.Window', {
                         name : 'filter',
                         fieldLabel: 'Filter',
                         labelAlign: 'right',
-                        labelWidth: 35,
+                        labelWidth: null,
                         listeners: {
                             scope : this,
-                            buffer: 50,
+                            buffer: 200,
                             change: this.filter
                         }
                     },
-                    ' ',
                     {
+                        margin: '0 0 0 10',
+                        inputWidth: 150,
                         xtype: 'combo',
-                        fieldLabel: 'Sort By',
                         labelAlign: 'right',
-                        labelWidth: 45,
+
+                        // Use non-breaking space so that labelWidth of null shrinkwraps the unbroken string width
+                        fieldLabel: 'Sort\u00a0By',
+                        labelWidth: null,
                         valueField: 'field',
                         displayField: 'label',
-                        value: 'Type',
+                        value: 'type',
                         editable: false,
                         store: Ext.create('Ext.data.Store', {
                             fields: ['field', 'label'],
-                            sorters: 'type',
-                            proxy : {
-                                type: 'memory',
-                                data  : [{label: 'Name', field: 'name'}, {label: 'Type', field: 'type'}]
-                            }
+                            data: [{label: 'Name', field: 'name'}, {label: 'Type', field: 'type'}]
                         }),
                         listeners: {
                             scope : this,
@@ -109,19 +115,6 @@ Ext.define('Ext.chooser.Window', {
         ];
         
         this.callParent(arguments);
-        
-        /**
-         * Specifies a new event that this component will fire when the user selects an item. The event is fired by the
-         * fireImageSelected function below. Other components can listen to this event and take action when it is fired
-         */
-        this.addEvents(
-            /**
-             * @event selected
-             * Fired whenever the user selects an image by double clicked it or clicking the window's OK button
-             * @param {Ext.data.Model} image The image that was selected
-             */
-            'selected'
-        );
     },
     
     /**
@@ -129,18 +122,21 @@ Ext.define('Ext.chooser.Window', {
      * Called whenever the user types in the Filter textfield. Filters the DataView's store
      */
     filter: function(field, newValue) {
-        var store = this.down('iconbrowser').store,
-            dataview = this.down('dataview');
+        var view = this.down('iconbrowser'),
+            store = view.getStore(),
+            selModel = view.getSelectionModel(),
+            selection = selModel.getSelection()[0];
         
-        store.suspendEvents();
-        store.clearFilter();
-        dataview.getSelectionModel().clearSelections();
-        store.resumeEvents();
-        store.filter({
+        store.getFilters().replaceAll({
             property: 'name',
             anyMatch: true,
             value   : newValue
         });
+        if (selection && store.indexOf(selection) === -1) {
+            selModel.clearSelections();
+            this.down('infopanel').clear();
+        }
+        
     },
     
     /**
@@ -149,8 +145,7 @@ Ext.define('Ext.chooser.Window', {
      */
     sort: function() {
         var field = this.down('combobox').getValue();
-        
-        this.down('dataview').store.sort(field);
+        this.down('iconbrowser').store.sort(field);
     },
     
     /**

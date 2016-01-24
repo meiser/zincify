@@ -22,7 +22,7 @@
  * method of any of its child Panels may themselves have a layout.
  *
  * The Viewport does not provide scrolling, so child Panels within the Viewport should provide
- * for scrolling if needed using the {@link #autoScroll} config.
+ * for scrolling if needed using the {@link #scrollable} config.
  *
  * An example showing a classic application border layout:
  *
@@ -33,7 +33,7 @@
  *             region: 'north',
  *             html: '<h1 class="x-panel-header">Page Title</h1>',
  *             border: false,
- *             margins: '0 0 5 0'
+ *             margin: '0 0 5 0'
  *         }, {
  *             region: 'west',
  *             collapsible: true,
@@ -64,21 +64,39 @@
  *             }
  *         }]
  *     });
+ *
+ * Alternatively you can turn any normal Container (or Component) into a Viewport using
+ * the `{@link Ext.plugin.Viewport viewport plugin}`.
  */
 Ext.define('Ext.container.Viewport', {
     extend: 'Ext.container.Container',
+
+    requires: [
+        'Ext.plugin.Viewport'
+    ],
+
+    mixins: [
+        'Ext.mixin.Responsive'
+    ],
+
     alias: 'widget.viewport',
-    requires: ['Ext.EventManager'],
     alternateClassName: 'Ext.Viewport',
+
+    /**
+     * @property {Boolean} isViewport
+     * `true` in this class to identify an object as an instantiated Viewport, or subclass thereof.
+     * @readonly
+     */
+
+    /**
+     * @cfg {Number} [maxUserScale=10]
+     * The maximum zoom scale. Only applicable for touch devices. Set this to 1 to
+     * disable zooming.
+     */
 
     // Privatize config options which, if used, would interfere with the
     // correct operation of the Viewport as the sole manager of the
     // layout of the document body.
-
-    /**
-     * @cfg {String/HTMLElement/Ext.Element} applyTo
-     * @private
-     */
 
     /**
      * @cfg {Boolean} allowDomMove
@@ -86,7 +104,7 @@ Ext.define('Ext.container.Viewport', {
      */
 
     /**
-     * @cfg {String/HTMLElement/Ext.Element} renderTo
+     * @cfg {String/HTMLElement/Ext.dom.Element} renderTo
      * Always renders to document body.
      * @private
      */
@@ -103,67 +121,20 @@ Ext.define('Ext.container.Viewport', {
      * @private
      */
 
-    /**
-     * @property {Boolean} isViewport
-     * `true` in this class to identify an object as an instantiated Viewport, or subclass thereof.
-     */
-    isViewport: true,
+    privates: {
+        updateResponsiveState: function () {
+            // By providing this method we are in sync with the layout suspend/resume as
+            // well as other changes to configs that need to happen during this pulse of
+            // size change.
 
-    ariaRole: 'application',
-    
-    preserveElOnDestroy: true,
+            // Since we are not using the Viewport plugin beyond applying its methods on
+            // to our prototype, we need to be Responsive ourselves and call this here:
+            this.handleViewportResize();
 
-    initComponent : function() {
-        var me = this,
-            html = document.body.parentNode,
-            el;
-
-        // Get the DOM disruption over with beforfe the Viewport renders and begins a layout
-        Ext.getScrollbarSize();
-        
-        // Clear any dimensions, we will size later on
-        me.width = me.height = undefined;
-
-        me.callParent(arguments);
-        Ext.fly(html).addCls(Ext.baseCSSPrefix + 'viewport');
-        if (me.autoScroll) {
-            delete me.autoScroll;
-            Ext.fly(html).setStyle('overflow', 'auto');
-        }
-        me.el = el = Ext.getBody();
-        el.setHeight = Ext.emptyFn;
-        el.setWidth = Ext.emptyFn;
-        el.setSize = Ext.emptyFn;
-        el.dom.scroll = 'no';
-        me.allowDomMove = false;
-        me.renderTo = me.el;
-    },
-    
-    onRender: function() {
-        var me = this;
-
-        me.callParent(arguments);
-
-        // Important to start life as the proper size (to avoid extra layouts)
-        // But after render so that the size is not stamped into the body
-        me.width = Ext.Element.getViewportWidth();
-        me.height = Ext.Element.getViewportHeight();
-    },
-
-    afterFirstLayout: function() {
-        var me = this;
-
-        me.callParent(arguments);
-        setTimeout(function() {
-            Ext.EventManager.onWindowResize(me.fireResize, me);
-        }, 1);
-    },
-
-    fireResize : function(width, height){
-        // In IE we can get resize events that have our current size, so we ignore them
-        // to avoid the useless layout...
-        if (width != this.width || height != this.height) {
-            this.setSize(width, height);
+            this.mixins.responsive.updateResponsiveState.call(this);
         }
     }
+},
+function () {
+    Ext.plugin.Viewport.decorate(this);
 });

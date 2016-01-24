@@ -3,6 +3,7 @@ Ext.Loader.setPath('Ext.org', '.');
 Ext.Loader.setPath('Ext.ux.DataView', '../ux/DataView');
 
 Ext.require([
+    'Ext.org.Image',
     'Ext.org.ImageView',
     'Ext.org.AlbumTree',
     'Ext.org.OrgPanel'

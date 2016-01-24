@@ -5,8 +5,8 @@
  * However a simpler way to allow a DropZone to manage any number of target elements is to configure the
  * DropZone with an implementation of {@link #getTargetFromEvent} which interrogates the passed
  * mouse event to see if it has taken place within an element, or class of elements. This is easily done
- * by using the event's {@link Ext.EventObject#getTarget getTarget} method to identify a node based on a
- * {@link Ext.DomQuery} selector.
+ * by using the event's {@link Ext.event.Event#getTarget getTarget} method to identify a node based on a
+ * CSS selector.
  *
  * Once the DropZone has detected through calling getTargetFromEvent, that the mouse is over
  * a drop target, that target is passed as the first parameter to {@link #onNodeEnter}, {@link #onNodeOver},
@@ -246,14 +246,19 @@ Ext.define('Ext.dd.DropZone', {
      * @template
      */
     notifyDrop : function(dd, e, data){
-        if(this.lastOverNode){
-            this.onNodeOut(this.lastOverNode, dd, e, data);
-            this.lastOverNode = null;
+        var me = this,
+            n = me.getTargetFromEvent(e),
+            result = n ?
+                me.onNodeDrop(n, dd, e, data) :
+                me.onContainerDrop(dd, e, data);
+
+        // Exit the overNode upon drop.
+        // Must do this after dropping because exiting a node may perform actions which invalidate a drop.
+        if (me.lastOverNode) {
+            me.onNodeOut(me.lastOverNode, dd, e, data);
+            me.lastOverNode = null;
         }
-        var n = this.getTargetFromEvent(e);
-        return n ?
-            this.onNodeDrop(n, dd, e, data) :
-            this.onContainerDrop(dd, e, data);
+        return result;
     },
 
     // private

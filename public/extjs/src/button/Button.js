@@ -133,24 +133,74 @@ Ext.define('Ext.button.Button', {
     /* Begin Definitions */
     alias: 'widget.button',
     extend: 'Ext.Component',
-
     requires: [
+        'Ext.dom.ButtonElement',
+        'Ext.button.Manager',
         'Ext.menu.Manager',
         'Ext.util.ClickRepeater',
-        'Ext.layout.component.Button',
         'Ext.util.TextMetrics',
         'Ext.util.KeyMap'
     ],
 
+    mixins: [
+        'Ext.mixin.Queryable'
+    ],
+
     alternateClassName: 'Ext.Button',
+
+    config: {
+        /**
+         * @cfg {String} iconAlign
+         * The side of the Button box to render the icon. Four values are allowed:
+         *
+         * - 'top'
+         * - 'right'
+         * - 'bottom'
+         * - 'left'
+         */
+        iconAlign: 'left',
+
+        /**
+         * @cfg {String}
+         * The button text to be used as innerHTML (html tags are accepted).
+         */
+        text: null,
+
+        /**
+         * @cfg {String}
+         * The text alignment for this button (center, left, right).
+         */
+        textAlign: 'center',
+
+        /**
+         * @cfg {Boolean}
+         * `false` to hide the button arrow.  Only applicable for {@link Ext.button.Split
+         * Split Buttons} and buttons configured with a {@link #cfg-menu}.
+         */
+        arrowVisible: true
+    },
+
     /* End Definitions */
 
     /*
-     * @property {Boolean} isAction
+     * @property {Boolean}
      * `true` in this class to identify an object as an instantiated Button, or subclass thereof.
      */
     isButton: true,
-    componentLayout: 'button',
+
+    //<feature legacyBrowser>
+    /**
+     * @property {Boolean}
+     * @private
+     * `true` to keep height of the frame's "MC" element in sync.  This is needed in IE8
+     * so that the button's inner element(s) can use height:100% to fill the button when
+     * it not in shrinkWrap mode
+     */
+    _syncFrameHeight: true,
+    //</feature>
+
+    // private, readonly
+    liquidLayout: true,
 
     /**
      * @property {Boolean} hidden
@@ -174,20 +224,17 @@ Ext.define('Ext.button.Button', {
     pressed: false,
 
     /**
-     * @cfg {String} text
-     * The button text to be used as innerHTML (html tags are accepted).
-     */
-
-    /**
      * @cfg {String} icon
      * The path to an image to display in the button.
+     *
+     * There are no default icons that come with Ext JS.
      */
 
     /**
      * @cfg {Function} handler
      * A function called when the button is clicked (can be used instead of click event).
      * @cfg {Ext.button.Button} handler.button This button.
-     * @cfg {Ext.EventObject} handler.e The click event.
+     * @cfg {Ext.event.Event} handler.e The click event.
      */
 
     /**
@@ -233,6 +280,7 @@ Ext.define('Ext.button.Button', {
      * @cfg {Number} tabIndex
      * Set a DOM tabIndex for this button.
      */
+    tabIndex: 0,
 
     /**
      * @cfg {Boolean} [allowDepress=true]
@@ -260,15 +308,16 @@ Ext.define('Ext.button.Button', {
 
     /**
      * @cfg {String} menuAlign
-     * The position to align the menu to (see {@link Ext.Element#alignTo} for more details).
+     * The position to align the menu to (see {@link Ext.util.Positionable#alignTo} for more details).
      */
     menuAlign: 'tl-bl?',
 
     /**
-     * @cfg {String} textAlign
-     * The text alignment for this button (center, left, right).
+     * @cfg {Boolean} showEmptyMenu
+     * True to force an attached {@link #cfg-menu} with no items to be shown when clicking
+     * this button. By default, the menu will not show if it is empty.
      */
-    textAlign: 'center',
+    showEmptyMenu: false,
 
     /**
      * @cfg {String} overflowText
@@ -279,13 +328,18 @@ Ext.define('Ext.button.Button', {
     /**
      * @cfg {String} iconCls
      * A css class which sets a background image to be used as the icon for this button.
+     *
+     * There are no default icon classes that come with Ext JS.
      */
 
     /**
-     * @cfg {String} type
-     * The type of `<input>` to create: submit, reset or button.
+     * @cfg {Number/String} glyph
+     * A numeric unicode character code to use as the icon for this button. The default
+     * font-family for glyphs can be set globally using
+     * {@link Ext#setGlyphFontFamily Ext.setGlyphFontFamily()}. Alternatively, this
+     * config option accepts a string with the charCode and font-family separated by the
+     * `@` symbol. For example '65@My Font Family'.
      */
-    type: 'button',
 
     /**
      * @cfg {String} clickEvent
@@ -295,7 +349,7 @@ Ext.define('Ext.button.Button', {
 
     /**
      * @cfg {Boolean} preventDefault
-     * True to prevent the default action when the {@link #clickEvent} is processed.
+     * `true` to prevent the default action when the {@link #clickEvent} is processed.
      */
     preventDefault: true,
 
@@ -318,33 +372,9 @@ Ext.define('Ext.button.Button', {
     baseCls: Ext.baseCSSPrefix + 'btn',
 
     /**
-     * @cfg {String} pressedCls
-     * The CSS class to add to a button when it is in the pressed state.
-     */
-    pressedCls: 'pressed',
-
-    /**
-     * @cfg {String} overCls
-     * The CSS class to add to a button when it is in the over (hovered) state.
-     */
-    overCls: 'over',
-
-    /**
-     * @cfg {String} focusCls
-     * The CSS class to add to a button when it is in the focussed state.
-     */
-    focusCls: 'focus',
-
-    /**
-     * @cfg {String} menuActiveCls
-     * The CSS class to add to a button when it's menu is active.
-     */
-    menuActiveCls: 'menu-active',
-
-    /**
      * @cfg {String} href
      * The URL to open when the button is clicked. Specifying this config causes the Button to be
-     * rendered with an anchor (An `<a>` element) as its active element, referencing the specified URL.
+     * rendered with the specified URL as the `href` attribute of its `<a>` Element.
      *
      * This is better than specifying a click handler of
      *
@@ -356,15 +386,21 @@ Ext.define('Ext.button.Button', {
      *
      * See also the {@link #hrefTarget} config.
      */
-    
+
     /**
       * @cfg {String} [hrefTarget="_blank"]
       * The target attribute to use for the underlying anchor. Only used if the {@link #href}
       * property is specified.
       */
      hrefTarget: '_blank',
-     
-     border: true,
+
+     /**
+     * @cfg {Boolean} [destroyMenu=true]
+     * Whether or not to destroy any associated menu when this button is destroyed.
+     * In addition, a value of `true` for this config will destroy the currently bound menu when a new
+     * menu is set in {@link #setMenu} unless overridden by that method's destroyMenu function argument.
+     */
+     destroyMenu: true,
 
     /**
      * @cfg {Object} baseParams
@@ -377,43 +413,78 @@ Ext.define('Ext.button.Button', {
      * override {@link #baseParams}. New params can be set using the {@link #setParams} method.
      */
 
+    /**
+     * @cfg {String/Number} value
+     * The value of this button.  Only applicable when used as an item of a {@link Ext.button.Segmented Segmented Button}.
+     */
+    
+    focusable: true,
+    ariaRole: 'button',
+
+    defaultBindProperty: 'text',
+
     childEls: [
         'btnEl', 'btnWrap', 'btnInnerEl', 'btnIconEl'
     ],
 
-    renderTpl: [
-        '<em id="{id}-btnWrap"<tpl if="splitCls"> class="{splitCls}"</tpl>>',
-            '<tpl if="href">',
-                '<a id="{id}-btnEl" href="{href}" class="{btnCls}" target="{hrefTarget}"',
-                    '<tpl if="tabIndex"> tabIndex="{tabIndex}"</tpl>',
-                    '<tpl if="disabled"> disabled="disabled"</tpl>',
-                    ' role="link">',
-                    '<span id="{id}-btnInnerEl" class="{baseCls}-inner">',
-                        '{text}',
-                    '</span>',
-                    '<span id="{id}-btnIconEl" class="{baseCls}-icon {iconCls}"<tpl if="iconUrl"> style="background-image:url({iconUrl})"</tpl>></span>',
-                '</a>',
-            '<tpl else>',
-                '<button id="{id}-btnEl" type="{type}" class="{btnCls}" hidefocus="true"',
-                    // the autocomplete="off" is required to prevent Firefox from remembering
-                    // the button's disabled state between page reloads.
-                    '<tpl if="tabIndex"> tabIndex="{tabIndex}"</tpl>',
-                    '<tpl if="disabled"> disabled="disabled"</tpl>',
-                    ' role="button" autocomplete="off">',
-                    '<span id="{id}-btnInnerEl" class="{baseCls}-inner" style="{innerSpanStyle}">',
-                        '{text}',
-                    '</span>',
-                    '<span id="{id}-btnIconEl" class="{baseCls}-icon {iconCls}"<tpl if="iconUrl"> style="background-image:url({iconUrl})"</tpl>></span>',
-                '</button>',
-            '</tpl>',
-        '</em>',
-        '<tpl if="closable">',
-            '<a id="{id}-closeEl" href="#" class="{baseCls}-close-btn" title="{closeText}"></a>',
-        '</tpl>'
-    ],
+    publishes: {
+        pressed:1
+    },
+    
+    // private
+    menuClickBuffer: 250,
+    _btnWrapCls: Ext.baseCSSPrefix + 'btn-wrap',
+    _btnCls: Ext.baseCSSPrefix + 'btn-button',
+    _baseIconCls: Ext.baseCSSPrefix + 'btn-icon-el',
+    _glyphCls: Ext.baseCSSPrefix + 'btn-glyph',
+    _innerCls: Ext.baseCSSPrefix + 'btn-inner',
+    _textCls: Ext.baseCSSPrefix + 'btn-text',
+    _noTextCls: Ext.baseCSSPrefix + 'btn-no-text',
+    _hasIconCls: Ext.baseCSSPrefix + 'btn-icon',
+    _pressedCls: Ext.baseCSSPrefix + 'btn-pressed',
+    overCls: Ext.baseCSSPrefix + 'btn-over',
+    _disabledCls: Ext.baseCSSPrefix + 'btn-disabled',
+    _menuActiveCls: Ext.baseCSSPrefix + 'btn-menu-active',
+    //<feature legacyBrowser>
+    // extra class to work around broken display:table impl in opera12
+    _operaArrowCls: Ext.baseCSSPrefix + 'opera12m-btn-arrow',
+    //</feature>
+
+    // We have to keep "unselectable" attribute on all elements because it's not inheritable.
+    // Without it, clicking anywhere on a button disrupts current selection and cursor position
+    // in HtmlEditor.
+    renderTpl:
+        '<span id="{id}-btnWrap" data-ref="btnWrap" role="presentation" unselectable="on" style="{btnWrapStyle}" ' +
+                'class="{btnWrapCls} {btnWrapCls}-{ui} {splitCls}{childElCls}">' +
+            '<span id="{id}-btnEl" data-ref="btnEl" role="presentation" unselectable="on" style="{btnElStyle}" ' +
+                    'class="{btnCls} {btnCls}-{ui} {textCls} {noTextCls} {hasIconCls} ' +
+                    '{iconAlignCls} {textAlignCls} {btnElAutoHeightCls}{childElCls}">' +
+                '<tpl if="iconBeforeText">{[values.$comp.renderIcon(values)]}</tpl>' +
+                '<span id="{id}-btnInnerEl" data-ref="btnInnerEl" unselectable="on" ' +
+                    'class="{innerCls} {innerCls}-{ui}{childElCls}">{text}</span>' +
+                '<tpl if="!iconBeforeText">{[values.$comp.renderIcon(values)]}</tpl>' +
+            '</span>' +
+        '</span>' +
+        '{[values.$comp.getAfterMarkup ? values.$comp.getAfterMarkup(values) : ""]}' +
+        // if "closable" (tab) add a close element icon
+        '<tpl if="closable">' +
+            '<span id="{id}-closeEl" data-ref="closeEl" class="{baseCls}-close-btn">' +
+                '<tpl if="closeText">' +
+                    ' {closeText}' +
+                '</tpl>' +
+            '</span>' +
+        '</tpl>',
+
+    iconTpl:
+        '<span id="{id}-btnIconEl" data-ref="btnIconEl" role="presentation" unselectable="on" class="{baseIconCls} ' +
+                '{baseIconCls}-{ui} {iconCls} {glyphCls}{childElCls}" style="' +
+            '<tpl if="iconUrl">background-image:url({iconUrl});</tpl>' +
+            '<tpl if="glyph && glyphFontFamily">font-family:{glyphFontFamily};</tpl>">' +
+            '<tpl if="glyph">&#{glyph};</tpl><tpl if="iconCls || iconUrl">&#160;</tpl>' +
+        '</span>',
 
     /**
-     * @cfg {String} scale
+     * @cfg {"small"/"medium"/"large"} scale
      * The size of the Button. Three values are allowed:
      *
      * - 'small' - Results in the button element being 16px high.
@@ -434,16 +505,6 @@ Ext.define('Ext.button.Button', {
      * Defaults to this Button.
      */
 
-    /**
-     * @cfg {String} iconAlign
-     * The side of the Button box to render the icon. Four values are allowed:
-     *
-     * - 'top'
-     * - 'right'
-     * - 'bottom'
-     * - 'left'
-     */
-    iconAlign: 'left',
 
     /**
      * @cfg {String} arrowAlign
@@ -481,100 +542,144 @@ Ext.define('Ext.button.Button', {
      */
 
     maskOnDisable: false,
-    
-    /**
-     * @private
-     * @property persistentPadding
-     * The padding spuriously added to a &lt;button> element which must be accounted for in the margins of the innerEl.
-     * This is calculated at first render time by creating a hidden button and measuring its insides.
-     */
-    persistentPadding: undefined,
 
     shrinkWrap: 3,
 
     frame: true,
 
-    // inherit docs
+    autoEl: {
+        tag: 'a',
+        hidefocus: 'on',
+        unselectable: 'on'
+    },
+
+    hasFrameTable: function () {
+        // Instead of browser sniffing, it's easier to check for the presence of frameTable.
+        // If present, we know that it's a browser that doesn't support CSS3BorderRadius.
+        return this.href && this.frameTable;
+    },
+
+    frameTableListener: function () {
+        if (!this.disabled) {
+            this.doNavigate();
+        }
+    },
+
+    doNavigate: function () {
+        // Non-HTML5 browsers don't support a block element inside an A tag.
+        // http://stackoverflow.com/questions/5682048/putting-a-table-inside-a-hyperlink-not-working-in-ie
+        // Note use this.getHref() to append any params to the url.
+        if (this.hrefTarget === '_blank') {
+            window.open(this.getHref(), this.hrefTarget);
+        } else {
+            location.href = this.getHref();
+        }
+    },
+
+    // A reusable object used by getTriggerRegion to avoid excessive object creation.
+    _triggerRegion: {},
+
+    /**
+     * @event click
+     * Fires when this button is clicked, before the configured {@link #handler} is invoked. Execution of the
+     * {@link #handler} may be vetoed by returning <code>false</code> to this event.
+     * @param {Ext.button.Button} this
+     * @param {Event} e The click event
+     */
+
+    /**
+     * @event toggle
+     * Fires when the 'pressed' state of this button changes (only if enableToggle = true)
+     * @param {Ext.button.Button} this
+     * @param {Boolean} pressed
+     */
+
+    /**
+     * @event mouseover
+     * Fires when the mouse hovers over the button
+     * @param {Ext.button.Button} this
+     * @param {Event} e The event object
+     */
+
+    /**
+     * @event mouseout
+     * Fires when the mouse exits the button
+     * @param {Ext.button.Button} this
+     * @param {Event} e The event object
+     */
+
+    /**
+     * @event menushow
+     * If this button has a menu, this event fires when it is shown
+     * @param {Ext.button.Button} this
+     * @param {Ext.menu.Menu} menu
+     */
+
+    /**
+     * @event menuhide
+     * If this button has a menu, this event fires when it is hidden
+     * @param {Ext.button.Button} this
+     * @param {Ext.menu.Menu} menu
+     */
+
+    /**
+     * @event menutriggerover
+     * If this button has a menu, this event fires when the mouse enters the menu triggering element
+     * @param {Ext.button.Button} this
+     * @param {Ext.menu.Menu} menu
+     * @param {Event} e
+     */
+
+    /**
+     * @event menutriggerout
+     * If this button has a menu, this event fires when the mouse leaves the menu triggering element
+     * @param {Ext.button.Button} this
+     * @param {Ext.menu.Menu} menu
+     * @param {Event} e
+     */
+
+    /**
+     * @event textchange
+     * Fired when the button's text is changed by the {@link #setText} method.
+     * @param {Ext.button.Button} this
+     * @param {String} oldText
+     * @param {String} newText
+     */
+
+    /**
+     * @event iconchange
+     * Fired when the button's icon is changed by the {@link #setIcon} or {@link #setIconCls} methods.
+     * @param {Ext.button.Button} this
+     * @param {String} oldIcon
+     * @param {String} newIcon
+     */
+
+    /**
+     * @event glyphchange
+     * Fired when the button's glyph is changed by the {@link #setGlyph} method.
+     * @param {Ext.button.Button} this
+     * @param {Number/String} newGlyph
+     * @param {Number/String} oldGlyph
+     */
+
     initComponent: function() {
         var me = this;
-        me.callParent(arguments);
 
-        me.addEvents(
-            /**
-             * @event click
-             * Fires when this button is clicked, before the configured {@link #handler} is invoked. Execution of the
-             * {@link #handler} may be vetoed by returning <code>false</code> to this event.
-             * @param {Ext.button.Button} this
-             * @param {Event} e The click event
-             */
-            'click',
+        // Ensure no selection happens
+        me.addCls(Ext.baseCSSPrefix + 'unselectable');
 
-            /**
-             * @event toggle
-             * Fires when the 'pressed' state of this button changes (only if enableToggle = true)
-             * @param {Ext.button.Button} this
-             * @param {Boolean} pressed
-             */
-            'toggle',
+        //<feature legacyBrowser>
+        if (Ext.isOpera12m && (me.split || me.menu) && me.getArrowVisible()) {
+            me.addCls(me._operaArrowCls + '-' + me.arrowAlign);
+        }
+        //</feature>
 
-            /**
-             * @event mouseover
-             * Fires when the mouse hovers over the button
-             * @param {Ext.button.Button} this
-             * @param {Event} e The event object
-             */
-            'mouseover',
-
-            /**
-             * @event mouseout
-             * Fires when the mouse exits the button
-             * @param {Ext.button.Button} this
-             * @param {Event} e The event object
-             */
-            'mouseout',
-
-            /**
-             * @event menushow
-             * If this button has a menu, this event fires when it is shown
-             * @param {Ext.button.Button} this
-             * @param {Ext.menu.Menu} menu
-             */
-            'menushow',
-
-            /**
-             * @event menuhide
-             * If this button has a menu, this event fires when it is hidden
-             * @param {Ext.button.Button} this
-             * @param {Ext.menu.Menu} menu
-             */
-            'menuhide',
-
-            /**
-             * @event menutriggerover
-             * If this button has a menu, this event fires when the mouse enters the menu triggering element
-             * @param {Ext.button.Button} this
-             * @param {Ext.menu.Menu} menu
-             * @param {Event} e
-             */
-            'menutriggerover',
-
-            /**
-             * @event menutriggerout
-             * If this button has a menu, this event fires when the mouse leaves the menu triggering element
-             * @param {Ext.button.Button} this
-             * @param {Ext.menu.Menu} menu
-             * @param {Event} e
-             */
-            'menutriggerout'
-        );
+        me.callParent();
 
         if (me.menu) {
             // Flag that we'll have a splitCls
             me.split = true;
-
-            // retrieve menu by id or instantiate instance if needed
-            me.menu = Ext.menu.Manager.get(me.menu);
-            me.menu.ownerButton = me;
+            me.setMenu(me.menu, /*destroyMenu*/false, true);
         }
 
         // Accept url as a synonym for href
@@ -583,122 +688,132 @@ Ext.define('Ext.button.Button', {
         }
 
         // preventDefault defaults to false for links
-        if (me.href && !me.hasOwnProperty('preventDefault')) {
+        me.configuredWithPreventDefault = me.hasOwnProperty('preventDefault');
+        if (me.href && !me.configuredWithPreventDefault) {
             me.preventDefault = false;
         }
 
         if (Ext.isString(me.toggleGroup) && me.toggleGroup !== '') {
             me.enableToggle = true;
         }
-        
+
         if (me.html && !me.text) {
             me.text = me.html;
             delete me.html;
         }
-
     },
 
-    // inherit docs
-    getActionEl: function() {
-        return this.btnEl;
-    },
-
-    // inherit docs
-    getFocusEl: function() {
-        return this.useElForFocus ? this.el : this.btnEl;
-    },
-
-    // Buttons add the focus class to the *outermost element*, not the focusEl!
-    onFocus: function(e) {
-        var me = this;
-
-        // Set this flag, so that when AbstractComponent's onFocus gets the focusEl to add the focusCls
-        // to, it will get the encapsulating element - that's what the CSS rules for Button need right now
-        me.useElForFocus = true;
-        me.callParent(arguments);
-        me.useElForFocus = false;
-    },
-
-    // See comments in onFocus
-    onBlur : function(e) {
-        this.useElForFocus = true;
-        this.callParent(arguments);
-        this.useElForFocus = false;
-    },
-    
-    // See comments in onFocus
-    onDisable: function(){
-        this.useElForFocus = true;
-        this.callParent(arguments);
-        this.useElForFocus = false;
-    },
-
-    // private
-    setComponentCls: function() {
+    getElConfig: function() {
         var me = this,
-            cls = me.getComponentCls();
+            config = me.callParent(),
+            href = me.getHref(),
+            hrefTarget = me.hrefTarget;
 
-        if (!Ext.isEmpty(me.oldCls)) {
-            me.removeClsWithUI(me.oldCls);
-            me.removeClsWithUI(me.pressedCls);
-        }
-
-        me.oldCls = cls;
-        me.addClsWithUI(cls);
-    },
-
-    getComponentCls: function() {
-        var me = this,
-            cls = [];
-
-        // Check whether the button has an icon or not, and if it has an icon, what is the alignment
-        if (me.iconCls || me.icon) {
-            if (me.text) {
-                cls.push('icon-text-' + me.iconAlign);
-            } else {
-                cls.push('icon');
+        if (config.tag === 'a') {
+            if (!me.disabled) {
+                config.tabIndex = me.tabIndex;
             }
-        } else if (me.text) {
-            cls.push('noicon');
+            if (href) {
+                // https://sencha.jira.com/browse/EXTJS-11964
+                // Disabled links are clickable on iPad, and right clickable on desktop browsers.
+                // The only way to completely disable navigation is removing the href
+                if (!me.disabled) {
+                    config.href = href;
+                    if (hrefTarget) {
+                       config.target = hrefTarget;
+                    }
+                }   
+            }
         }
-
-        if (me.pressed) {
-            cls.push(me.pressedCls);
-        }
-        return cls;
+        return config;
     },
 
-    beforeRender: function () {
-        var me = this;
+    beforeRender: function() {
+        this.callParent();
 
-        me.callParent();
-
-        // Add all needed classes to the protoElement.
-        me.oldCls = me.getComponentCls();
-        me.addClsWithUI(me.oldCls);
-
-        // Apply the renderData to the template args
-        Ext.applyIf(me.renderData, me.getTemplateArgs());
-
-        if (me.scale) {
-            me.setScale(me.scale);
+        if (this.pressed) {
+            this.addCls(this._pressedCls);
         }
     },
 
-    // private
+    initRenderData: function () {
+        return Ext.apply(this.callParent(), this.getTemplateArgs());
+    },
+
+    /**
+     * Get the {@link #cfg-menu} for this button.
+     * @return {Ext.menu.Menu} The menu. `null` if no menu is configured.
+     */
+    getMenu: function() {
+        return this.menu || null;
+    },
+
+    /**
+     * Sets a new menu for this button. Pass a falsy value to unset the current menu.
+     * To destroy the previous menu for this button, explicitly pass `false` as the second argument. If this is not set, the destroy will depend on the
+     * value of {@link #cfg-destroyMenu}.
+     *
+     * @param {Ext.menu.Menu/String/Object/null} menu Accepts a menu component, a menu id or a menu config.
+     * @param {Boolean} destroyMenu By default, will destroy the previous set menu and remove it from the menu manager. Pass `false` to prevent the destroy.
+     */
+    setMenu: function (menu, destroyMenu, /* private */ initial) {
+        var me = this,
+            oldMenu = me.menu;
+
+        if (oldMenu && !initial) {
+            if (destroyMenu !== false && me.destroyMenu) {
+                oldMenu.destroy();
+            }
+            oldMenu.ownerCmp = null;
+        }
+
+        if (menu) {
+            // Retrieve menu by id or instantiate instance if needed.
+            menu = Ext.menu.Manager.get(menu, {
+                // Use ownerCmp as the upward link. Menus *must have no ownerCt* - they are global floaters.
+                // Upward navigation is done using the up() method.
+                ownerCmp: me
+            });
+            // We need to forcibly set this here because we could be passed an existing menu, which means
+            // the config above won't get applied during creation.
+            menu.ownerCmp = me;
+
+            me.mon(menu, {
+                scope: me,
+                show: me.onMenuShow,
+                hide: me.onMenuHide
+            });
+
+            // If the button wasn't initially configured with a menu or has previously been unset then we need
+            // to poke the split classes onto the btnWrap dom element.
+            if (!oldMenu && me.getArrowVisible()) {
+                me.split = true;
+                if (me.rendered) {
+                    me._addSplitCls();
+                    me.updateLayout();
+                }
+            }
+
+            me.menu = menu;
+        } else {
+            if (me.rendered) {
+                me._removeSplitCls();
+                me.updateLayout();
+            }
+
+            me.split = false;
+            me.menu = null;
+        }
+    },
+
+    // @private
     onRender: function() {
         var me = this,
             addOnclick,
             btn,
             btnListeners;
 
-        me.doc = Ext.getDoc();
         me.callParent(arguments);
-
-        // If it is a split button + has a toolip for the arrow
-        if (me.split && me.arrowTooltip) {
-            me.arrowEl.dom.setAttribute(me.getTipAttr(), me.arrowTooltip);
-        }
 
         // Set btn as a local variable for easy access
         btn = me.el;
@@ -724,17 +839,16 @@ Ext.define('Ext.button.Button', {
             };
         }
 
+        // Touch start events must be preventDefaulted when in disabled state
+        if (Ext.supports.Touch) {
+            btnListeners.touchstart = me.onTouchStart;
+        }
+
         // Check if the button has a menu
         if (me.menu) {
-            me.mon(me.menu, {
-                scope: me,
-                show: me.onMenuShow,
-                hide: me.onMenuHide
-            });
-
             me.keyMap = new Ext.util.KeyMap({
                 target: me.el,
-                key: Ext.EventObject.DOWN,
+                key: Ext.event.Event.prototype.DOWN,
                 handler: me.onDownKey,
                 scope: me
             });
@@ -756,13 +870,23 @@ Ext.define('Ext.button.Button', {
         // Add whatever button listeners we need
         me.mon(btn, btnListeners);
 
+        if (me.hasFrameTable()) {
+            me.mon(me.frameTable, 'click', me.frameTableListener, me);
+        }
+
         // If the listeners object had an entry for our clickEvent, add a listener now
         if (addOnclick) {
             me.mon(btn, me.clickEvent, me.onClick, me);
         }
 
-        // Register the button in the toggle manager
-        Ext.ButtonToggleManager.register(me);
+        Ext.button.Manager.register(me);
+    },
+
+    onFocusLeave: function(e) {
+        this.callParent([e]);
+        if (this.menu) {
+            this.menu.hide();
+        }
     },
 
     /**
@@ -771,68 +895,153 @@ Ext.define('Ext.button.Button', {
      *
      * Instances or subclasses which use a different Template to create a different DOM structure may need to provide
      * their own implementation of this method.
+     * @protected
      *
      * @return {Object} Substitution data for a Template. The default implementation which provides data for the default
      * {@link #template} returns an Object containing the following properties:
-     * @return {String} return.type The `<button>`'s {@link #type}
+     * @return {String} return.innerCls A CSS class to apply to the button's text element.
      * @return {String} return.splitCls A CSS class to determine the presence and position of an arrow icon.
      * (`'x-btn-arrow'` or `'x-btn-arrow-bottom'` or `''`)
-     * @return {String} return.cls A CSS class name applied to the Button's main `<tbody>` element which determines the
-     * button's scale and icon alignment.
+     * @return {String} return.iconUrl The url for the button icon.
+     * @return {String} return.iconCls The CSS class for the button icon.
+     * @return {String} return.glyph The glyph to use as the button icon.
+     * @return {String} return.glyphCls The CSS class to use for the glyph element.
+     * @return {String} return.glyphFontFamily The CSS font-family to use for the glyph element.
      * @return {String} return.text The {@link #text} to display ion the Button.
-     * @return {Number} return.tabIndex The tab index within the input flow.
      */
     getTemplateArgs: function() {
         var me = this,
-            persistentPadding = me.getPersistentPadding(),
-            innerSpanStyle = '';
+            btnCls = me._btnCls,
+            baseIconCls = me._baseIconCls,
+            iconAlign = me.getIconAlign(),
+            glyph = me.glyph,
+            glyphFontFamily = Ext._glyphFontFamily,
+            text = me.text,
+            hasIcon = me._hasIcon(),
+            hasIconCls = me._hasIconCls,
+            glyphParts;
 
-        // Create negative margin offsets to counteract persistent button padding if needed
-        if (Math.max.apply(Math, persistentPadding) > 0) {
-            innerSpanStyle = 'margin:' + Ext.Array.map(persistentPadding, function(pad) {
-                return -pad + 'px';
-            }).join(' ');
+        if (typeof glyph === 'string') {
+            glyphParts = glyph.split('@');
+            glyph = glyphParts[0];
+            glyphFontFamily = glyphParts[1];
         }
 
         return {
-            href     : me.getHref(),
-            disabled : me.disabled,
-            hrefTarget: me.hrefTarget,
-            type     : me.type,
-            btnCls   : me.getBtnCls(),
-            splitCls : me.getSplitCls(),
-            iconUrl  : me.icon,
-            iconCls  : me.iconCls,
-            text     : me.text || '&#160;',
-            tabIndex : me.tabIndex,
-            innerSpanStyle: innerSpanStyle
+            innerCls: me._innerCls,
+            splitCls: me.getArrowVisible() ? me.getSplitCls() : '',
+            iconUrl: me.icon,
+            iconCls: me.iconCls,
+            glyph: glyph,
+            glyphCls: glyph ? me._glyphCls : '',
+            glyphFontFamily: glyphFontFamily,
+            text: text || '&#160;',
+            closeText: me.closeText,
+            textCls: text ? me._textCls : '',
+            noTextCls: text ? '' : me._noTextCls,
+            hasIconCls: hasIcon ? hasIconCls : '',
+            btnWrapCls: me._btnWrapCls,
+            btnWrapStyle: me.width ? 'table-layout:fixed;' : '',
+            btnElStyle: me.height ? 'height:auto;' : '',
+            btnCls: btnCls,
+            baseIconCls: baseIconCls,
+            iconBeforeText: iconAlign === 'left' || iconAlign === 'top',
+            iconAlignCls: hasIcon ? (hasIconCls + '-' + iconAlign) : '',
+            textAlignCls: btnCls + '-' + me.getTextAlign()
         };
+    },
+
+    renderIcon: function(values) {
+        return this.getTpl('iconTpl').apply(values);
+    },
+
+    /**
+     * Sets the href of the embedded anchor element to the passed URL.
+     *
+     * Also appends any configured {@link #cfg-baseParams} and parameters set through {@link #setParams}.
+     * @param {String} href The URL to set in the anchor element.
+     *
+     */
+    setHref: function(href) {
+        var me = this,
+            hrefTarget = me.hrefTarget,
+            dom;
+
+        me.href = href;
+
+        if (!me.configuredWithPreventDefault) {
+            me.preventDefault = !href;
+        }
+
+        if (me.rendered) {
+            dom = me.el.dom;
+            // https://sencha.jira.com/browse/EXTJS-11964
+            // Disabled links are clickable on iPad, and right clickable on desktop browsers.
+            // The only way to completely disable navigation is removing the href
+            if (!href || me.disabled) {
+                dom.removeAttribute('href');
+                dom.removeAttribute('hrefTarget');
+            } else {
+                dom.href = me.getHref();
+                if (hrefTarget) {
+                    dom.target = hrefTarget;
+                }
+            }
+        }
     },
 
     /**
      * @private
      * If there is a configured href for this Button, returns the href with parameters appended.
-     * @returns The href string with parameters appended.
+     * @return {String/Boolean} The href string with parameters appended.
      */
     getHref: function() {
         var me = this,
-            params = Ext.apply({}, me.baseParams);
+            href = me.href;
 
-        // write baseParams first, then write any params
-        params = Ext.apply(params, me.params);
-        return me.href ? Ext.urlAppend(me.href, Ext.Object.toQueryString(params)) : false;
+        return href ? Ext.urlAppend(href, Ext.Object.toQueryString(Ext.apply({}, me.params, me.baseParams))) : false;
     },
 
     /**
      * Sets the href of the link dynamically according to the params passed, and any {@link #baseParams} configured.
+     *
+     *     var button = Ext.create('Ext.button.Button', {
+     *         renderTo   : document.body,
+     *         text       : 'Open',
+     *         href       : 'http://www.sencha.com',
+     *         baseParams : {
+     *             foo : 'bar'
+     *         }
+     *     });
+     *
+     *     button.setParams({
+     *         company : 'Sencha'
+     *     });
+     *
+     * When clicked, this button will open a new window with the url http://www.sencha.com/?foo=bar&company=Sencha because
+     * the button wased configured with the {@link #baseParams} to have `foo` = `'bar'` and then used {@link #setParams} to set the `company` parameter to `'Sencha'`.
      *
      * **Only valid if the Button was originally configured with a {@link #href}**
      *
      * @param {Object} params Parameters to use in the href URL.
      */
     setParams: function(params) {
-        this.params = params;
-        this.btnEl.dom.href = this.getHref();
+        var me = this,
+            dom;
+
+        me.params = params;
+
+        // https://sencha.jira.com/browse/EXTJS-11964
+        // Disabled links are clickable on iPad, and right clickable on desktop browsers.
+        // The only way to completely disable navigation is removing the href
+        if (me.rendered) {
+            dom = me.el.dom;
+            if (me.disabled) {
+                dom.removeAttribute('href');
+            } else {
+                dom.href = me.getHref() || '';
+            }
+        }
     },
 
     getSplitCls: function() {
@@ -840,8 +1049,30 @@ Ext.define('Ext.button.Button', {
         return me.split ? (me.baseCls + '-' + me.arrowCls) + ' ' + (me.baseCls + '-' + me.arrowCls + '-' + me.arrowAlign) : '';
     },
 
-    getBtnCls: function() {
-        return this.textAlign ? this.baseCls + '-' + this.textAlign : '';
+    /**
+     * Sets the background image (inline style) of the button. This method also changes the value of the {@link #icon}
+     * config internally.
+     * @param {String} icon The path to an image to display in the button
+     * @return {Ext.button.Button} this
+     */
+    setIcon: function(icon) {
+        icon = icon || '';
+        var me = this,
+            btnIconEl = me.btnIconEl,
+            oldIcon = me.icon || '';
+
+        me.icon = icon;
+        if (icon !== oldIcon) {
+            if (btnIconEl) {
+                btnIconEl.setStyle('background-image', icon ? 'url(' + icon + ')': '');
+                me._syncHasIconCls();
+                if (me.didIconStateChange(oldIcon, icon)) {
+                    me.updateLayout();
+                }
+            }
+            me.fireEvent('iconchange', me, oldIcon, icon);
+        }
+        return me;
     },
 
     /**
@@ -851,20 +1082,69 @@ Ext.define('Ext.button.Button', {
      * @return {Ext.button.Button} this
      */
     setIconCls: function(cls) {
+        cls = cls || '';
         var me = this,
             btnIconEl = me.btnIconEl,
-            oldCls = me.iconCls;
-            
+            oldCls = me.iconCls || '';
+
         me.iconCls = cls;
+        if (oldCls !== cls) {
+            if (btnIconEl) {
+                // Remove the previous iconCls from the button
+                btnIconEl.removeCls(oldCls);
+                btnIconEl.addCls(cls);
+                me._syncHasIconCls();
+                if (me.didIconStateChange(oldCls, cls)) {
+                    me.updateLayout();
+                }
+            }
+            me.fireEvent('iconchange', me, oldCls, cls);
+        }
+        return me;
+    },
+
+    /**
+     * Sets this button's glyph
+     * @param {Number/String} glyph the numeric charCode or string charCode/font-family.
+     * This parameter expects a format consistent with that of {@link #glyph}
+     * @return {Ext.button.Button} this
+     */
+    setGlyph: function(glyph) {
+        glyph = glyph || 0;
+        var me = this,
+            btnIconEl = me.btnIconEl,
+            oldGlyph = me.glyph,
+            glyphCls = me._glyphCls,
+            fontFamily, glyphParts;
+
+        me.glyph = glyph;
+
         if (btnIconEl) {
-            // Remove the previous iconCls from the button
-            btnIconEl.removeCls(oldCls);
-            btnIconEl.addCls(cls || '');
-            me.setComponentCls();
-            if (me.didIconStateChange(oldCls, cls)) {
+            if (typeof glyph === 'string') {
+                glyphParts = glyph.split('@');
+                glyph = glyphParts[0];
+                fontFamily = glyphParts[1] || Ext._glyphFontFamily;
+            }
+
+            if (!glyph) {
+                btnIconEl.dom.innerHTML = '';
+                btnIconEl.removeCls(glyphCls);
+            } else if (oldGlyph !== glyph) {
+                btnIconEl.dom.innerHTML = '&#' + glyph + ';';
+                btnIconEl.addCls(glyphCls);
+            }
+
+            if (fontFamily) {
+                btnIconEl.setStyle('font-family', fontFamily);
+            }
+            me._syncHasIconCls();
+            if (me.didIconStateChange(oldGlyph, glyph)) {
                 me.updateLayout();
             }
         }
+
+        me.fireEvent('glyphchange', me, me.glyph, oldGlyph);
+
         return me;
     },
 
@@ -882,17 +1162,19 @@ Ext.define('Ext.button.Button', {
         var me = this;
 
         if (me.rendered) {
-            if (!initial) {
+            if (!initial || !tooltip) {
                 me.clearTip();
             }
-            if (Ext.isObject(tooltip)) {
-                Ext.tip.QuickTipManager.register(Ext.apply({
-                    target: me.btnEl.id
-                },
-                tooltip));
-                me.tooltip = tooltip;
-            } else {
-                me.btnEl.dom.setAttribute(me.getTipAttr(), tooltip);
+            if (tooltip) {
+                if (Ext.quickTipsActive && Ext.isObject(tooltip)) {
+                    Ext.tip.QuickTipManager.register(Ext.apply({
+                        target: me.el.id
+                    },
+                    tooltip));
+                    me.tooltip = tooltip;
+                } else {
+                    me.el.dom.setAttribute(me.getTipAttr(), tooltip);
+                }
             }
         } else {
             me.tooltip = tooltip;
@@ -900,31 +1182,51 @@ Ext.define('Ext.button.Button', {
         return me;
     },
 
-    /**
-     * Sets the text alignment for this button.
-     * @param {String} align The new alignment of the button text. See {@link #textAlign}.
-     */
-    setTextAlign: function(align) {
+    updateIconAlign: function(align, oldAlign) {
         var me = this,
-            btnEl = me.btnEl;
+            btnEl, btnIconEl, hasIconCls;
 
-        if (btnEl) {
-            btnEl.removeCls(me.baseCls + '-' + me.textAlign);
-            btnEl.addCls(me.baseCls + '-' + align);
+        if (me.rendered) {
+            btnEl = me.btnEl;
+            btnIconEl = me.btnIconEl;
+            hasIconCls = me._hasIconCls;
+
+            if (oldAlign) {
+                btnEl.removeCls(hasIconCls + '-' + oldAlign);
+            }
+            btnEl.addCls(hasIconCls + '-' + align);
+
+            // move the iconWrap to the correct position in the dom - before the btnInnerEl
+            // for top/left alignments, and after the btnInnerEl for right/bottom
+            if (align === 'top' || align === 'left') {
+                btnEl.insertFirst(btnIconEl);
+            } else {
+                btnEl.appendChild(btnIconEl);
+            }
+            me.updateLayout();
         }
-        me.textAlign = align;
-        return me;
+    },
+
+    updateTextAlign: function(align, oldAlign) {
+        var me = this,
+            btnEl = me.btnEl,
+            btnCls = me._btnCls;
+
+        if (me.rendered) {
+            btnEl.removeCls(btnCls + '-' + oldAlign);
+            btnEl.addCls(btnCls + '-' + align);
+        }
     },
 
     getTipAttr: function(){
-        return this.tooltipType == 'qtip' ? 'data-qtip' : 'title';
+        return this.tooltipType === 'qtip' ? 'data-qtip' : 'title';
     },
 
-    // private
+    // @private
     getRefItems: function(deep){
         var menu = this.menu,
             items;
-        
+
         if (menu) {
             items = menu.getRefItems(deep);
             items.unshift(menu);
@@ -932,38 +1234,45 @@ Ext.define('Ext.button.Button', {
         return items || [];
     },
 
-    // private
+    // @private
     clearTip: function() {
-        if (Ext.isObject(this.tooltip)) {
-            Ext.tip.QuickTipManager.unregister(this.btnEl);
+        var me = this,
+            el = me.el;
+
+        if (Ext.quickTipsActive && Ext.isObject(me.tooltip)) {
+            Ext.tip.QuickTipManager.unregister(el);
+        } else {
+            el.dom.removeAttribute(me.getTipAttr());
         }
     },
 
-    // private
+    // @private
     beforeDestroy: function() {
         var me = this;
+
         if (me.rendered) {
             me.clearTip();
         }
-        if (me.menu && me.destroyMenu !== false) {
-            Ext.destroy(me.menu);
-        }
-        Ext.destroy(me.btnInnerEl, me.repeater);
+
+        Ext.destroy(me.repeater);
         me.callParent();
     },
 
-    // private
+    // @private
     onDestroy: function() {
-        var me = this;
-        if (me.rendered) {
-            me.doc.un('mouseover', me.monitorMouseOver, me);
-            me.doc.un('mouseup', me.onMouseUp, me);
-            delete me.doc;
-            Ext.ButtonToggleManager.unregister(me);
+        var me = this,
+            menu = me.menu;
 
+        if (me.rendered) {
             Ext.destroy(me.keyMap);
             delete me.keyMap;
         }
+
+        if (menu && me.destroyMenu) {
+            me.menu = Ext.destroy(menu);
+        }
+
+        Ext.button.Manager.unregister(me);
         me.callParent();
     },
 
@@ -976,52 +1285,32 @@ Ext.define('Ext.button.Button', {
      */
     setHandler: function(handler, scope) {
         this.handler = handler;
-        this.scope = scope;
+        if (arguments.length > 1) {
+            this.scope = scope;
+        }
         return this;
     },
 
-    /**
-     * Sets this Button's text
-     * @param {String} text The button text
-     * @return {Ext.button.Button} this
-     */
-    setText: function(text) {
-        var me = this;
-        me.text = text;
-        if (me.rendered) {
-            me.btnInnerEl.update(text || '&#160;');
-            me.setComponentCls();
-            if (Ext.isStrict && Ext.isIE8) {
-                // weird repaint issue causes it to not resize
-                me.el.repaint();
-            }
-            me.updateLayout();
-        }
-        return me;
-    },
-
-    /**
-     * Sets the background image (inline style) of the button. This method also changes the value of the {@link #icon}
-     * config internally.
-     * @param {String} icon The path to an image to display in the button
-     * @return {Ext.button.Button} this
-     */
-    setIcon: function(icon) {
+    applyText: function(text) {
+        // Coerce to string. Maybe set to a numeric value.
+        text = text == null ? '' : String(text);
         var me = this,
-            btnIconEl = me.btnIconEl,
-            oldIcon = me.icon;
-            
-        me.icon = icon;
-        if (btnIconEl) {
-            btnIconEl.setStyle('background-image', icon ? 'url(' + icon + ')': '');
-            me.setComponentCls();
-            if (me.didIconStateChange(oldIcon, icon)) {
+            btnInnerEl = me.btnInnerEl,
+            btnEl = me.btnEl,
+            oldText = me.text || '';
+
+        if (text !== oldText) {
+            me.text = text;
+            if (me.rendered) {
+                btnInnerEl.setHtml(text || '&#160;');
+                btnEl[text ? 'addCls' : 'removeCls'](me._textCls);
+                btnEl[text ? 'removeCls' : 'addCls'](me._noTextCls);
                 me.updateLayout();
             }
+            me.fireEvent('textchange', me, oldText, text);
         }
-        return me;
     },
-    
+
     /**
      * Checks if the icon/iconCls changed from being empty to having a value, or having a value to being empty.
      * @private
@@ -1035,11 +1324,12 @@ Ext.define('Ext.button.Button', {
     },
 
     /**
-     * Gets the text for this Button
-     * @return {String} The button text
+     * Sets the `pressed` state of this button.
+     * @param {Boolean} [pressed=true] Pass `false` to clear the `pressed` state.
+     * @return {Ext.button.Button} this
      */
-    getText: function() {
-        return this.text;
+    setPressed: function (pressed) {
+        return this.toggle(pressed !== false);
     },
 
     /**
@@ -1052,39 +1342,52 @@ Ext.define('Ext.button.Button', {
         var me = this;
         state = state === undefined ? !me.pressed: !!state;
         if (state !== me.pressed) {
-            if (me.rendered) {
-                me[state ? 'addClsWithUI': 'removeClsWithUI'](me.pressedCls);
-            }
+            me[state ? 'addCls': 'removeCls'](me._pressedCls);
             me.pressed = state;
             if (!suppressEvent) {
                 me.fireEvent('toggle', me, state);
-                Ext.callback(me.toggleHandler, me.scope || me, [me, state]);
+                Ext.callback(me.toggleHandler, me.scope, [me, state], 0, me);
+
+                if (me.reference && me.publishState) {
+                    me.publishState('pressed', state);
+                }
             }
         }
         return me;
     },
-    
-    maybeShowMenu: function(){
+
+    maybeShowMenu: function(e) {
         var me = this;
-        if (me.menu && !me.hasVisibleMenu() && !me.ignoreNextClick) {
-            me.showMenu();
+        if (me.menu && !me.ignoreNextClick) {
+            me.showMenu(e);
         }
     },
 
     /**
      * Shows this button's menu (if it has one)
      */
-    showMenu: function() {
-        var me = this;
-        if (me.rendered && me.menu) {
-            if (me.tooltip && me.getTipAttr() != 'title') {
-                Ext.tip.QuickTipManager.getQuickTip().cancelShow(me.btnEl);
-            }
-            if (me.menu.isVisible()) {
-                me.menu.hide();
-            }
+    showMenu: function(/* private */ clickEvent) {
+        var me = this,
+            menu = me.menu,
+            isPointerEvent = !clickEvent || clickEvent.pointerType;
 
-            me.menu.showBy(me.el, me.menuAlign, ((!Ext.isStrict && Ext.isIE) || Ext.isIE6) ? [-2, -2] : undefined);
+        if (menu && me.rendered) {
+            if (me.tooltip && Ext.quickTipsActive && me.getTipAttr() !== 'title') {
+                Ext.tip.QuickTipManager.getQuickTip().cancelShow(me.el);
+            }
+            if (menu.isVisible()) {
+                // Click/tap toggles the menu visibility.
+                if (isPointerEvent) {
+                    menu.hide();
+                } else {
+                    menu.focus();
+                }
+            }
+            else if (!clickEvent || me.showEmptyMenu || menu.items.getCount() > 0) {
+                // Pointer-invoked menus do not auto focus, key invoked ones do.
+                menu.autoFocus = !isPointerEvent;
+                menu.showBy(me.el, me.menuAlign);
+            }
         }
         return me;
     },
@@ -1108,41 +1411,51 @@ Ext.define('Ext.button.Button', {
         return menu && menu.rendered && menu.isVisible();
     },
 
-    // private
+    // @private
     onRepeatClick: function(repeat, e) {
         this.onClick(e);
     },
 
-    // private
+    onTouchStart: function(e) {
+        this.doPreventDefault(e);
+    },
+
+    // @private
     onClick: function(e) {
         var me = this;
-        if (me.preventDefault || (me.disabled && me.getHref()) && e) {
-            e.preventDefault();
-        }
-        if (e.button !== 0) {
+        me.doPreventDefault(e);
+
+        // Can be triggered by ENTER or SPACE keydown events which set the button property.
+        // Only veto event handling if it's a mouse event with an alternative button.
+        // Checking e.button for a truthy value (instead of != 0) also allows touch events
+        // (tap) to continue, as they do not have a button property defined.
+        if (e.type !== 'keydown' && e.button) {
             return;
         }
         if (!me.disabled) {
             me.doToggle();
-            me.maybeShowMenu();
+            me.maybeShowMenu(e);
             me.fireHandler(e);
         }
     },
-    
-    fireHandler: function(e){
-        var me = this,
-            handler = me.handler;
-            
-        if (me.fireEvent('click', me, e) !== false) {
-            if (handler) {
-                handler.call(me.scope || me, me, e);
-            }
-            me.blur();
+
+    doPreventDefault: function(e) {
+        if (e && (this.preventDefault || (this.disabled && this.getHref()))) {
+            e.preventDefault();
         }
     },
-    
-    doToggle: function(){
-        var me = this;    
+
+    fireHandler: function(e) {
+        var me = this;
+
+        // Click may have destroyed the button
+        if (me.fireEvent('click', me, e) !== false && !me.isDestroyed) {
+            Ext.callback(me.handler, me.scope, [me, e], 0, me);
+        }
+    },
+
+    doToggle: function() {
+        var me = this;
         if (me.enableToggle && (me.allowDepress !== false || !me.pressed)) {
             me.toggle();
         }
@@ -1188,47 +1501,50 @@ Ext.define('Ext.button.Button', {
      */
     onMouseMove: function(e) {
         var me = this,
-            el = me.el,
-            over = me.overMenuTrigger,
-            overlap, btnSize;
+            over = me.overMenuTrigger;
 
         if (me.split) {
-            if (me.arrowAlign === 'right') {
-                overlap = e.getX() - el.getX();
-                btnSize = el.getWidth();
-            } else {
-                overlap = e.getY() - el.getY();
-                btnSize = el.getHeight();
-            }
-
-            if (overlap > (btnSize - me.getTriggerSize())) {
+            if (me.isWithinTrigger(e)) {
                 if (!over) {
                     me.onMenuTriggerOver(e);
                 }
-            } else {
-                if (over) {
-                    me.onMenuTriggerOut(e);
-                }
+            } else if (over) {
+                me.onMenuTriggerOut(e);
             }
         }
     },
 
     /**
-     * @private
-     * Measures the size of the trigger area for menu and split buttons. Will be a width for
-     * a right-aligned trigger and a height for a bottom-aligned trigger. Cached after first measurement.
+     * @protected
+     * Returns true if the passed event's x/y coordinates are within the trigger region
+     * @param {Ext.event.Event} e
      */
-    getTriggerSize: function() {
+    isWithinTrigger: function(e) {
         var me = this,
-            size = me.triggerSize,
-            side, sideFirstLetter, undef;
+            el = me.el,
+            overPosition, triggerRegion;
 
-        if (size === undef) {
-            side = me.arrowAlign;
-            sideFirstLetter = side.charAt(0);
-            size = me.triggerSize = me.el.getFrameWidth(sideFirstLetter) + me.btnWrap.getFrameWidth(sideFirstLetter) + me.frameSize[side];
-        }
-        return size;
+        overPosition = (me.arrowAlign === 'right') ?  e.getX() - me.getX() : e.getY() - el.getY();
+        triggerRegion = me.getTriggerRegion();
+        return overPosition > triggerRegion.begin && overPosition < triggerRegion.end;
+    },
+
+    /**
+     * @private
+     * Returns an object containing `begin` and `end` properties that indicate the
+     * left/right bounds of a right trigger or the top/bottom bounds of a bottom trigger.
+     * @return {Object}
+     */
+    getTriggerRegion: function() {
+        var me = this,
+            region = me._triggerRegion,
+            isRight = me.arrowAlign === 'right',
+            getEnd = isRight ? 'getRight' : 'getBottom',
+            btnSize = isRight ? me.getWidth() : me.getHeight();
+
+        region.begin = btnSize - (me.el[getEnd]() - me.btnEl[getEnd]());
+        region.end = btnSize;
+        return region;
     },
 
     /**
@@ -1238,9 +1554,8 @@ Ext.define('Ext.button.Button', {
      * @param e
      */
     onMouseEnter: function(e) {
-        var me = this;
-        me.addClsWithUI(me.overCls);
-        me.fireEvent('mouseover', me, e);
+        // overCls is handled by Component
+        this.fireEvent('mouseover', this, e);
     },
 
     /**
@@ -1250,9 +1565,8 @@ Ext.define('Ext.button.Button', {
      * @param e
      */
     onMouseLeave: function(e) {
-        var me = this;
-        me.removeClsWithUI(me.overCls);
-        me.fireEvent('mouseout', me, e);
+        // overCls is handled by Component
+        this.fireEvent('mouseout', this, e);
     },
 
     /**
@@ -1262,8 +1576,15 @@ Ext.define('Ext.button.Button', {
      * @param e
      */
     onMenuTriggerOver: function(e) {
-        var me = this;
+        var me = this,
+            arrowTip = me.arrowTooltip;
+
         me.overMenuTrigger = true;
+        // We don't have a separate arrow element, so we only add the tip attribute if
+        // we're over that part of the button
+        if (me.split && arrowTip) {
+            me.btnWrap.dom.setAttribute(me.getTipAttr(), arrowTip);
+        }
         me.fireEvent('menutriggerover', me, me.menu, e);
     },
 
@@ -1276,39 +1597,61 @@ Ext.define('Ext.button.Button', {
     onMenuTriggerOut: function(e) {
         var me = this;
         delete me.overMenuTrigger;
+        // See onMenuTriggerOver
+        if (me.split && me.arrowTooltip) {
+            me.btnWrap.dom.setAttribute(me.getTipAttr(), '');
+        }
         me.fireEvent('menutriggerout', me, me.menu, e);
     },
 
-    // inherit docs
-    enable : function(silent) {
-        var me = this;
+    enable: function(silent) {
+        var me = this,
+            href = me.href,
+            hrefTarget = me.hrefTarget,
+            dom;
 
         me.callParent(arguments);
 
-        if (me.btnEl) {
-            me.btnEl.dom.disabled = false;
+        me.removeCls(me._disabledCls);
+        if (me.rendered) {
+            dom = me.el.dom;
+            dom.setAttribute('tabindex', me.tabIndex);
+
+            // https://sencha.jira.com/browse/EXTJS-11964
+            // Disabled links are clickable on iPad, and right clickable on desktop browsers.
+            // The only way to completely disable navigation is removing the href
+            if (href) {
+                dom.href = href;
+            }
+            if (hrefTarget) {
+                dom.target = hrefTarget;
+            }
         }
-        me.removeClsWithUI('disabled');
 
         return me;
     },
 
-    // inherit docs
-    disable : function(silent) {
-        var me = this;
+    disable: function(silent) {
+        var me = this,
+            dom;
 
         me.callParent(arguments);
 
-        if (me.btnEl) {
-            me.btnEl.dom.disabled = true;
-        }
-        me.addClsWithUI('disabled');
-        me.removeClsWithUI(me.overCls);
+        me.addCls(me._disabledCls);
+        me.removeCls(me.overCls);
+        if (me.rendered) {
+            dom = me.el.dom;
+            dom.removeAttribute('tabindex');
 
-        // IE renders disabled text by layering gray text on top of white text, offset by 1 pixel. Normally this is fine
-        // but in some circumstances (such as using formBind) it gets confused and renders them side by side instead.
-        if (me.btnInnerEl && (Ext.isIE6 || Ext.isIE7)) {
-            me.btnInnerEl.repaint();
+            // https://sencha.jira.com/browse/EXTJS-11964
+            // Disabled links are clickable on iPad, and right clickable on desktop browsers.
+            // The only way to completely disable navigation is clearing the href
+            if (me.href) {
+                dom.removeAttribute('href');
+            }
+            if (me.hrefTarget) {
+                dom.removeAttribute('target');
+            }
         }
 
         return me;
@@ -1331,7 +1674,6 @@ Ext.define('Ext.button.Button', {
         me.setUI(ui);
     },
 
-    // inherit docs
     setUI: function(ui) {
         var me = this;
 
@@ -1341,155 +1683,166 @@ Ext.define('Ext.button.Button', {
         }
 
         me.callParent([ui]);
-
-        // Set all the state classNames, as they need to include the UI
-        // me.disabledCls += ' ' + me.baseCls + '-' + me.ui + '-disabled';
     },
 
-    // private
+
+    // @private
     onMouseDown: function(e) {
         var me = this;
+
+        if (Ext.isIE || e.pointerType === 'touch') {
+            // In IE the use of unselectable on the button's elements causes the element
+            // to not receive focus, even when it is directly clicked.
+            // On Touch devices, we need to explicitly focus on touchstart.
+            me.getFocusEl().focus();
+        }
+
         if (!me.disabled && e.button === 0) {
-            me.addClsWithUI(me.pressedCls);
-            me.doc.on('mouseup', me.onMouseUp, me);
+            Ext.button.Manager.onButtonMousedown(me, e);
+            me.addCls(me._pressedCls);
         }
     },
-    // private
+
+    // @private
     onMouseUp: function(e) {
         var me = this;
-        if (e.button === 0) {
+
+        // If the external mouseup listener of the ButtonManager fires after the button has been destroyed, ignore.
+        if (!me.isDestroyed && e.button === 0) {
             if (!me.pressed) {
-                me.removeClsWithUI(me.pressedCls);
+                me.removeCls(me._pressedCls);
             }
-            me.doc.un('mouseup', me.onMouseUp, me);
         }
     },
-    // private
-    onMenuShow: function(e) {
+
+    // @private
+    onMenuShow: function() {
         var me = this;
         me.ignoreNextClick = 0;
-        me.addClsWithUI(me.menuActiveCls);
+        me.addCls(me._menuActiveCls);
         me.fireEvent('menushow', me, me.menu);
     },
 
-    // private
+    // @private
     onMenuHide: function(e) {
-        var me = this;
-        me.removeClsWithUI(me.menuActiveCls);
-        me.ignoreNextClick = Ext.defer(me.restoreClick, 250, me);
+        var me = this,
+            menuClickBuffer = me.menuClickBuffer;
+
+        me.removeCls(me._menuActiveCls);
+        if (menuClickBuffer) {
+            me.ignoreNextClick = Ext.defer(me.restoreClick, menuClickBuffer, me);
+        }
         me.fireEvent('menuhide', me, me.menu);
     },
 
-    // private
+    // @private
     restoreClick: function() {
         this.ignoreNextClick = 0;
     },
 
-    // private
-    onDownKey: function() {
+    // @private
+    onDownKey: function(k, e) {
         var me = this;
 
-        if (!me.disabled) {
-            if (me.menu) {
-                me.showMenu();
-            }
+        if (me.menu && !me.disabled) {
+            me.showMenu(e);
+            e.stopEvent();
+            return false;
         }
     },
 
-    /**
-     * @private
-     * Some browsers (notably Safari and older Chromes on Windows) add extra "padding" inside the button
-     * element that cannot be removed. This method returns the size of that padding with a one-time detection.
-     * @return {Number[]} [top, right, bottom, left]
-     */
-    getPersistentPadding: function() {
-        var me = this,
-            reset = Ext.scopeResetCSS,
-            padding = me.persistentPadding,
-            btn, leftTop, btnEl, btnInnerEl, wrap;
+    updateArrowVisible: function(visible) {
+        var me = this;
 
-        // Create auto-size button offscreen and measure its insides
-        // Short-circuit IE as it sometimes gives false positive for padding
-        if (!padding) {
-            padding = me.self.prototype.persistentPadding = [0, 0, 0, 0];
-            if (!Ext.isIE) {
-                btn = new Ext.button.Button({
-                    text: 'test',
-                    style: 'position:absolute;top:-999px;'
-                });
-                btn.el = Ext.DomHelper.append(Ext.resetElement, btn.getRenderTree(), true);
-                btn.applyChildEls(btn.el);
-                btnEl = btn.btnEl;
-                btnInnerEl = btn.btnInnerEl;
-                btnEl.setSize(null, null); //clear any hard dimensions on the button el to see what it does naturally
-                leftTop = btnInnerEl.getOffsetsTo(btnEl);
-                padding[0] = leftTop[1];
-                padding[1] = btnEl.getWidth() - btnInnerEl.getWidth() - leftTop[0];
-                padding[2] = btnEl.getHeight() - btnInnerEl.getHeight() - leftTop[1];
-                padding[3] = leftTop[0];
-                
-                btn.destroy();
-                btn.el.remove();
+        if (me.rendered) {
+            if (visible) {
+                if (me.menu || me.isSplitButton) {
+                    me.split = true;
+                    me._addSplitCls();
+                }
+            } else {
+                me._removeSplitCls();
+                me.split = false;
             }
         }
-        return padding;
+
+        return visible;
+    },
+
+    privates: {
+        addOverCls: function() {
+            if (!this.disabled) {
+                this.addCls(this.overCls);
+            }
+        },
+
+        _addSplitCls: function() {
+            var me = this;
+
+            me.btnWrap.addCls(me.getSplitCls());
+
+            //<feature legacyBrowser>
+            if (Ext.isOpera12m) {
+                me.addCls(me._operaArrowCls + '-' + me.arrowAlign);
+            }
+            //</feature>
+        },
+
+        getFocusEl: function() {
+            return this.el;
+        },
+
+        /**
+         * @private
+         * @override
+         * Needed for when widget is rendered into a grid cell. The class to add to the cell element.
+         * Override needed to add scale to the mix which is poart of the ui name in the mixin and the CSS rule
+         */
+        getTdCls: function() {
+            return Ext.baseCSSPrefix + 'button-' + this.ui + '-' + this.scale + '-cell';
+        },
+
+        removeOverCls: function() {
+            this.removeCls(this.overCls);
+        },
+
+        _removeSplitCls: function() {
+            var me = this;
+
+            me.btnWrap.removeCls(me.getSplitCls());
+
+            //<feature legacyBrowser>
+            if (Ext.isOpera12m) {
+                me.removeCls(me._operaArrowCls + '-' + me.arrowAlign);
+            }
+            //</feature>
+        },
+
+        _syncHasIconCls: function() {
+            var me = this,
+                btnEl = me.btnEl,
+                hasIconCls = me._hasIconCls;
+
+            if (btnEl) {
+                btnEl[me._hasIcon() ? 'addCls' : 'removeCls']([
+                    hasIconCls,
+                    hasIconCls + '-' + me.iconAlign
+                ]);
+            }
+        },
+
+        /**
+         * Returns true if this button has an icon (either icon, iconCls, or glyph)
+         * @return {Boolean}
+         * @private
+         */
+        _hasIcon: function() {
+            return !!(this.icon || this.iconCls || this.glyph);
+        },
+
+        wrapPrimaryEl: function(dom) {
+            this.el = new Ext.dom.ButtonElement(dom);
+            this.callParent([dom]);
+        }
     }
-}, function() {
-    var groups = {},
-        toggleGroup = function(btn, state) {
-            if (state) {
-                var g = groups[btn.toggleGroup],
-                    length = g.length,
-                    i;
-
-                for (i = 0; i < length; i++) {
-                    if (g[i] !== btn) {
-                        g[i].toggle(false);
-                    }
-                }
-            }
-        };
-
-    // Private utility class used by Button
-    Ext.ButtonToggleManager = {
-        register: function(btn) {
-            if (!btn.toggleGroup) {
-                return;
-            }
-            var group = groups[btn.toggleGroup];
-            if (!group) {
-                group = groups[btn.toggleGroup] = [];
-            }
-            group.push(btn);
-            btn.on('toggle', toggleGroup);
-        },
-
-        unregister: function(btn) {
-            if (!btn.toggleGroup) {
-                return;
-            }
-            var group = groups[btn.toggleGroup];
-            if (group) {
-                Ext.Array.remove(group, btn);
-                btn.un('toggle', toggleGroup);
-            }
-        },
-
-        // Gets the pressed button in the passed group or null
-        // @param {String} group
-        // @return {Ext.button.Button}
-        getPressed: function(group) {
-            var g = groups[group],
-                i = 0,
-                len;
-            if (g) {
-                for (len = g.length; i < len; i++) {
-                    if (g[i].pressed === true) {
-                        return g[i];
-                    }
-                }
-            }
-            return null;
-        }
-    };
 });

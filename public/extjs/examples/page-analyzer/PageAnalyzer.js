@@ -1,11 +1,13 @@
-//{"duration":8,"time":"2012-02-25T10:55:01","success":false,"cycleCount":6,"flushCount":5,"calcCount":7,"orphans":0,"layouts":[{"allDone":true,"done":true,"id":"autocomponent-1193","type":"autocomponent","name":"headercontainer-1115<autocomponent>","blocks":[],"boxParent":null,"isBoxParent":null,"triggers":[],"orphan":false,"heightModel":"configured","widthModel":"calculated","children":[],"duration":0,"totalTime":0,"count":1},{"allDone":false,"done":false,"id":"gridcolumn-1194","type":"gridcolumn","name":"headercontainer-1115<gridcolumn>","blocks":[],"boxParent":null,"isBoxParent":null,"triggers":[{"name":"gridview-1118.height","prop":"height","value":null,"dirty":false,"missing":true,"setBy":"??"},{"name":"gridcolumn-1116.height","prop":"height","value":22,"dirty":false,"missing":false,"setBy":"gridcolumn-1116<columncomponent>"},{"name":"headercontainer-1115.contentWidth","prop":"contentWidth","value":335,"dirty":false,"missing":false,"setBy":"headercontainer-1115<gridcolumn>"},{"name":"headercontainer-1115.height","prop":"height","value":0,"dirty":false,"missing":false,"setBy":"headercontainer-1115<autocomponent>"},{"name":"headercontainer-1115.width","prop":"width","value":335,"dirty":false,"missing":false,"setBy":"headercontainer-1115<autocomponent>"},{"name":"numbercolumn-1117.height","prop":"height","value":22,"dirty":false,"missing":false,"setBy":"numbercolumn-1117<columncomponent>"}],"orphan":false,"heightModel":"configured","widthModel":"calculated","children":[{"allDone":true,"done":true,"id":"columncomponent-1195","type":"columncomponent","name":"gridcolumn-1116<columncomponent>","blocks":[],"boxParent":null,"isBoxParent":true,"triggers":[{"name":"gridcolumn-1116.containerChildrenDone:dom","prop":"containerChildrenDone","value":true,"dirty":false,"missing":false,"setBy":"??"},{"name":"gridcolumn-1116.width:dom","prop":"width","value":168,"dirty":false,"missing":false,"setBy":"headercontainer-1115<gridcolumn>"}],"orphan":false,"heightModel":"shrinkWrap (calculatedFromShrinkWrap)","widthModel":"calculated","children":[],"duration":0,"totalTime":0,"count":2},{"allDone":true,"done":true,"id":"columncomponent-1197","type":"columncomponent","name":"numbercolumn-1117<columncomponent>","blocks":[],"boxParent":null,"isBoxParent":true,"triggers":[{"name":"numbercolumn-1117.containerChildrenDone:dom","prop":"containerChildrenDone","value":true,"dirty":false,"missing":false,"setBy":"??"},{"name":"numbercolumn-1117.width:dom","prop":"width","value":167,"dirty":false,"missing":false,"setBy":"headercontainer-1115<gridcolumn>"}],"orphan":false,"heightModel":"shrinkWrap (calculatedFromShrinkWrap)","widthModel":"calculated","children":[],"duration":2,"totalTime":2,"count":2}],"duration":4,"totalTime":6,"count":2}],"statsById":{"columncomponent-1195":{"duration":0,"count":2},"columncomponent-1197":{"duration":2,"count":2},"autocomponent-1193":{"duration":0,"count":1},"gridcolumn-1194":{"duration":4,"count":2}},"statsByType":{"columncomponent":{"duration":2,"layoutCount":2,"count":4},"autocomponent":{"duration":0,"layoutCount":1,"count":1},"gridcolumn":{"duration":4,"layoutCount":1,"count":2}},"flushTime":1,"flushInvalidateTime":1,"flushInvalidateCount":1,"flushLayoutStats":{"completeLayout":{"count":2,"time":0}},"totalTime":8,"num":5}
+//{"duration":8,"time":"2012-02-25T10:55:01","success":false,"cycleCount":6,"flushCount":5,"calcCount":7,"orphans":0,"layouts":[{"allDone":true,"done":true,"id":"autocomponent-1193","type":"autocomponent","name":"headercontainer-1115<autocomponent>","blocks":[],"boxParent":null,"isBoxParent":null,"triggers":[],"orphan":false,"heightModel":"configured","widthModel":"calculated","children":[],"duration":0,"totalTime":0,"count":1},{"allDone":false,"done":false,"id":"gridcolumn-1194","type":"gridcolumn","name":"headercontainer-1115<gridcolumn>","blocks":[],"boxParent":null,"isBoxParent":null,"triggers":[{"name":"gridview-1118.height","prop":"height","value":null,"dirty":false,"missing":true,"setBy":"??"},{"name":"gridcolumn-1116.height","prop":"height","value":22,"dirty":false,"missing":false,"setBy":"gridcolumn-1116<columncomponent>"},{"name":"headercontainer-1115.contentWidth","prop":"contentWidth","value":335,"dirty":false,"missing":false,"setBy":"headercontainer-1115<gridcolumn>"},{"name":"headercontainer-1115.height","prop":"height","value":0,"dirty":false,"missing":false,"setBy":"headercontainer-1115<autocomponent>"},{"name":"headercontainer-1115.width","prop":"width","value":335,"dirty":false,"missing":false,"setBy":"headercontainer-1115<autocomponent>"},{"name":"numbercolumn-1117.height","prop":"height","value":22,"dirty":false,"missing":false,"setBy":"numbercolumn-1117<columncomponent>"}],"orphan":false,"heightModel":"configured","widthModel":"calculated","children":[{"allDone":true,"done":true,"id":"columncomponent-1195","type":"columncomponent","name":"gridcolumn-1116<columncomponent>","blocks":[],"boxParent":null,"isBoxParent":true,"triggers":[{"name":"gridcolumn-1116.containerChildrenSizeDone:dom","prop":"containerChildrenSizeDone","value":true,"dirty":false,"missing":false,"setBy":"??"},{"name":"gridcolumn-1116.width:dom","prop":"width","value":168,"dirty":false,"missing":false,"setBy":"headercontainer-1115<gridcolumn>"}],"orphan":false,"heightModel":"shrinkWrap (calculatedFromShrinkWrap)","widthModel":"calculated","children":[],"duration":0,"totalTime":0,"count":2},{"allDone":true,"done":true,"id":"columncomponent-1197","type":"columncomponent","name":"numbercolumn-1117<columncomponent>","blocks":[],"boxParent":null,"isBoxParent":true,"triggers":[{"name":"numbercolumn-1117.containerChildrenSizeDone:dom","prop":"containerChildrenSizeDone","value":true,"dirty":false,"missing":false,"setBy":"??"},{"name":"numbercolumn-1117.width:dom","prop":"width","value":167,"dirty":false,"missing":false,"setBy":"headercontainer-1115<gridcolumn>"}],"orphan":false,"heightModel":"shrinkWrap (calculatedFromShrinkWrap)","widthModel":"calculated","children":[],"duration":2,"totalTime":2,"count":2}],"duration":4,"totalTime":6,"count":2}],"statsById":{"columncomponent-1195":{"duration":0,"count":2},"columncomponent-1197":{"duration":2,"count":2},"autocomponent-1193":{"duration":0,"count":1},"gridcolumn-1194":{"duration":4,"count":2}},"statsByType":{"columncomponent":{"duration":2,"layoutCount":2,"count":4},"autocomponent":{"duration":0,"layoutCount":1,"count":1},"gridcolumn":{"duration":4,"layoutCount":1,"count":2}},"flushTime":1,"flushInvalidateTime":1,"flushInvalidateCount":1,"flushLayoutStats":{"completeLayout":{"count":2,"time":0}},"totalTime":8,"num":5}
 Ext.Loader.setConfig({
     enabled: true
 });
 
 Ext.Loader.setPath({
     'Ext.ux': '../ux/',
-    'PageAnalyzer': './'
+    'PageAnalyzer': './',
+    'Ext.draw': '../../packages/ext-charts/src/draw',
+    'Ext.chart': '../../packages/ext-charts/src/chart'
 });
 
 Ext.require([
@@ -13,6 +15,7 @@ Ext.require([
     'Ext.tree.*',
     'Ext.container.Viewport',
     'Ext.layout.container.Border',
+    'Ext.window.Window',
     'Ext.History',
     'Ext.tab.Panel',
     'Ext.grid.column.Action',
@@ -26,7 +29,12 @@ Ext.require([
     'PageAnalyzer.Summary',
     'Ext.ux.IFrame',
     'Ext.state.Manager',
-    'Ext.state.CookieProvider'
+    'Ext.state.CookieProvider',
+    'Ext.chart.Chart',
+    'Ext.chart.series.Column',
+    'Ext.chart.axis.Numeric',
+    'Ext.chart.axis.Category',
+    'Ext.chart.series.Pie'
 ]);
 
 Ext.define('PageAnalyzer.MainForm', {
@@ -988,7 +996,7 @@ Ext.define('PageAnalyzer.MainForm', {
         var states = this.states,
             target = this.target;
 
-        if (target && target.Ext && target.Ext.isReady) {
+        if (target && target.Ext && target.Ext.isDomReady && (Ext.isReady || target.Ext.env.Ready.blocks === 1)) {
 
             if (target._layoutRuns && target.Ext._readyTime) {
                 return states.ready;
@@ -1090,8 +1098,7 @@ Ext.define('PageAnalyzer.MainForm', {
             if (me.reloading) {
                 Ext.log('firing ready event in target document');
                 me.reloading = false;
-                me.target.Ext._continueFireReady = true;
-                me.target.Ext.EventManager.readyEvent.fire();
+                me.target.Ext.env.Ready.unblock();
             }
             me.updateLayoutRuns();
         }

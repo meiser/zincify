@@ -65,8 +65,37 @@ Ext.define('Ext.form.field.VTypes', (function(){
     // closure these in so they are only created once.
     var alpha = /^[a-zA-Z_]+$/,
         alphanum = /^[a-zA-Z0-9_]+$/,
-        email = /^(\w+)([\-+.][\w]+)*@(\w[\-\w]*\.){1,5}([A-Za-z]){2,6}$/,
-        url = /(((^https?)|(^ftp)):\/\/([\-\w]+\.)+\w{2,3}(\/[%\-\w]+(\.\w{2,})?)*(([\w\-\.\?\\\/+@&#;`~=%!]*)(\.\w{2,})?)*\/?)/i;
+
+        // http://en.wikipedia.org/wiki/Email_address#Local_part
+        // http://stackoverflow.com/a/2049510
+        // http://isemail.info/
+        // http://blog.stevenlevithan.com/archives/capturing-vs-non-capturing-groups
+        //
+        // 1. Can begin with a double-quote ONLY IF the local part also ends in a double-quote.
+        // 2. Can NOT BEGIN with a period.
+        // 3. Can NOT END with a period.
+        // 4. Can not have MORE THAN ONE period in a row.
+        //
+        // Let's break this down:
+        //
+        // ^(")?
+        // The local part may begin with double-quotes, but only if it also ends with it.
+        // See the back-reference.  Capturing.
+        //
+        // (?:[^\."])
+        // Here we've defined that the local part cannot begin with a period or a double-quote.  Non-capturing.
+        //
+        // (?:(?:[\.])?(?:[\w\-!#$%&'*+/=?^_`{|}~]))*
+        // After the first character is matched, the regex ensures that there is not more than one period
+        // in a row.  Then, this nested grouping allows for zero or more of the accepted characters.
+        // NOTE that this also ensures that any character not defined in the character class
+        // is invalid as an ending character for the local part (such as the period).
+        //
+        // \1@
+        // The local part of the address is a backreference to the first (and only) capturing group that allows
+        // for a double-quote to wrap the local part of an email address.
+        email = /^(")?(?:[^\."])(?:(?:[\.])?(?:[\w\-!#$%&'*+/=?^_`{|}~]))*\1@(\w[\-\w]*\.){1,5}([A-Za-z]){2,6}$/,
+        url = /(((^https?)|(^ftp)):\/\/((([\-\w]+\.)+\w{2,3}(\/[%\-\w]+(\.\w{2,})?)*(([\w\-\.\?\\\/+@&#;`~=%!]*)(\.\w{2,})?)*)|(localhost|LOCALHOST))\/?)/i;
 
     // All these messages and functions are configurable
     return {
@@ -74,24 +103,30 @@ Ext.define('Ext.form.field.VTypes', (function(){
         alternateClassName: 'Ext.form.VTypes',
 
         /**
-         * The function used to validate email addresses. Note that this is a very basic validation - complete
-         * validation per the email RFC specifications is very complex and beyond the scope of this class, although this
-         * function can be overridden if a more comprehensive validation scheme is desired. See the validation section
-         * of the [Wikipedia article on email addresses][1] for additional information. This implementation is intended
-         * to validate the following emails:
+         * The function used to validate email addresses. Note that complete validation per the email RFC
+         * specifications is very complex and beyond the scope of this class, although this function can be
+         * overridden if a more comprehensive validation scheme is desired. See the validation section
+         * of the [Wikipedia article on email addresses][1] for additional information. This implementation is
+         * intended to validate the following types of emails:
          *
          * - `barney@example.de`
          * - `barney.rubble@example.com`
          * - `barney-rubble@example.coop`
          * - `barney+rubble@example.com`
+         * - `barney'rubble@example.com`
+         * - `b.arne.y_r.ubbl.e@example.com`
+         * - `barney4rubble@example.com`
+         * - `barney4rubble!@example.com`
+         * - `_barney+rubble@example.com`
+         * - `"barney+rubble"@example.com`
          *
          * [1]: http://en.wikipedia.org/wiki/E-mail_address
          *
          * @param {String} value The email address
          * @return {Boolean} true if the RegExp test passed, and false if not.
          */
-        'email' : function(v){
-            return email.test(v);
+        'email' : function(value){
+            return email.test(value);
         },
         //<locale>
         /**
@@ -106,15 +141,15 @@ Ext.define('Ext.form.field.VTypes', (function(){
          * The keystroke filter mask to be applied on email input. See the {@link #email} method for information about
          * more complex email validation. Defaults to: /[a-z0-9_\.\-@]/i
          */
-        'emailMask' : /[a-z0-9_\.\-@\+]/i,
+        'emailMask' : /[\w.\-@'"!#$%&'*+/=?^_`{|}~]/i,
 
         /**
          * The function used to validate URLs
          * @param {String} value The URL
          * @return {Boolean} true if the RegExp test passed, and false if not.
          */
-        'url' : function(v){
-            return url.test(v);
+        'url' : function(value){
+            return url.test(value);
         },
         //<locale>
         /**
@@ -130,8 +165,8 @@ Ext.define('Ext.form.field.VTypes', (function(){
          * @param {String} value The value
          * @return {Boolean} true if the RegExp test passed, and false if not.
          */
-        'alpha' : function(v){
-            return alpha.test(v);
+        'alpha' : function(value){
+            return alpha.test(value);
         },
         //<locale>
         /**
@@ -152,8 +187,8 @@ Ext.define('Ext.form.field.VTypes', (function(){
          * @param {String} value The value
          * @return {Boolean} true if the RegExp test passed, and false if not.
          */
-        'alphanum' : function(v){
-            return alphanum.test(v);
+        'alphanum' : function(value){
+            return alphanum.test(value);
         },
         //<locale>
         /**

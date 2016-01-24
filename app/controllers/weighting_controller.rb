@@ -237,7 +237,9 @@
 		@item_base_data = ItemBaseData.find(params[:item_base_data_ids][j])
 		@weighting.update_column(:item_base_data_id, @item_base_data.id)
 	end
-	render :nothing => true
+	#render :nothing => true
+	head :ok, content_type: 'text/html'
+
  end 
  
  private

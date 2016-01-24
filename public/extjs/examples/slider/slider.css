@@ -1,12 +1,15 @@
 #custom-slider {
-    width:214px;
-    padding-top:6px;
-    background-image:url(images/ticks.gif);
-}
-#custom-slider .x-slider-thumb {
-    background-image:url(images/slider-thumb.png);
+    width: 214px;
+    height: 29px;
+    padding-top: 13px;
+    background-image: url(images/ticks.gif);
 }
 
 h3 {
     padding:15px 0 5px;
+}
+
+.x-theme-neptune-touch #custom-slider{
+    height: 33px;
+    padding-top: 6px;
 }

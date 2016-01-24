@@ -9,17 +9,16 @@
  * Manages certain element-like data prior to rendering. These values are passed
  * on to the render process. This is currently used to manage the "class" and "style" attributes
  * of a component's primary el as well as the bodyEl of panels. This allows things like
- * addBodyCls in Panel to share logic with addCls in AbstractComponent.
+ * addBodyCls in Panel to share logic with addCls in Component.
  * @private
  */
-Ext.define('Ext.util.ProtoElement', (function () {
+Ext.define('Ext.util.ProtoElement', function () {
     var splitWords = Ext.String.splitWords,
         toMap = Ext.Array.toMap;
 
     return {
-        
         isProtoEl: true,
-        
+
         /**
          * The property name for the className on the data object passed to {@link #writeTo}.
          */
@@ -29,7 +28,7 @@ Ext.define('Ext.util.ProtoElement', (function () {
          * The property name for the style on the data object passed to {@link #writeTo}.
          */
         styleProp: 'style',
-        
+
         /**
          * The property name for the removed classes on the data object passed to {@link #writeTo}.
          */
@@ -37,30 +36,37 @@ Ext.define('Ext.util.ProtoElement', (function () {
 
         /**
          * True if the style must be converted to text during {@link #writeTo}. When used to
-         * populate tpl data, this will be true. When used to populate {@link Ext.DomHelper}
+         * populate tpl data, this will be true. When used to populate {@link Ext.dom.Helper}
          * specs, this will be false (the default).
          */
         styleIsText: false,
 
         constructor: function (config) {
-            var me = this;
+            var me = this,
+                cls, style;
 
-            Ext.apply(me, config);
+            if (config) {
+                Ext.apply(me, config);
+                cls = me.cls;
+                style = me.style;
+                delete me.cls;
+            }
 
-            me.classList = splitWords(me.cls);
-            me.classMap = toMap(me.classList);
-            delete me.cls;
+            me.classList = cls ? splitWords(cls) : [];
+            me.classMap = cls ? toMap(me.classList) : {};
 
-            if (Ext.isFunction(me.style)) {
-                me.styleFn = me.style;
-                delete me.style;
-            } else if (typeof me.style == 'string') {
-                me.style = Ext.Element.parseStyles(me.style);
-            } else if (me.style) {
-                me.style = Ext.apply({}, me.style); // don't edit the given object
+            if (style) {
+                if (typeof style === 'string') {
+                    me.style = Ext.Element.parseStyles(style);
+                } else if (Ext.isFunction(style)) {
+                    me.styleFn = style;
+                    delete me.style;
+                } else {
+                    me.style = Ext.apply({}, style); // don't edit the given object
+                }
             }
         },
-        
+
         /**
          * Indicates that the current state of the object has been flushed to the DOM, so we need
          * to track any subsequent changes
@@ -70,6 +76,7 @@ Ext.define('Ext.util.ProtoElement', (function () {
             this.removedClasses = {};
             // clear the style, it will be recreated if we add anything new
             delete this.style;
+            delete this.unselectableAttr;
         },
 
         /**
@@ -78,8 +85,12 @@ Ext.define('Ext.util.ProtoElement', (function () {
          * @return {Ext.util.ProtoElement} this
          */
         addCls: function (cls) {
+
+            if (!cls) {
+                return this;
+            }
             var me = this,
-                add = splitWords(cls),
+                add = (typeof cls === 'string') ? splitWords(cls) : cls,
                 length = add.length,
                 list = me.classList,
                 map = me.classMap,
@@ -167,6 +178,15 @@ Ext.define('Ext.util.ProtoElement', (function () {
             return me;
         },
 
+        unselectable: function() {
+            // See Ext.dom.Element.unselectable for an explanation of what is required to make an element unselectable
+            this.addCls(Ext.dom.Element.unselectableCls);
+
+            if (Ext.isOpera) {
+                this.unselectableAttr = true;
+            }
+        },
+
         /**
          * Writes style and class properties to given object.
          * Styles will be written to {@link #styleProp} and class names to {@link #clsProp}.
@@ -189,9 +209,9 @@ Ext.define('Ext.util.ProtoElement', (function () {
             to[me.clsProp] = classList.join(' ');
 
             if (style) {
-                to[me.styleProp] = me.styleIsText ? Ext.DomHelper.generateStyles(style) : style;
+                to[me.styleProp] = me.styleIsText ? Ext.DomHelper.generateStyles(style, null, true) : style;
             }
-            
+
             if (removedClasses) {
                 removedClasses = Ext.Object.getKeys(removedClasses);
                 if (removedClasses.length) {
@@ -199,7 +219,11 @@ Ext.define('Ext.util.ProtoElement', (function () {
                 }
             }
 
+            if (me.unselectableAttr) {
+                to.unselectable = 'on';
+            }
+
             return to;
         }
     };
-}()));
+});

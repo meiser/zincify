@@ -94,6 +94,7 @@ Ext.define('CustomerGrid', {
                 dataIndex: 'name',
                 flex: 1
             }, {
+                width: 140,
                 text: 'Phone',
                 dataIndex: 'phone'
             }],
@@ -186,13 +187,11 @@ Ext.define('OrderGrid', {
     },
     
     loadItems: function(){
-        var customerName = this.customer.get('name'),
-            rec = this.active,
-            date = Ext.Date.format(rec.get('date'), 'Y-m-d'),
+        var rec = this.active,
             owner = this.ownerCt,
             orderitems;
         
-        orderitems = rec.orderitems();
+        orderitems = rec.orderItems();
         if (orderitems.isLoading()) {
             Logger.log('Begin loading order items - ' + rec.getId(), true);
         }
@@ -280,7 +279,7 @@ Ext.define('ItemLoader', {
     initComponent: function(){
         Ext.apply(this, {
             border: false,
-            autoScroll: true,
+            scrollable: true,
             dockedItems: [{
                 xtype: 'toolbar',
                 items: [{
@@ -300,7 +299,7 @@ Ext.define('ItemLoader', {
             tplWriteMode: 'append'
         });
         this.callParent();
-        this.orderItem = new OrderItem(this.orderItemData, this.orderItemId);
+        this.orderItem = new OrderItem(this.orderItemData);
     },
     
     onOrderClick: function(){
@@ -392,7 +391,7 @@ Ext.onReady(function(){
             tplWriteMode: 'append',
             tpl: '<div class="{cls}">[{now:date("H:i:s")}] - {msg}</div>',
             bodyPadding: 5,
-            autoScroll: true,
+            scrollable: true,
             listeners: {
                 render: Logger.init
             }

@@ -1,5 +1,4 @@
 /**
- * @class Ext.ux.FieldReplicator
  * <p>A plugin for Field Components which creates clones of the Field for as
  * long as the user keeps filling them. Leaving the final one blank ends the repeating series.</p>
  * <p>Usage:</p>
@@ -14,7 +13,7 @@
  * </code></pre>
  */
 Ext.define('Ext.ux.FieldReplicator', {
-    singleton: true,
+    alias: 'plugin.fieldreplicator',
 
     init: function(field) {
         // Assign the field an id grouping it with fields cloned from it. If it already

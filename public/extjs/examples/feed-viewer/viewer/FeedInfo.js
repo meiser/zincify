@@ -16,12 +16,8 @@ Ext.define('FeedViewer.FeedInfo', {
     maxTabWidth: 230,
     border: false,
 
-    initComponent: function() {
-        this.tabBar = {
-            border: true
-        };
-        
-        this.callParent();
+    tabBar: {
+        border: true
     },
     
     /**
@@ -54,8 +50,8 @@ Ext.define('FeedViewer.FeedInfo', {
     /**
      * Listens for a new tab request
      * @private
-     * @param {FeedViewer.FeedPost} The post
-     * @param {Ext.data.Model} model The model
+     * @param {FeedViewer.FeedPost} post The post
+     * @param {Ext.data.Model} rec The model instance
      */
     onTabOpen: function(post, rec) {
         var items = [],
@@ -78,7 +74,7 @@ Ext.define('FeedViewer.FeedInfo', {
             }, this);
             this.add(items);
         }
-        else {
+        else if (rec) {
             title = rec.get('title');
             item = this.getTabByTitle(title);
             if (!item) {
@@ -108,8 +104,8 @@ Ext.define('FeedViewer.FeedInfo', {
     /**
      * Listens for a row dblclick
      * @private
-     * @param {FeedViewer.Detail} detail The detail
-     * @param {Ext.data.Model} model The model
+     * @param {FeedViewer.Detail} info The detail
+     * @param {Ext.data.Model} rec The model instance
      */
     onRowDblClick: function(info, rec){
         this.onTabOpen(null, rec);
@@ -118,7 +114,7 @@ Ext.define('FeedViewer.FeedInfo', {
     /**
      * Listens for the open all click
      * @private
-     * @param {FeedViewer.FeedDetail}
+     * @param {FeedViewer.FeedDetail} detail
      */
     onOpenAll: function(detail) {
         this.onTabOpen(null, detail.getFeedData());

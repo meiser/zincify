@@ -5,7 +5,7 @@ Ext.define('FV.view.Viewer', {
     requires: ['FV.view.feed.Show'],
     
     activeItem: 0,
-    margins: '5 5 5 5',
+    margin: '5 5 5 0',
     
     cls: 'preview',
     

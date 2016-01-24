@@ -4,7 +4,7 @@ class ItemBaseData < ActiveRecord::Base
   validates_presence_of :item, :description
   
   
-  default_scope order("#{self.table_name}.item ASC")
+  default_scope {order("#{self.table_name}.item ASC")}
   
   def item_dsca
 	[self.item.lstrip, self.description].join(" ")

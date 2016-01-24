@@ -27,8 +27,7 @@ Ext.onReady(function(){
         },
         items: [{
             region: 'north',
-            styleHtmlContent: true,
-            height: 150,
+            height: 170,
             bodyPadding: 5,
             split: true,
             html: [
@@ -54,7 +53,6 @@ Ext.onReady(function(){
                             maximizable: true,
                             stateId: 'stateWindowExample',
                             stateful: true,
-                            styleHtmlContent: true,
                             bodyPadding: 5,
                             html: [
                                 'Between refreshes, this window will remember:',
@@ -78,7 +76,7 @@ Ext.onReady(function(){
             bodyPadding: 5,
             region: 'west',
             title: 'Collapse/Width Panel',
-            width: 200,
+            width: 240,
             stateId: 'statePanelExample',
             stateful: true,
             split: true,
@@ -126,12 +124,15 @@ Ext.onReady(function(){
             }),
             columns: [{
                 text: 'First Name',
+                width:110,
                 dataIndex: 'first'
             }, {
                 text: 'Last Name',
+                width:110,
                 dataIndex: 'last'
             }, {
                 text: 'Age',
+                width:60,
                 dataIndex: 'age'
             }, {
                 flex: 1,

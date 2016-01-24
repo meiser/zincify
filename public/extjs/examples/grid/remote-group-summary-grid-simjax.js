@@ -36,7 +36,7 @@ function initAjaxSim () {
                 var ret = Ext.apply({}, rows[0]);
                 ret.cost = 0;
                 ret.estHours = 0;
-                Ext.each(rows, function (row) {
+                Ext.Array.forEach(rows, function (row) {
                     ret.estHours += row.estHours;
                     ret.cost += row.estHours * row.rate;
                 });

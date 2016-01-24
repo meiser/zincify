@@ -38,13 +38,16 @@ $(document).ready(function() {
 	});
 	
 	$(document).on("ajax:beforeSend", "#change_item_form", function() {
-		var mask = new Ext.LoadMask(Ext.get('set_items_window'), {msg:"Please wait..."});
-        mask.show();
+		Ext.get('set_items_window').mask("Please wait...");
+		//var mask = new Ext.LoadMask(Ext.get('set_items_window'), {msg:"Please wait..."});
+        //mask.show();
 	});
 	
 	$(document).on("ajax:success", "#change_item_form", function() {
-		var form = Ext.get('set_items_window');
-		form.unmask();
+		Ext.get('set_items_window').unmask();
+
+		//var form = Ext.get('set_items_window');
+		//form.unmask();
 	});
 	
 	

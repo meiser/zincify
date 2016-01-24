@@ -49,7 +49,7 @@ Ext.onReady(function() {
         "name": "St Michael's Alley",
         "cuisine": "Californian"
     }, {
-        "name": "Coconuts Caribbean Restaurant &amp; Bar",
+        "name": "Coconuts Caribbean Restaurant & Bar",
         "cuisine": "Caribbean"
     }, {
         "name": "Mango Caribbean Cafe",
@@ -76,7 +76,7 @@ Ext.onReady(function() {
         "name": "Starbucks",
         "cuisine": "Coffee"
     }, {
-        "name": "Rose &amp; Crown",
+        "name": "Rose & Crown",
         "cuisine": "English"
     }, {
         "name": "Bistro Maxine",
@@ -247,7 +247,6 @@ Ext.onReady(function() {
     });
 
     var restaurants = Ext.create('Ext.data.Store', {
-        storeId: 'restaraunts',
         model: 'Restaurant',
         groupField: 'cuisine',
         remoteGroup: true,
@@ -349,10 +348,13 @@ Ext.onReady(function() {
             text: 'Add',
             type: 'submit',
             handler: function() {
-                var newRec = Ext.ModelManager.create({name: newRestaurantDialog.down('[name=name]').getValue(), cuisine: newRestaurantDialog.down('[name=cuisine]').getValue()}, 'Restaurant');
+                var newRec = new Restaurant({
+                    name: newRestaurantDialog.down('[name=name]').getValue(), 
+                    cuisine: newRestaurantDialog.down('[name=cuisine]').getValue()
+                });
                 restaurants.add(newRec);
                 newRestaurantDialog.hide();
-                newRestaurantDialog.el.dom.reset();
+                newRestaurantDialog.getEl().dom.reset();
             }
         }, {
             text: 'Cancel',

@@ -7,10 +7,10 @@ Ext.define('Ext.grid.property.HeaderContainer', {
     extend: 'Ext.grid.header.Container',
 
     alternateClassName: 'Ext.grid.PropertyColumnModel',
-    
+
     nameWidth: 115,
 
-    // private - strings used for locale support
+    // @private strings used for locale support
     //<locale>
     nameText : 'Name',
     //</locale>
@@ -27,8 +27,9 @@ Ext.define('Ext.grid.property.HeaderContainer', {
     falseText: 'false',
     //</locale>
 
-    // private
+    // @private
     nameColumnCls: Ext.baseCSSPrefix + 'grid-property-name',
+    nameColumnInnerCls: Ext.baseCSSPrefix + 'grid-cell-inner-property-name',
 
     /**
      * Creates new HeaderContainer.
@@ -37,23 +38,29 @@ Ext.define('Ext.grid.property.HeaderContainer', {
      */
     constructor : function(grid, store) {
         var me = this;
-        
+
         me.grid = grid;
         me.store = store;
         me.callParent([{
+            isRootHeader: true,
+            enableColumnResize: Ext.isDefined(grid.enableColumnResize) ? grid.enableColumnResize : me.enableColumnResize,
+            enableColumnMove: Ext.isDefined(grid.enableColumnMove) ? grid.enableColumnMove : me.enableColumnMove,
             items: [{
                 header: me.nameText,
                 width: grid.nameColumnWidth || me.nameWidth,
                 sortable: grid.sortableColumns,
                 dataIndex: grid.nameField,
-                renderer: Ext.Function.bind(me.renderProp, me),
+                scope: me,
+                renderer: me.renderProp,
                 itemId: grid.nameField,
-                menuDisabled :true,
-                tdCls: me.nameColumnCls
+                menuDisabled: true,
+                tdCls: me.nameColumnCls,
+                innerCls: me.nameColumnInnerCls
             }, {
                 header: me.valueText,
-                renderer: Ext.Function.bind(me.renderCell, me),
-                getEditor: Ext.Function.bind(me.getCellEditor, me),
+                scope: me,
+                renderer: me.renderCell,
+                getEditor: me.getCellEditor.bind(me),
                 sortable: grid.sortableColumns,
                 flex: 1,
                 fixed: true,
@@ -62,23 +69,27 @@ Ext.define('Ext.grid.property.HeaderContainer', {
                 menuDisabled: true
             }]
         }]);
+
+        // PropertyGrid needs to know which column is the editable "value" column.
+        me.grid.valueColumn = me.items.getAt(1);
     },
-    
+
     getCellEditor: function(record){
         return this.grid.getCellEditor(record, this);
     },
 
-    // private
+    // @private
     // Render a property name cell
     renderProp : function(v) {
         return this.getPropertyName(v);
     },
 
-    // private
+    // @private
     // Render a property value cell
     renderCell : function(val, meta, rec) {
         var me = this,
-            renderer = me.grid.customRenderers[rec.get(me.grid.nameField)],
+            grid = me.grid,
+            renderer = grid.getConfigProp(rec.get(grid.nameField), 'renderer'),
             result = val;
 
         if (renderer) {
@@ -92,18 +103,17 @@ Ext.define('Ext.grid.property.HeaderContainer', {
         return Ext.util.Format.htmlEncode(result);
     },
 
-    // private
+    // @private
     renderDate : Ext.util.Format.date,
 
-    // private
+    // @private
     renderBool : function(bVal) {
         return this[bVal ? 'trueText' : 'falseText'];
     },
 
-    // private
+    // @private
     // Renders custom property names instead of raw names if defined in the Grid
     getPropertyName : function(name) {
-        var pn = this.grid.propertyNames;
-        return pn && pn[name] ? pn[name] : name;
+        return this.grid.getConfigProp(name, 'displayName', name);
     }
 });

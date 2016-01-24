@@ -1,12 +1,15 @@
 /**
- * @class Ext.ux.data.PagingMemoryProxy
- * @extends Ext.data.proxy.Memory
- * <p>Paging Memory Proxy, allows to use paging grid with in memory dataset</p>
+ * Paging Memory Proxy, allows to use paging grid with in memory dataset
  */
 Ext.define('Ext.ux.data.PagingMemoryProxy', {
     extend: 'Ext.data.proxy.Memory',
     alias: 'proxy.pagingmemory',
     alternateClassName: 'Ext.data.PagingMemoryProxy',
+    
+    constructor: function() {
+        Ext.log.warn('Ext.ux.data.PagingMemoryProxy functionality has been merged into Ext.data.proxy.Memory by using the enablePaging flag.');    
+        this.callParent(arguments);
+    },
 
     read : function(operation, callback, scope){
         var reader = this.getReader(),

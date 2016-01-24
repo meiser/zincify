@@ -43,12 +43,37 @@ Ext.define('SimpleTasks.view.lists.Tree', {
     ],
 
     viewConfig: {
-            plugins: {
-                ptype: 'tasksdragdrop',
-                dragText: 'Drag to reorder',
-                ddGroup: 'task'
-            }
+        plugins: {
+            ptype: 'tasksdragdrop',
+            dragText: 'Drag to reorder',
+            ddGroup: 'task'
+        }
     },
+
+    /**
+     * @event deleteclick
+     * Fires when the delete icon is clicked
+     * @param {Ext.grid.View} gridView
+     * @param {Number} rowIndex
+     * @param {Number} colIndex
+     * @param {Ext.grid.column.Action} column
+     * @param {EventObject} e
+     */
+
+    /**
+     * @event taskdrop
+     * Fires when a task record is dropped on this grid
+     * @param {SimpleTasks.model.Task} task       The task record
+     * @param {SimpleTasks.model.List} list       The list that the task was dropped on
+     */
+
+    /**
+     * @event listdrop
+     * Fires when a list record is dropped on this grid
+     * @param {SimpleTasks.model.List} list         The list that was dropped
+     * @param {SimpleTasks.model.List} overList     The list that the list was dropped on
+     * @param {String} position               `"before"` or `"after"` depending on whether the mouse is above or below the midline of the node.
+     */
 
     initComponent: function() {
         var me = this;
@@ -68,10 +93,7 @@ Ext.define('SimpleTasks.view.lists.Tree', {
                 editor: {
                     xtype: 'textfield',
                     selectOnFocus: true,
-                    validator: function(value){
-                        value = Ext.String.trim(value);
-                        return value.length < 1 ? this.blankText : true;
-                    }
+                    allowOnlyWhitespace: false
                 },
                 renderer: Ext.bind(me.renderName, me)
             },
@@ -87,38 +109,8 @@ Ext.define('SimpleTasks.view.lists.Tree', {
         
         me.callParent(arguments);
 
-        me.addEvents(
-            /**
-             * @event deleteclick
-             * Fires when the delete icon is clicked
-             * @param {Ext.grid.View} gridView
-             * @param {Number} rowIndex
-             * @param {Number} colIndex
-             * @param {Ext.grid.column.Action} column
-             * @param {EventObject} e
-             */
-            'deleteclick',
-
-            /**
-             * @event taskdrop
-             * Fires when a task record is dropped on this grid
-             * @param {SimpleTasks.model.Task} task       The task record
-             * @param {SimpleTasks.model.List} list       The list that the task was dropped on
-             */
-            'taskdrop',
-
-            /**
-             * @event listdrop
-             * Fires when a list record is dropped on this grid
-             * @param {SimpleTasks.model.List} list         The list that was dropped
-             * @param {SimpleTasks.model.List} overList     The list that the list was dropped on
-             * @param {String} position               `"before"` or `"after"` depending on whether the mouse is above or below the midline of the node.
-             */
-            'listdrop'
-        );
-
         me.on('beforeedit', me.handleBeforeEdit, me);
-        me.relayEvents(me.getView(), ['taskdrop', 'listdrop'])
+        me.relayEvents(me.getView(), ['taskdrop', 'listdrop']);
 
     },
 
@@ -172,7 +164,7 @@ Ext.define('SimpleTasks.view.lists.Tree', {
             list.eachChild(function(child) {
                 countTasks(child);
             });
-        })(list);
+        }(list));
 
         return value + ' (' + count + ')';
     },

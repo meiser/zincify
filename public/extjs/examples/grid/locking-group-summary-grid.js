@@ -3,7 +3,8 @@ Ext.require([
     'Ext.data.*',
     'Ext.form.field.Number',
     'Ext.form.field.Date',
-    'Ext.tip.QuickTipManager'
+    'Ext.tip.QuickTipManager',
+    'Ext.layout.container.Fit'
 ]);
 
 Ext.define('Task', {
@@ -74,14 +75,8 @@ Ext.onReady(function(){
                 text: 'Toggle Summary',
                 enableToggle: true,
                 pressed: true,
-                handler: function(){
-                    showSummary = !showSummary;
-                    var view = grid.lockedGrid.getView();
-                    view.getFeature('group').toggleSummaryRow(showSummary);
-                    view.refresh();
-                    view = grid.normalGrid.getView();
-                    view.getFeature('group').toggleSummaryRow(showSummary);
-                    view.refresh();
+                handler: function() {
+                    grid.lockedGrid.getView().getFeature('group').toggleSummaryRow(showSummary);
                 }
             }]
         }],
@@ -154,7 +149,7 @@ Ext.onReady(function(){
             renderer: function(value, metaData, record, rowIdx, colIdx, store, view) {
                 return Ext.util.Format.usMoney(record.get('estimate') * record.get('rate'));
             },
-            summaryType: function(records){
+            summaryType: function(records, values) {
                 var i = 0,
                     length = records.length,
                     total = 0,
@@ -169,4 +164,5 @@ Ext.onReady(function(){
             summaryRenderer: Ext.util.Format.usMoney
         }]
     });
+    
 });

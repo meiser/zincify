@@ -15,7 +15,7 @@ Ext.onReady(function(){
             url: 'get-images.php',
             reader: {
                 type: 'json',
-                root: 'images'
+                rootProperty: 'images'
             }
         }
     });
@@ -36,7 +36,7 @@ Ext.onReady(function(){
 
         columns: [{
             text: 'File',
-            flex: 50,
+            flex: (Ext.themeName === 'neptune-touch' || Ext.themeName === 'crisp') ? 47: 50,
             dataIndex: 'name'
         },{
             text: 'Last Modified',
@@ -49,15 +49,17 @@ Ext.onReady(function(){
             dataIndex: 'size',
             tpl: '{size:fileSize}',
             align: 'right',
-            flex: 15,
+            flex: (Ext.themeName === 'neptune-touch' || Ext.themeName === 'crisp') ? 18: 15,
             cls: 'listview-filesize'
         }]
     });
 
     // little bit of feedback
     listView.on('selectionchange', function(view, nodes){
-        var l = nodes.length;
-        var s = l != 1 ? 's' : '';
-        listView.setTitle('Simple ListView <i>('+l+' item'+s+' selected)</i>');
+        var len = nodes.length,
+            suffix = len === 1 ? '' : 's',
+            str = 'Simple ListView <i>({0} item{1} selected)</i>';
+            
+        listView.setTitle(Ext.String.format(str, len, suffix));
     });
 });

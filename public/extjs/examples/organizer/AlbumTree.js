@@ -17,7 +17,8 @@ Ext.define('Ext.org.AlbumTree', {
     viewConfig: {
         plugins: [{
             ddGroup: 'organizerDD',
-            ptype  : 'treeviewdragdrop'
+            ptype  : 'treeviewdragdrop',
+            displayField: 'name'
         }]
     },
     
@@ -59,7 +60,7 @@ Ext.define('Ext.org.AlbumTree', {
      * Adds a new album node to the root
      */
     addAlbum: function() {
-        var root = this.store.getRootNode();
+        var root = this.store.getRoot();
         this.count++;
         
         root.appendChild({

@@ -5,7 +5,7 @@ Ext.define('Ext.fx.PropertyHandler', {
 
     /* Begin Definitions */
 
-    requires: ['Ext.draw.Draw'],
+    requires: ['Ext.fx.DrawPath'],
 
     statics: {
         defaultHandler: {
@@ -291,7 +291,7 @@ Ext.define('Ext.fx.PropertyHandler', {
 
             forcePath: function(path) {
                 if (!Ext.isArray(path) && !Ext.isArray(path[0])) {
-                    path = Ext.draw.Draw.parsePathString(path);
+                    path = Ext.fx.DrawPath.parsePathString(path);
                 }
                 return path;
             },
@@ -304,7 +304,7 @@ Ext.define('Ext.fx.PropertyHandler', {
                 for (i = 0; i < startLn; i++) {
                     startPath = this.forcePath(start[i][1]);
 
-                    deltaPath = Ext.draw.Draw.interpolatePaths(startPath, endPath);
+                    deltaPath = Ext.fx.DrawPath.interpolatePaths(startPath, endPath);
                     startPath = deltaPath[0];
                     endPath = deltaPath[1];
 

@@ -1,8 +1,8 @@
 /**
  * A Column definition class which renders a value by processing a {@link Ext.data.Model Model}'s
- * {@link Ext.data.Model#persistenceProperty data} using a {@link #tpl configured}
+ * {@link Ext.data.Model#getData data} using a {@link #tpl configured}
  * {@link Ext.XTemplate XTemplate}.
- * 
+ *
  *     @example
  *     Ext.create('Ext.data.Store', {
  *         storeId:'employeeStore',
@@ -16,7 +16,7 @@
  *             { firstname: "Angela",  lastname: "Martin",  seniority: 5, department: "Accounting" }
  *         ]
  *     });
- *     
+ *
  *     Ext.create('Ext.grid.Panel', {
  *         title: 'Column Template Demo',
  *         store: Ext.data.StoreManager.lookup('employeeStore'),
@@ -38,15 +38,16 @@ Ext.define('Ext.grid.column.Template', {
     /**
      * @cfg {String/Ext.XTemplate} tpl
      * An {@link Ext.XTemplate XTemplate}, or an XTemplate *definition string* to use to process a
-     * {@link Ext.data.Model Model}'s {@link Ext.data.Model#persistenceProperty data} to produce a
-     * column's rendered value.
+     * {@link Ext.data.Model Model}'s data object to produce a cell's rendered value.
      */
+
     /**
-     * @cfg renderer
+     * @cfg {Object} renderer
      * @hide
      */
+
     /**
-     * @cfg scope
+     * @cfg {Object} scope
      * @hide
      */
 
@@ -58,9 +59,13 @@ Ext.define('Ext.grid.column.Template', {
         me.hasCustomRenderer = true;
         me.callParent(arguments);
     },
-    
+
     defaultRenderer: function(value, meta, record) {
         var data = Ext.apply({}, record.data, record.getAssociatedData());
         return this.tpl.apply(data);
+    },
+
+    updater: function(cell, value) {
+        cell.firstChild.innerHTML = Ext.grid.column.CheckColumn.prototype.defaultRenderer.call(this, value);
     }
 });

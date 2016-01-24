@@ -26,9 +26,17 @@
 				id: 'set_items_window',  
 				autoScroll: true,				
 				layout: 'fit',
-				autoLoad: { 
-					method: 'get',
-					url : 'meiser_deliveries/'+key.data.id+'.html?item=1'  
+				loader : { 
+					timeout: 60,
+					ajaxOptions: {
+						method: 'get'
+					},
+					url: 'meiser_deliveries/'+key.data.id+'.html?item=1',
+					autoLoad: true,
+					text: 'Loading...',
+					failure: function(loader, response, options ){
+						console.log( response )
+					}
 				}
 			});
 			win.modal = true;			
@@ -56,13 +64,22 @@
       function(m,r){
 		grid = this;
 		Ext.iterate(this.getSelectionModel().getSelection(),function(key,value){
-			var win = new Ext.Window({  
+			var win = new Ext.window.Window({  
 				id: 'myWindow',  
 				autoScroll: true,				
 				layout: 'fit',
-				autoLoad : { 
-					method: 'get',
-					url : 'meiser_deliveries/'+key.data.id+'.html'  
+				loader : { 
+					timeout: 60,
+					ajaxOptions: {
+						method: 'get'
+					},
+					scripts: true,
+					url: 'meiser_deliveries/'+key.data.id+'.html',
+					autoLoad: true,
+					text: 'Loading...',
+					failure: function(loader, response, options ){
+						console.log( response )
+					}
 				}
 			});
 			win.modal = true;			

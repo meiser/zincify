@@ -192,6 +192,10 @@ Ext.define('Ext.form.field.Radio', {
     inputType: 'radio',
     ariaRole: 'radio',
     
+    // Radios are naturally focusable but they need to participate in RadioGroups
+    // which are focusable containers; we set tabIndex to >= 0 here to make that work
+    tabIndex: 0,
+    
     formId: null,
 
     /**
@@ -206,7 +210,7 @@ Ext.define('Ext.form.field.Radio', {
     /**
      * @private Handle click on the radio button
      */
-    onBoxClick: function(e) {
+    onBoxClick: function() {
         var me = this;
         if (!me.disabled && !me.readOnly) {
             this.setValue(true);
@@ -224,14 +228,14 @@ Ext.define('Ext.form.field.Radio', {
      * @param {String/Boolean} value Checked value, or the value of the sibling radio button to check.
      * @return {Ext.form.field.Radio} this
      */
-    setValue: function(v) {
+    setValue: function(value) {
         var me = this,
-            active;
+            container, active;
 
-        if (Ext.isBoolean(v)) {
+        if (Ext.isBoolean(value)) {
             me.callParent(arguments);
         } else {
-            active = me.getManager().getWithValue(me.name, v, me.getFormId()).getAt(0);
+            active = me.getManager().getWithValue(me.name, value, me.getFormId()).getAt(0);
             if (active) {
                 active.setValue(true);
             }
@@ -248,7 +252,11 @@ Ext.define('Ext.form.field.Radio', {
     },
 
     getModelData: function() {
-        return this.getSubmitData();
+        var o = this.callParent(arguments);
+        if (o) {
+            o[this.getName()] = this.getSubmitValue();
+        }
+        return o;
     },
 
     // inherit docs

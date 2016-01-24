@@ -4,7 +4,7 @@
  *
  * This class uses template methods to perform the individual aspects of measurement,
  * calculation and publication of results. The methods called depend on the component's
- * {@link Ext.AbstractComponent#getSizeModel size model}.
+ * {@link Ext.Component#getSizeModel size model}.
  * 
  * ## configured / calculated
  *
@@ -71,16 +71,16 @@ Ext.define('Ext.layout.component.Auto', {
         var me = this,
             lastWidthModel = me.lastWidthModel,
             lastHeightModel = me.lastHeightModel,
-            owner = me.owner;
+            el = me.owner.el;
             
         me.callParent(arguments);
             
         if (lastWidthModel && lastWidthModel.fixed && ownerContext.widthModel.shrinkWrap) {
-            owner.el.setWidth(null);
+            el.setWidth(null);
         }
             
         if (lastHeightModel && lastHeightModel.fixed && ownerContext.heightModel.shrinkWrap) {
-            owner.el.setHeight(null);
+            el.setHeight(null);
         }    
     },
 

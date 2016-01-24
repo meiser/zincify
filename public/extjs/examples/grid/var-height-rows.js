@@ -4,8 +4,7 @@ Ext.Loader.setPath('Ext.ux', '../ux/');
 Ext.require([
     'Ext.grid.*',
     'Ext.data.*',
-    'Ext.util.*',
-    'Ext.grid.PagingScroller'
+    'Ext.util.*'
 ]);
 
 Ext.define('Employee', {
@@ -42,6 +41,7 @@ Ext.onReady(function(){
                 name        = Ext.String.format("{0} {1}", firstNames[firstNameId], lastNames[lastNameId]);
 
             data.push({
+                id: 'rec-' + i,
                 rating: rating,
                 salary: salary,
                 name: name,
@@ -50,28 +50,37 @@ Ext.onReady(function(){
         }
         return data;
     }
+
+    var data = createFakeData(49679),
+        ln = data.length,
+        records = [],
+        i = 0,
+        store;
+
+    for (; i < ln; i++) {
+        records.push(Ext.create('Employee', data[i]));
+    }
+
     // create the Data Store
-    var store = Ext.create('Ext.data.Store', {
+    store = Ext.create('Ext.data.BufferedStore', {
         id: 'store',
         pageSize: 50000,
-        // allow the grid to interact with the paging scroller by buffering
-        buffered: true,
         // never purge any data, we prefetch all up front
         purgePageCount: 0,
         model: 'Employee',
         proxy: {
-            type: 'memory'
-        }
+            type: 'memory',
+            data: records
+        },
+        autoLoad: true
     });
 
-    var grid = Ext.create('Ext.grid.Panel', {
+    Ext.create('Ext.grid.Panel', {
+        border: true,
         width: 700,
         height: 500,
-        title: 'Bufffered Grid of 50,000 random records',
+        title: 'Buffered Grid of 49,679 random records',
         store: store,
-        verticalScroller: {
-            variableRowHeight: true
-        },
         loadMask: true,
         selModel: {
             pruneRemoved: false,
@@ -83,11 +92,15 @@ Ext.onReady(function(){
         // grid columns
         columns:[{
             xtype: 'rownumberer',
-            width: 40,
+            width: 70,
             sortable: false,
+            
+            // Only this column causes unpredictable row heights.
+            // Hide this column, and we can measure a row and used exact row height.
+            variableRowHeight: true,
             xhooks: {
-                renderer: function(v, meta, record) {
-                    meta.tdAttr = 'style="vertical-align:center;height:' + record.data.rowHeight + 'px"';
+                defaultRenderer: function(v, meta, record) {
+                    meta.tdStyle = 'vertical-align:center;height:' + record.data.rowHeight + 'px';
                     return this.callParent(arguments);
                 }
             }
@@ -111,16 +124,4 @@ Ext.onReady(function(){
         }],
         renderTo: Ext.getBody()
     });
-
-    var data = createFakeData(49679),
-        ln = data.length,
-        records = [],
-        i = 0;
-    for (; i < ln; i++) {
-        records.push(Ext.create('Employee', data[i]));
-    }
-
-    // Load data as a single, 50000 record page, only render 50 rows.
-    store.cachePage(records, 1);
-    store.guaranteeRange(0, 49);
 });

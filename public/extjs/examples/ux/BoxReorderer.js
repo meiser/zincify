@@ -2,6 +2,10 @@
  * Base class from Ext.ux.TabReorderer.
  */
 Ext.define('Ext.ux.BoxReorderer', {
+    requires: [
+        'Ext.dd.DD'
+    ],
+
     mixins: {
         observable: 'Ext.util.Observable'
     },
@@ -20,67 +24,65 @@ Ext.define('Ext.ux.BoxReorderer', {
      */
     animate: 100,
 
+    /**
+     * @event StartDrag
+     * Fires when dragging of a child Component begins.
+     * @param {Ext.ux.BoxReorderer} this
+     * @param {Ext.container.Container} container The owning Container
+     * @param {Ext.Component} dragCmp The Component being dragged
+     * @param {Number} idx The start index of the Component being dragged.
+     */
+
+    /**
+     * @event Drag
+     * Fires during dragging of a child Component.
+     * @param {Ext.ux.BoxReorderer} this
+     * @param {Ext.container.Container} container The owning Container
+     * @param {Ext.Component} dragCmp The Component being dragged
+     * @param {Number} startIdx The index position from which the Component was initially dragged.
+     * @param {Number} idx The current closest index to which the Component would drop.
+     */
+
+    /**
+     * @event ChangeIndex
+     * Fires when dragging of a child Component causes its drop index to change.
+     * @param {Ext.ux.BoxReorderer} this
+     * @param {Ext.container.Container} container The owning Container
+     * @param {Ext.Component} dragCmp The Component being dragged
+     * @param {Number} startIdx The index position from which the Component was initially dragged.
+     * @param {Number} idx The current closest index to which the Component would drop.
+     */
+
+    /**
+     * @event Drop
+     * Fires when a child Component is dropped at a new index position.
+     * @param {Ext.ux.BoxReorderer} this
+     * @param {Ext.container.Container} container The owning Container
+     * @param {Ext.Component} dragCmp The Component being dropped
+     * @param {Number} startIdx The index position from which the Component was initially dragged.
+     * @param {Number} idx The index at which the Component is being dropped.
+     */
+
     constructor: function() {
-        this.addEvents(
-            /**
-             * @event StartDrag
-             * Fires when dragging of a child Component begins.
-             * @param {Ext.ux.BoxReorderer} this
-             * @param {Ext.container.Container} container The owning Container
-             * @param {Ext.Component} dragCmp The Component being dragged
-             * @param {Number} idx The start index of the Component being dragged.
-             */
-             'StartDrag',
-            /**
-             * @event Drag
-             * Fires during dragging of a child Component.
-             * @param {Ext.ux.BoxReorderer} this
-             * @param {Ext.container.Container} container The owning Container
-             * @param {Ext.Component} dragCmp The Component being dragged
-             * @param {Number} startIdx The index position from which the Component was initially dragged.
-             * @param {Number} idx The current closest index to which the Component would drop.
-             */
-             'Drag',
-            /**
-             * @event ChangeIndex
-             * Fires when dragging of a child Component causes its drop index to change.
-             * @param {Ext.ux.BoxReorderer} this
-             * @param {Ext.container.Container} container The owning Container
-             * @param {Ext.Component} dragCmp The Component being dragged
-             * @param {Number} startIdx The index position from which the Component was initially dragged.
-             * @param {Number} idx The current closest index to which the Component would drop.
-             */
-             'ChangeIndex',
-            /**
-             * @event Drop
-             * Fires when a child Component is dropped at a new index position.
-             * @param {Ext.ux.BoxReorderer} this
-             * @param {Ext.container.Container} container The owning Container
-             * @param {Ext.Component} dragCmp The Component being dropped
-             * @param {Number} startIdx The index position from which the Component was initially dragged.
-             * @param {Number} idx The index at which the Component is being dropped.
-             */
-             'Drop'
-        );
         this.mixins.observable.constructor.apply(this, arguments);
     },
 
     init: function(container) {
         var me = this;
- 
+
         me.container = container;
- 
+
         // Set our animatePolicy to animate the start position (ie x for HBox, y for VBox)
         me.animatePolicy = {};
         me.animatePolicy[container.getLayout().names.x] = true;
-        
-        
+
+
 
         // Initialize the DD on first layout, when the innerCt has been created.
         me.container.on({
             scope: me,
-            boxready: me.afterFirstLayout,
-            destroy: me.onContainerDestroy
+            boxready: me.onBoxReady,
+            beforedestroy: me.onContainerDestroy
         });
     },
 
@@ -88,12 +90,14 @@ Ext.define('Ext.ux.BoxReorderer', {
      * @private Clear up on Container destroy
      */
     onContainerDestroy: function() {
-        if (this.dd) {
-            this.dd.unreg();
+        var dd = this.dd;
+        if (dd) {
+            dd.unreg();
+            this.dd = null;
         }
     },
 
-    afterFirstLayout: function() {
+    onBoxReady: function() {
         var me = this,
             layout = me.container.getLayout(),
             names = layout.names,
@@ -104,12 +108,12 @@ Ext.define('Ext.ux.BoxReorderer', {
         // TODO: Ext5's DD classes should not use init internally because it collides with use as a plugin
         // TODO: Ext5's DD classes should be Observable.
         // TODO: When all the above are trus, this plugin should extend the DD class.
-        dd = me.dd = Ext.create('Ext.dd.DD', layout.innerCt, me.container.id + '-reorderer');
+        dd = me.dd = new Ext.dd.DD(layout.innerCt, me.container.id + '-reorderer');
         Ext.apply(dd, {
             animate: me.animate,
             reorderer: me,
             container: me.container,
-            getDragCmp: this.getDragCmp,
+            getDragCmp: me.getDragCmp,
             clickValidator: Ext.Function.createInterceptor(dd.clickValidator, me.clickValidator, me, false),
             onMouseDown: me.onMouseDown,
             startDrag: me.startDrag,
@@ -123,8 +127,8 @@ Ext.define('Ext.ux.BoxReorderer', {
         // Decide which dimension we are measuring, and which measurement metric defines
         // the *start* of the box depending upon orientation.
         dd.dim = names.width;
-        dd.startAttr = names.left;
-        dd.endAttr = names.right;
+        dd.startAttr = names.beforeX;
+        dd.endAttr = names.afterX;
     },
 
     getDragCmp: function(e) {
@@ -153,24 +157,24 @@ Ext.define('Ext.ux.BoxReorderer', {
             me.startIndex = me.curIndex = container.items.indexOf(me.dragCmp);
 
             // Start position of dragged Component
-            cmpBox = cmpEl.getPageBox();
+            cmpBox = cmpEl.getBox();
 
             // Last tracked start position
-            me.lastPos = cmpBox[this.startAttr];
+            me.lastPos = cmpBox[me.startAttr];
 
             // Calculate constraints depending upon orientation
             // Calculate offset from mouse to dragEl position
-            containerBox = container.el.getPageBox();
+            containerBox = container.el.getBox();
             if (me.dim === 'width') {
                 me.minX = containerBox.left;
                 me.maxX = containerBox.right - cmpBox.width;
                 me.minY = me.maxY = cmpBox.top;
-                me.deltaX = e.getPageX() - cmpBox.left;
+                me.deltaX = e.getX() - cmpBox.left;
             } else {
                 me.minY = containerBox.top;
                 me.maxY = containerBox.bottom - cmpBox.height;
                 me.minX = me.maxX = cmpBox.left;
-                me.deltaY = e.getPageY() - cmpBox.top;
+                me.deltaY = e.getY() - cmpBox.top;
             }
             me.constrainY = me.constrainX = true;
         }
@@ -179,7 +183,7 @@ Ext.define('Ext.ux.BoxReorderer', {
     startDrag: function() {
         var me = this,
             dragCmp = me.dragCmp;
-            
+
         if (dragCmp) {
             // For the entire duration of dragging the *Element*, defeat any positioning and animation of the dragged *Component*
             dragCmp.setPosition = Ext.emptyFn;
@@ -246,7 +250,7 @@ Ext.define('Ext.ux.BoxReorderer', {
             items = me.container.items,
             container = me.container,
             wasRoot = me.container._isLayoutRoot,
-            orig, dest, tmpIndex, temp;
+            orig, dest, tmpIndex;
 
         newIndex = me.findReorderable(newIndex);
 
@@ -296,7 +300,7 @@ Ext.define('Ext.ux.BoxReorderer', {
             // Reinstate the Component's positioning method after mouseup, and allow the layout system to animate it.
             delete me.dragCmp.setPosition;
             me.dragCmp.animate = true;
-            
+
             // Ensure the lastBox is correct for the animation system to restore to when it creates the "from" animation frame
             me.dragCmp.lastBox[layout.names.x] = me.dragCmp.getPosition(true)[layout.names.widthIndex];
 
@@ -304,7 +308,7 @@ Ext.define('Ext.ux.BoxReorderer', {
             me.container._isLayoutRoot = true;
             me.container.updateLayout();
             me.container._isLayoutRoot = undefined;
-            
+
             // Attempt to hook into the afteranimate event of the drag Component to call the cleanup
             temp = Ext.fx.Manager.getFxQueue(me.dragCmp.el.id)[0];
             if (temp) {
@@ -312,7 +316,7 @@ Ext.define('Ext.ux.BoxReorderer', {
                     afteranimate: me.reorderer.afterBoxReflow,
                     scope: me
                 });
-            } 
+            }
             // If not animated, clean up after the mouseup has happened so that we don't click the thing being dragged
             else {
                 Ext.Function.defer(me.reorderer.afterBoxReflow, 1, me);
@@ -344,7 +348,7 @@ Ext.define('Ext.ux.BoxReorderer', {
     getNewIndex: function(pointerPos) {
         var me = this,
             dragEl = me.getDragEl(),
-            dragBox = Ext.fly(dragEl).getPageBox(),
+            dragBox = Ext.fly(dragEl).getBox(),
             targetEl,
             targetBox,
             targetMidpoint,
@@ -360,7 +364,7 @@ Ext.define('Ext.ux.BoxReorderer', {
 
             // Only look for a drop point if this found item is an item according to our selector
             if (targetEl.is(me.reorderer.itemSelector)) {
-                targetBox = targetEl.getPageBox();
+                targetBox = targetEl.getBox();
                 targetMidpoint = targetBox[me.startAttr] + (targetBox[me.dim] >> 1);
                 if (i < me.curIndex) {
                     if ((dragBox[me.startAttr] < lastPos) && (dragBox[me.startAttr] < (targetMidpoint - 5))) {

@@ -21,6 +21,8 @@ Ext.define('Ext.picker.Color', {
     requires: 'Ext.XTemplate',
     alias: 'widget.colorpicker',
     alternateClassName: 'Ext.ColorPalette',
+    
+    focusable: true,
 
     /**
      * @cfg {String} [componentCls='x-color-picker']
@@ -33,6 +35,12 @@ Ext.define('Ext.picker.Color', {
      * The CSS class to apply to the selected element
      */
     selectedCls: Ext.baseCSSPrefix + 'color-picker-selected',
+
+    /**
+     * @cfg {String} itemCls
+     * The CSS class to apply to the color picker's items
+     */
+    itemCls: Ext.baseCSSPrefix + 'color-picker-item',
 
     /**
      * @cfg {String} value
@@ -102,26 +110,24 @@ Ext.define('Ext.picker.Color', {
     
     renderTpl: [
         '<tpl for="colors">',
-            '<a href="#" class="color-{.}" hidefocus="on">',
-                '<em><span style="background:#{.}" unselectable="on">&#160;</span></em>',
+            '<a href="#" role="button" class="color-{.} {parent.itemCls}" hidefocus="on">',
+                '<span class="{parent.itemCls}-inner" style="background:#{.}">&#160;</span>',
             '</a>',
         '</tpl>'
     ],
 
-    // private
+    /**
+     * @event select
+     * Fires when a color is selected
+     * @param {Ext.picker.Color} this
+     * @param {String} color The 6-digit color hex code (without the # symbol)
+     */
+
+    // @private
     initComponent : function(){
         var me = this;
 
         me.callParent(arguments);
-        me.addEvents(
-            /**
-             * @event select
-             * Fires when a color is selected
-             * @param {Ext.picker.Color} this
-             * @param {String} color The 6-digit color hex code (without the # symbol)
-             */
-            'select'
-        );
 
         if (me.handler) {
             me.on('select', me.handler, me.scope, true);
@@ -129,7 +135,7 @@ Ext.define('Ext.picker.Color', {
     },
 
 
-    // private
+    // @private
     initRenderData : function(){
         var me = this;
         return Ext.apply(me.callParent(), {
@@ -146,12 +152,12 @@ Ext.define('Ext.picker.Color', {
 
         me.mon(me.el, clickEvent, me.handleClick, me, {delegate: 'a'});
         // always stop following the anchors
-        if(clickEvent != 'click'){
+        if (clickEvent !== 'click'){
             me.mon(me.el, 'click', Ext.emptyFn, me, {delegate: 'a', stopEvent: true});
         }
     },
 
-    // private
+    // @private
     afterRender : function(){
         var me = this,
             value;
@@ -164,14 +170,14 @@ Ext.define('Ext.picker.Color', {
         }
     },
 
-    // private
-    handleClick : function(event, target){
+    // @private
+    handleClick : function(event){
         var me = this,
             color;
 
         event.stopEvent();
         if (!me.disabled) {
-            color = target.className.match(me.colorRe)[1];
+            color = event.currentTarget.className.match(me.colorRe)[1];
             me.select(color.toUpperCase());
         }
     },
@@ -186,7 +192,7 @@ Ext.define('Ext.picker.Color', {
         var me = this,
             selectedCls = me.selectedCls,
             value = me.value,
-            el;
+            el, item;
 
         color = color.replace('#', '');
         if (!me.rendered) {
@@ -199,14 +205,31 @@ Ext.define('Ext.picker.Color', {
             el = me.el;
 
             if (me.value) {
-                el.down('a.color-' + value).removeCls(selectedCls);
+                item = el.down('a.color-' + value, true);
+                Ext.fly(item).removeCls(selectedCls);
             }
-            el.down('a.color-' + color).addCls(selectedCls);
+            item = el.down('a.color-' + color, true);
+            Ext.fly(item).addCls(selectedCls);
             me.value = color;
             if (suppressEvent !== true) {
                 me.fireEvent('select', me, color);
             }
         }
+    },
+    
+    /**
+     * Clears any selection and sets the value to `null`.
+     */
+    clear: function(){
+        var me = this,
+            value = me.value,
+            el;
+            
+        if (value && me.rendered) {
+            el = me.el.down('a.color-' + value, true);
+            Ext.fly(el).removeCls(me.selectedCls);
+        }
+        me.value = null;  
     },
 
     /**

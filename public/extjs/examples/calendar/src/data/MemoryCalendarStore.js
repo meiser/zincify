@@ -18,7 +18,7 @@ Ext.define('Ext.calendar.data.MemoryCalendarStore', {
         type: 'memory',
         reader: {
             type: 'json',
-            root: 'calendars'
+            rootProperty: 'calendars'
         },
         writer: {
             type: 'json'

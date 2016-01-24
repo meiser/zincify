@@ -16,9 +16,8 @@ Ext.onReady(function(){
         },
         items: [{
             flex: 1,
-            margins: '0 2 0 0',
+            margin: '0 2 0 0',
             title: 'Load raw html',
-            styleHtmlContent: true,
             bodyPadding: 5,
             loader: {
                 autoLoad: true,
@@ -26,7 +25,7 @@ Ext.onReady(function(){
             }
         }, {
             flex: 1,
-            margins: '0 2 0 3',
+            margin: '0 2 0 3',
             title: 'Load data for template',
             bodyPadding: 5,
             tpl: 'Favorite Colors<br /><br /><tpl for="."><b>{name}</b> - <span style="color: #{hex};">{color}</span><br /></tpl>',
@@ -37,14 +36,14 @@ Ext.onReady(function(){
             }
         }, {
             flex: 1,
-            margins: '0 0 0 3',
+            margin: '0 0 0 3',
             layout: {
                 type: 'vbox',
                 align: 'stretch',
                 padding: '5 5 0 5'
             },
             defaults: {
-                margins: '0 0 5 0'
+                margin: '0 0 5 0'
             },
             title: 'Load Dynamic Components - No autoLoad',
             itemId: 'dynamic',
@@ -54,6 +53,7 @@ Ext.onReady(function(){
                 items: [' ',{
                     fieldLabel: '# to load',
                     labelWidth: 60,
+                    inputWidth: 60,
                     xtype: 'numberfield',
                     value: 5,
                     minValue: 1,

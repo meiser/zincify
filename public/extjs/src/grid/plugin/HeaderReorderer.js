@@ -2,7 +2,7 @@
  * @private
  */
 Ext.define('Ext.grid.plugin.HeaderReorderer', {
-    extend: 'Ext.AbstractPlugin',
+    extend: 'Ext.plugin.Abstract',
     requires: ['Ext.grid.header.DragZone', 'Ext.grid.header.DropZone'],
     alias: 'plugin.gridheaderreorderer',
 
@@ -17,7 +17,7 @@ Ext.define('Ext.grid.plugin.HeaderReorderer', {
 
     /**
      * @private
-     * AbstractComponent calls destroy on all its plugins at destroy time.
+     * Component calls destroy on all its plugins at destroy time.
      */
     destroy: function() {
         Ext.destroy(this.dragZone, this.dropZone);

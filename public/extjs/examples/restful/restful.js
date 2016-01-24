@@ -33,7 +33,7 @@ Ext.onReady(function(){
             url: 'app.php/users',
             reader: {
                 type: 'json',
-                root: 'data'
+                rootProperty: 'data'
             },
             writer: {
                 type: 'json'
@@ -47,7 +47,6 @@ Ext.onReady(function(){
                     
                     
                 if (name == 'Destroy') {
-                    record = operation.records[0];
                     verb = 'Destroyed';
                 } else {
                     verb = name + 'd';
@@ -58,22 +57,34 @@ Ext.onReady(function(){
         }
     });
     
-    var rowEditing = Ext.create('Ext.grid.plugin.RowEditing');
+    var rowEditing = Ext.create('Ext.grid.plugin.RowEditing', {
+        listeners: {
+            cancelEdit: function(rowEditing, context) {
+                // Canceling editing of a locally added, unsaved record: remove it
+                if (context.record.phantom) {
+                    store.remove(context.record);
+                }
+            }
+        }
+    });
     
     var grid = Ext.create('Ext.grid.Panel', {
         renderTo: document.body,
         plugins: [rowEditing],
-        width: 400,
-        height: 300,
+        width: 500,
+        height: 330,
         frame: true,
         title: 'Users',
         store: store,
         iconCls: 'icon-user',
         columns: [{
             text: 'ID',
-            width: 40,
+            width: 50,
             sortable: true,
-            dataIndex: 'id'
+            dataIndex: 'id',
+            renderer: function(v, meta, rec) {
+                return rec.phantom ? '' : v;
+            }
         }, {
             text: 'Email',
             flex: 1,
@@ -84,7 +95,7 @@ Ext.onReady(function(){
             }
         }, {
             header: 'First',
-            width: 80,
+            width: 120,
             sortable: true,
             dataIndex: 'first',
             field: {
@@ -92,7 +103,7 @@ Ext.onReady(function(){
             }
         }, {
             text: 'Last',
-            width: 80,
+            width: 120,
             sortable: true,
             dataIndex: 'last',
             field: {

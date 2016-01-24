@@ -31,7 +31,7 @@ Ext.define('Ext.util.Cookies', {
             domain = (argc > 4) ? argv[4] : null,
             secure = (argc > 5) ? argv[5] : false;
             
-        document.cookie = name + "=" + escape(value) + ((expires === null) ? "" : ("; expires=" + expires.toGMTString())) + ((path === null) ? "" : ("; path=" + path)) + ((domain === null) ? "" : ("; domain=" + domain)) + ((secure === true) ? "; secure" : "");
+        document.cookie = name + "=" + escape(value) + ((expires === null) ? "" : ("; expires=" + expires.toUTCString())) + ((path === null) ? "" : ("; path=" + path)) + ((domain === null) ? "" : ("; domain=" + domain)) + ((secure === true) ? "; secure" : "");
     },
 
     /**
@@ -44,21 +44,21 @@ Ext.define('Ext.util.Cookies', {
      * @return {Object} Returns the cookie value for the specified name;
      * null if the cookie name does not exist.
      */
-    get : function(name){
-        var arg = name + "=",
-            alen = arg.length,
-            clen = document.cookie.length,
-            i = 0,
-            j = 0;
-            
-        while(i < clen){
-            j = i + alen;
-            if(document.cookie.substring(i, j) == arg){
-                return this.getCookieVal(j);
-            }
-            i = document.cookie.indexOf(" ", i) + 1;
-            if(i === 0){
-                break;
+    get : function(name) {
+        var parts = document.cookie.split('; '),
+            len = parts.length,
+            item, i, ret;
+
+        // In modern browsers, a cookie with an empty string will be stored:
+        // MyName=
+        // In older versions of IE, it will be stored as:
+        // MyName
+        // So here we iterate over all the parts in an attempt to match the key.
+        for (i = 0; i < len; ++i) {
+            item = parts[i].split('=');
+            if (item[0] === name) {
+                ret = item[1];
+                return ret ? unescape(ret) : '';
             }
         }
         return null;
@@ -72,20 +72,9 @@ Ext.define('Ext.util.Cookies', {
      * This must be included if you included a path while setting the cookie.
      */
     clear : function(name, path){
-        if(this.get(name)){
+        if (this.get(name)) {
             path = path || '/';
-            document.cookie = name + '=' + '; expires=Thu, 01-Jan-70 00:00:01 GMT; path=' + path;
+            document.cookie = name + '=' + '; expires=Thu, 01-Jan-1970 00:00:01 GMT; path=' + path;
         }
-    },
-    
-    /**
-     * @private
-     */
-    getCookieVal : function(offset){
-        var endstr = document.cookie.indexOf(";", offset);
-        if(endstr == -1){
-            endstr = document.cookie.length;
-        }
-        return unescape(document.cookie.substring(offset, endstr));
     }
 });

@@ -40,45 +40,13 @@ Ext.define('Ext.layout.container.Fit', {
     targetCls: Ext.baseCSSPrefix + 'layout-fit',
     type: 'fit',
    
-    /**
-     * @cfg {Object} defaultMargins
-     * If the individual contained items do not have a margins property specified or margin specified via CSS, the
-     * default margins from this property will be applied to each item.
-     *
-     * This property may be specified as an object containing margins to apply in the format:
-     *
-     *     {
-     *         top: (top margin),
-     *         right: (right margin),
-     *         bottom: (bottom margin),
-     *         left: (left margin)
-     *     }
-     *
-     * This property may also be specified as a string containing space-separated, numeric margin values. The order of
-     * the sides associated with each value matches the way CSS processes margin values:
-     *
-     *   - If there is only one value, it applies to all sides.
-     *   - If there are two values, the top and bottom borders are set to the first value and the right and left are
-     *     set to the second.
-     *   - If there are three values, the top is set to the first value, the left and right are set to the second,
-     *     and the bottom is set to the third.
-     *   - If there are four values, they apply to the top, right, bottom, and left, respectively.
-     *
-     */
-    defaultMargins: {
-        top: 0,
-        right: 0,
-        bottom: 0,
-        left: 0
-    },
-
     manageMargins: true,
 
     sizePolicies: {
-        0: { setsWidth: 0, setsHeight: 0 },
-        1: { setsWidth: 1, setsHeight: 0 },
-        2: { setsWidth: 0, setsHeight: 1 },
-        3: { setsWidth: 1, setsHeight: 1 }
+        0: { readsWidth: 1, readsHeight: 1, setsWidth: 0, setsHeight: 0 },
+        1: { readsWidth: 0, readsHeight: 1, setsWidth: 1, setsHeight: 0 },
+        2: { readsWidth: 1, readsHeight: 0, setsWidth: 0, setsHeight: 1 },
+        3: { readsWidth: 0, readsHeight: 0, setsWidth: 1, setsHeight: 1 }
     },
 
     getItemSizePolicy: function (item, ownerSizeModel) {
@@ -164,11 +132,11 @@ Ext.define('Ext.layout.container.Fit', {
         c = ownerContext.target;
         ownerContext.overflowX = (!ownerContext.widthModel.shrinkWrap && 
                                    ownerContext.maxChildMinWidth &&
-                                   (c.autoScroll || c.overflowX)) || undef;
+                                   c.scrollFlags.x) || undef;
 
         ownerContext.overflowY = (!ownerContext.heightModel.shrinkWrap &&
                                    ownerContext.maxChildMinHeight &&
-                                   (c.autoScroll || c.overflowY)) || undef;
+                                   c.scrollFlags.y) || undef;
     },
 
     calculate : function (ownerContext) {
@@ -206,10 +174,15 @@ Ext.define('Ext.layout.container.Fit', {
             }
         }
 
-        // Size the child items to the container (if non-shrinkWrap):
-        for (i = 0; i < length; ++i) {
-            info.index = i;
-            me.fitItem(childItems[i], info);
+        // If length === 0, it means we either have no child items, or the children are hidden
+        if (length > 0) {
+            // Size the child items to the container (if non-shrinkWrap):
+            for (i = 0; i < length; ++i) {
+                info.index = i;
+                me.fitItem(childItems[i], info);
+            }
+        } else {
+            info.contentWidth = info.contentHeight = 0;
         }
         
         if (shrinkWrapHeight || shrinkWrapWidth) {
@@ -296,6 +269,9 @@ Ext.define('Ext.layout.container.Fit', {
             if (info.targetSize.gotWidth) {
                 ++info.got;
                 this.setItemWidth(itemContext, info);
+            } else {
+                // Too early to position
+                return;
             }
         }
 
@@ -320,6 +296,9 @@ Ext.define('Ext.layout.container.Fit', {
             if (info.targetSize.gotHeight) {
                 ++info.got;
                 this.setItemHeight(itemContext, info);
+            } else {
+                // Too early to position
+                return;
             }
         }
 

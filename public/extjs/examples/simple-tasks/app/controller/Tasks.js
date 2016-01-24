@@ -190,7 +190,7 @@ Ext.define('SimpleTasks.controller.Tasks', {
 
         // try to blur all of this form's items to make sure that the user can't type into a field while saving
         form.items.each(function(item) {
-            var inputEl = item.getEl().down('input')
+            var inputEl = item.getEl().down('input');
             if(inputEl) {
                 inputEl.blur();
             }
@@ -202,7 +202,7 @@ Ext.define('SimpleTasks.controller.Tasks', {
         task.save({
             success: function(task, operation) {
                 me.getTasksStore().add(task);
-                me.refreshFiltersAndCount();
+                me.refreshListTree();
                 me.getTasksStore().sort();
                 titleField.reset();
                 titleField.focus();
@@ -231,12 +231,12 @@ Ext.define('SimpleTasks.controller.Tasks', {
     updateTask: function(task) {
         var me = this;
 
-        if(task.modified.done === false) {
+        if (task.modified && task.modified.done === false) {
             task.set('reminder', null);
         }
         task.save({
             success: function(task, operation) {
-                me.refreshFiltersAndCount();
+                me.refreshListTree();
                 me.getTasksStore().sort();
             },
             failure: function(task, operation) {
@@ -288,10 +288,10 @@ Ext.define('SimpleTasks.controller.Tasks', {
             buttons: Ext.Msg.YESNO,
             fn: function(response) {
                 if(response === 'yes') {
-                    task.destroy({
+                    task.erase({
                         success: function(task, operation) {
                             me.getTasksStore().remove(task);
-                            me.refreshFiltersAndCount();
+                            me.refreshListTree();
                             if(successCallback) {
                                 successCallback();
                             }
@@ -316,9 +316,7 @@ Ext.define('SimpleTasks.controller.Tasks', {
     /**
      * Refreshes the task grid's list filter, and the task counts in the list tree
      */
-    refreshFiltersAndCount: function() {
-        // refresh the task filters
-        this.getTaskGrid().refreshFilters();
+    refreshListTree: function() {
         // refresh the lists list view so that the task counts will be correct
         this.getListTree().refreshView();
     },
@@ -401,7 +399,7 @@ Ext.define('SimpleTasks.controller.Tasks', {
                 });
             }
         });
-        this.refreshFiltersAndCount();
+        this.refreshListTree();
     },
 
     /**
@@ -428,7 +426,7 @@ Ext.define('SimpleTasks.controller.Tasks', {
                 });
             }
         });
-        this.refreshFiltersAndCount();
+        this.refreshListTree();
     },
 
     /**
@@ -451,23 +449,8 @@ Ext.define('SimpleTasks.controller.Tasks', {
      * @param {Ext.EventObject} e
      */
     filterAll: function(button, e) {
-        var tasksStore = this.getTasksStore(),
-            filters = tasksStore.filters.getRange(0, tasksStore.filters.getCount() - 1),
-            filterCount = filters.length,
-            i = 0;
-
-        if(button.pressed) {
-            tasksStore.clearFilter();
-            for(; i < filterCount; i++) {
-                if(filters[i].property === 'done') {
-                    filters.splice(i, 1);
-                    filterCount --;
-                }
-            }
-            tasksStore.filter(filters);
-        } else {
-            button.toggle();
-        } 
+        this.getTasksStore().clearFilter();
+        this.refreshListTree();
     },
 
     /**
@@ -476,24 +459,11 @@ Ext.define('SimpleTasks.controller.Tasks', {
      * @param {Ext.EventObject} e
      */
     filterActive: function(button, e) {
-        var tasksStore = this.getTasksStore(),
-            filters = tasksStore.filters.getRange(0, tasksStore.filters.getCount() - 1),
-            filterCount = filters.length,
-            i = 0;
-
-        if(button.pressed) {
-            tasksStore.clearFilter();
-            for(; i < filterCount; i++) {
-                if(filters[i].property === 'done') {
-                    filters.splice(i, 1);
-                    filterCount --;
-                }
-            }
-            filters.push({ property: 'done', value: false });
-            this.getTasksStore().filter(filters);
-        } else {
-            button.toggle();
-        } 
+        this.getTasksStore().addFilter({
+            property: 'done',
+            value: false
+        });
+        this.refreshListTree();
     },
 
     /**
@@ -502,24 +472,11 @@ Ext.define('SimpleTasks.controller.Tasks', {
      * @param {Ext.EventObject} e
      */
     filterComplete: function(button, e) {
-        var tasksStore = this.getTasksStore(),
-            filters = tasksStore.filters.getRange(0, tasksStore.filters.getCount() - 1),
-            filterCount = filters.length,
-            i = 0;
-
-        if(button.pressed) {
-            tasksStore.clearFilter();
-            for(; i < filterCount; i++) {
-                if(filters[i].property === 'done') {
-                    filters.splice(i, 1);
-                    filterCount --;
-                }
-            }
-            filters.push({ property: 'done', value: true });
-            this.getTasksStore().filter(filters);
-        } else {
-            button.toggle();
-        } 
+        this.getTasksStore().addFilter({
+            property: 'done',
+            value: true
+        });
+        this.refreshListTree();
     },
 
     /**
@@ -541,7 +498,7 @@ Ext.define('SimpleTasks.controller.Tasks', {
      * @param {Ext.EventObject} e
      */
     showActions: function(view, task, node, rowIndex, e) {
-        var icons = Ext.DomQuery.select('.x-action-col-icon', node);
+        var icons = Ext.fly(node).query('.x-action-col-icon');
         Ext.each(icons, function(icon){
             Ext.get(icon).removeCls('x-hidden');
         });
@@ -557,7 +514,7 @@ Ext.define('SimpleTasks.controller.Tasks', {
      * @param {Ext.EventObject} e
      */
     hideActions: function(view, task, node, rowIndex, e) {
-        var icons = Ext.DomQuery.select('.x-action-col-icon', node);
+        var icons = Ext.fly(node).query('.x-action-col-icon');
         Ext.each(icons, function(icon){
             Ext.get(icon).addCls('x-hidden');
         });
@@ -675,7 +632,7 @@ Ext.define('SimpleTasks.controller.Tasks', {
                 defaultTimeMilliseconds = defaultTimeDate - Ext.Date.clearTime(defaultTimeDate, true);
                 form.findField('reminder').setValue(new Date(dateField.getValue().getTime() + defaultTimeMilliseconds));
                 windowEl.unmask();
-            });
+            }, timeField.format);
         } else { // if the "has reminder" checkbox was unchecked
             // nullify the form's hidden reminder field and disable the reminder date and time fields
             form.findField('reminder').setValue(null);
@@ -698,20 +655,22 @@ Ext.define('SimpleTasks.controller.Tasks', {
      */
     saveEditWindow: function() {
         var taskEditWindow = this.getTaskEditWindow(),
+            listTree = this.getListTree(),
             windowEl = taskEditWindow.getEl(),
             form = taskEditWindow.down('form').getForm(),
             task = form.getRecord();
 
-        if(form.isValid()) {
+        if (form.isValid()) {
             windowEl.mask('saving');
             form.updateRecord(task);
-            if(task.modified.done === false) {
+            if (task.modified && task.modified.done === false) {
                 task.set('reminder', null);
             }
             task.save({
                 success: function(task, operation) {
                     windowEl.unmask();
                     taskEditWindow.close();
+                    listTree.view.refresh();
                 },
                 failure: function(task, operation) {
                     var error = operation.getError(),
@@ -725,7 +684,7 @@ Ext.define('SimpleTasks.controller.Tasks', {
                     });
                     windowEl.unmask();
                 }
-            })
+            });
         } else {
             Ext.Msg.alert('Invalid Data', 'Please correct form errors');
         }
@@ -745,7 +704,7 @@ Ext.define('SimpleTasks.controller.Tasks', {
             time, reminderDate;
 
         if(date && timeDate) {
-            time = timeDate - Ext.Date.clearTime(timeDate, true),
+            time = timeDate - Ext.Date.clearTime(timeDate, true);
             reminderDate = new Date(date.getTime() + time);
             reminderField.setValue(reminderDate); 
         }
@@ -825,25 +784,26 @@ Ext.define('SimpleTasks.controller.Tasks', {
                     }
                 });
             }
-        });
+        }, defaultTimeField.format);
     },
 
     /**
      * Gets the default reminder time and passes it to the callback function.
      * Retrieves default reminder time from the server on the first call, then caches it for future calls.
      * @param {Function} callback
+     * @param {String} timeFormat, the time format used to encode the time: the time format of the destination TimeField
      */
-    getDefaultReminderTime: function(callback) {
+    getDefaultReminderTime: function(callback, timeFormat) {
         var me = this,
             defaultReminderTime;
 
         if(me.defaultReminderTime) {
             callback(me.defaultReminderTime);
         } else {
-            me.defaultReminderTime = '8:00 AM'; // the default time if no value can be retrieved from storage
-            if (SimpleTasksSettings.useLocalStorage) {
+            me.defaultReminderTime = Ext.Date.format(Ext.Date.parse('8', 'g'), timeFormat || "g:i A"); // the default time if no value can be retrieved from storage
+            if (SimpleTasks.Settings.useLocalStorage) {
                 defaultReminderTime = localStorage.getItem('SimpleTasks-defaultReminderTime');
-                if (defaultReminderTime) {
+                if (defaultReminderTime && Ext.Date.parse(defaultReminderTime, timeFormat)) {
                     me.defaultReminderTime = defaultReminderTime;
                 }
                 callback(me.defaultReminderTime);
@@ -855,7 +815,7 @@ Ext.define('SimpleTasks.controller.Tasks', {
                     },
                     success: function(response, options) {
                         var responseData = Ext.decode(response.responseText);
-                        if(responseData.success && responseData.value) {
+                        if(responseData.success && responseData.value && Ext.Date.parse(responseData.value, timeFormat)) {
                             me.defaultReminderTime = responseData.value;
                         }
                         callback(me.defaultReminderTime);
@@ -886,9 +846,14 @@ Ext.define('SimpleTasks.controller.Tasks', {
         var me = this,
             defaultTimeWindow = me.getDefaultTimeWindow(),
             windowEl = defaultTimeWindow.getEl(),
-            time = defaultTimeWindow.down('form').getForm().findField('default_time').getRawValue();
+            field = defaultTimeWindow.down('form').getForm().findField('default_time'),
+            time = field.getRawValue();
+            
+        if (!field.isValid()) {
+            return;
+        }
 
-        if (SimpleTasksSettings.useLocalStorage) {
+        if (SimpleTasks.Settings.useLocalStorage) {
             localStorage.setItem('SimpleTasks-defaultReminderTime', time);
             me.defaultReminderTime = time;
             defaultTimeWindow.close();

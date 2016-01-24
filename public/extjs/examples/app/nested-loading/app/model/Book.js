@@ -3,7 +3,7 @@
  */
 Ext.define('Books.model.Book', {
     extend: 'Ext.data.Model',
-    requires: ['Books.model.Review', 'Ext.data.association.HasMany', 'Ext.data.association.BelongsTo'],
+    requires: ['Books.model.Review'],
 
     fields: [
         'id',
@@ -14,5 +14,9 @@ Ext.define('Books.model.Book', {
         'image'
     ],
 
-    hasMany: {model: 'Books.model.Review', name: 'reviews'}
+    hasMany: {
+        model: 'Books.model.Review', 
+        name: 'reviews',
+        foreignKey: 'book_id'
+    }
 });

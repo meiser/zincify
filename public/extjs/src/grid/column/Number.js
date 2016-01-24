@@ -17,7 +17,7 @@
  *            { symbol: "sencha", price: 142.08, change: 8.85, volume: 5556351  }
  *        ]
  *     });
- *     
+ *
  *     Ext.create('Ext.grid.Panel', {
  *         title: 'Number Column Demo',
  *         store: Ext.data.StoreManager.lookup('sampleStore'),
@@ -35,8 +35,11 @@
 Ext.define('Ext.grid.column.Number', {
     extend: 'Ext.grid.column.Column',
     alias: ['widget.numbercolumn'],
+
     requires: ['Ext.util.Format'],
     alternateClassName: 'Ext.grid.NumberColumn',
+
+    defaultFilterType: 'number',
 
     //<locale>
     /**
@@ -47,15 +50,26 @@ Ext.define('Ext.grid.column.Number', {
     //</locale>
 
     /**
-     * @cfg renderer
-     * @hide
-     */
-    /**
-     * @cfg scope
+     * @cfg {Object} renderer
      * @hide
      */
 
-    defaultRenderer: function(value){
+    /**
+     * @cfg {Object} scope
+     * @hide
+     */
+
+    /**
+     * @cfg {Boolean} producesHTML
+     * @inheritdoc
+     */
+    producesHTML: false,
+
+    defaultRenderer: function(value) {
         return Ext.util.Format.number(value, this.format);
+    },
+
+    updater: function(cell, value) {
+        cell.firstChild.innerHTML = Ext.grid.column.Number.prototype.defaultRenderer.call(this, value);
     }
 });

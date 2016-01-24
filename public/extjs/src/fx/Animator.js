@@ -171,6 +171,26 @@ Ext.define('Ext.fx.Animator', {
      * method to apply the same animation to many targets.
      */
 
+    /**
+     * @event beforeanimate
+     * Fires before the animation starts. A handler can return false to cancel the animation.
+     * @param {Ext.fx.Animator} this
+     */
+
+    /**
+      * @event keyframe
+      * Fires at each keyframe.
+      * @param {Ext.fx.Animator} this
+      * @param {Number} keyframe step number
+      */
+
+    /**
+     * @event afteranimate
+     * Fires when the animation is complete.
+     * @param {Ext.fx.Animator} this
+     * @param {Date} startTime
+     */
+
      /**
       * @cfg {Object} keyframes
       * Animation keyframes follow the CSS3 Animation configuration pattern. 'from' is always considered '0%' and 'to'
@@ -200,28 +220,7 @@ keyframes : {
         config = Ext.apply(me, config || {});
         me.config = config;
         me.id = Ext.id(null, 'ext-animator-');
-        me.addEvents(
-            /**
-             * @event beforeanimate
-             * Fires before the animation starts. A handler can return false to cancel the animation.
-             * @param {Ext.fx.Animator} this
-             */
-            'beforeanimate',
-            /**
-              * @event keyframe
-              * Fires at each keyframe.
-              * @param {Ext.fx.Animator} this
-              * @param {Number} keyframe step number
-              */
-            'keyframe',
-            /**
-             * @event afteranimate
-             * Fires when the animation is complete.
-             * @param {Ext.fx.Animator} this
-             * @param {Date} startTime
-             */
-            'afteranimate'
-        );
+
         me.mixins.observable.constructor.call(me, config);
         me.timeline = [];
         me.createTimeline(me.keyframes);
@@ -248,7 +247,7 @@ keyframes : {
             attrs = [],
             to = me.to || {},
             duration = me.duration,
-            prevMs, ms, i, ln, pct, anim, nextAnim, attr;
+            prevMs, ms, i, ln, pct, attr;
 
         for (pct in keyframes) {
             if (keyframes.hasOwnProperty(pct) && me.animKeyFramesRE.test(pct)) {
@@ -293,9 +292,8 @@ keyframes : {
         var me = this,
             anims = [],
             timeline = me.timeline,
-            reverse = me.reverse,
             ln = timeline.length,
-            anim, easing, damper, initial, attrs, lastAttrs, i;
+            anim, easing, damper, attrs, i;
 
         if (me.fireEvent('beforeanimate', me) !== false) {
             for (i = 0; i < ln; i++) {

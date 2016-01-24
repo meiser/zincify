@@ -2,8 +2,8 @@
  * This animation class is a mixin.
  *
  * Ext.util.Animate provides an API for the creation of animated transitions of properties and styles.
- * This class is used as a mixin and currently applied to {@link Ext.Element}, {@link Ext.CompositeElement},
- * {@link Ext.draw.Sprite}, {@link Ext.draw.CompositeSprite}, and {@link Ext.Component}.  Note that Components
+ * This class is used as a mixin and currently applied to {@link Ext.dom.Element}, {@link Ext.CompositeElement},
+ * {@link Ext.draw.sprite.Sprite}, {@link Ext.draw.sprite.Composite}, and {@link Ext.Component}.  Note that Components
  * have a limited subset of what attributes can be animated such as top, left, x, y, height, width, and
  * opacity (color, paddings, and margins can not be animated).
  *
@@ -198,13 +198,19 @@
  *     }
  */
 Ext.define('Ext.util.Animate', {
-    requires: ['Ext.Element', 'Ext.CompositeElementLite'],
-    uses: ['Ext.fx.Manager', 'Ext.fx.Anim'],
+    mixinId: 'animate',
+
+    requires: [
+        'Ext.fx.Manager', 
+        'Ext.fx.Anim'
+    ],
+    
+    isAnimate: true,
 
     /**
      * Performs custom animation on this object.
      *
-     * This method is applicable to both the {@link Ext.Component Component} class and the {@link Ext.draw.Sprite Sprite}
+     * This method is applicable to both the {@link Ext.Component Component} class and the {@link Ext.draw.sprite.Sprite Sprite}
      * class. It performs animated transitions of certain properties of this object over a specified timeline.
      *
      * ### Animating a {@link Ext.Component Component}
@@ -221,7 +227,7 @@ Ext.define('Ext.util.Animate', {
      *
      *   - `width` - The Component's `width` value in pixels.
      *
-     *   - `width` - The Component's `width` value in pixels.
+     *   - `height` - The Component's `height` value in pixels.
      *
      *   - `dynamic` - Specify as true to update the Component's layout (if it is a Container) at every frame of the animation.
      *     *Use sparingly as laying out on every intermediate size change is an expensive operation.*
@@ -238,11 +244,11 @@ Ext.define('Ext.util.Animate', {
      *         },
      *         items: [{
      *             title: 'Left: 33%',
-     *             margins: '5 0 5 5',
+     *             margin: '5 0 5 5',
      *             flex: 1
      *         }, {
      *             title: 'Left: 66%',
-     *             margins: '5 5 5 5',
+     *             margin: '5 5 5 5',
      *             flex: 2
      *         }]
      *     });
@@ -292,12 +298,20 @@ Ext.define('Ext.util.Animate', {
             paused: true
         }, config);
     },
+    
+    // @private - get animation properties
+    getAnimationProps: function() {
+        var me = this,
+            layout = me.layout;
+        
+        return layout && layout.animate ? layout.animate : {};
+    },
 
     /**
      * Stops any running effects and clears this object's internal effects queue if it contains any additional effects
      * that haven't started yet.
      * @deprecated 4.0 Replaced by {@link #stopAnimation}
-     * @return {Ext.Element} The Element
+     * @return {Ext.dom.Element} The Element
      * @method
      */
     stopFx: Ext.Function.alias(Ext.util.Animate, 'stopAnimation'),
@@ -305,7 +319,7 @@ Ext.define('Ext.util.Animate', {
     /**
      * Stops any running effects and clears this object's internal effects queue if it contains any additional effects
      * that haven't started yet.
-     * @return {Ext.Element} The Element
+     * @return {Ext.dom.Element} The Element
      */
     stopAnimation: function() {
         Ext.fx.Manager.stopAnimation(this.id);
@@ -350,9 +364,4 @@ Ext.define('Ext.util.Animate', {
     getActiveAnimation: function() {
         return Ext.fx.Manager.getActiveAnimation(this.id);
     }
-}, function(){
-    // Apply Animate mixin manually until Element is defined in the proper 4.x way
-    Ext.applyIf(Ext.Element.prototype, this.prototype);
-    // We need to call this again so the animation methods get copied over to CE
-    Ext.CompositeElementLite.importElementMethods();
 });

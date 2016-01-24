@@ -21,8 +21,7 @@ Ext.define('Ext.chooser.IconBrowser', {
             '<tpl for=".">',
                 '<div class="thumb-wrap">',
                     '<div class="thumb">',
-                    (!Ext.isIE6? '<img src="icons/{thumb}" />' : 
-                    '<div style="width:74px;height:74px;filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src=\'icons/{thumb}\')"></div>'),
+                        '<img src="icons/{thumb}" />',
                     '</div>',
                     '<span>{name}</span>',
                 '</div>',
@@ -34,17 +33,17 @@ Ext.define('Ext.chooser.IconBrowser', {
         this.store = Ext.create('Ext.data.Store', {
             autoLoad: true,
             fields: ['name', 'thumb', 'url', 'type'],
+            remoteSort: false,
+            sorters: 'type',
             proxy: {
                 type: 'ajax',
                 url : 'icons.json',
                 reader: {
-                    type: 'json',
-                    root: ''
+                    type: 'json'
                 }
             }
         });
         
         this.callParent(arguments);
-        this.store.sort();
     }
 });

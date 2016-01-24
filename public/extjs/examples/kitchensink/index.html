@@ -1,28 +1,34 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
+<!DOCTYPE html>
+<html manifest="">
 <head>
-    <title>Kitchen Sink</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="UTF-8">
 
-    <!-- Example -->
-    <link rel="stylesheet" type="text/css" href="resources/css/sink.css" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="google" content="notranslate" />
 
-    <!-- Ext JS -->
-    <link rel="stylesheet" type="text/css" href="../../resources/css/ext-neptune.css" />
+    <title>Ext JS Kitchen Sink</title>
 
+    <link rel="apple-touch-icon" href="resources/images/apple-touch-icon.png"/>
+    <link rel="stylesheet" type="text/css" href="resources/Sencha-Examples/style.css"/>
 
-    <!-- GC -->
+    <!-- The line below must be kept intact for Sencha Command to build your application -->
+    <script type="text/javascript">
+        var Ext = Ext || {};
+        Ext.beforeLoad = function(tags){
+            var theme = location.href.match(/theme=([\w-]+)/),
+                locale = location.href.match(/locale=([\w-]+)/);
 
-    <!-- <x-compile> -->
-    <!-- <x-bootstrap> -->
-    <script type="text/javascript" src="../../ext-all.js"></script>
-    <!-- </x-bootstrap> -->
-    <script type="text/javascript" src="../../ext-neptune.js"></script>
-    <script type="text/javascript" src="app.js"></script>
-    <!-- </x-compile> -->
+            theme  = (theme && theme[1]) || (tags.desktop ? 'crisp' : 'crisp-touch');
+            locale = (locale && locale[1]) || 'en';
 
+            Ext.manifest = theme + "-" + locale;
+            tags.test = /testMode=true/.test(location.search);
+            Ext.microloaderTags = tags;
+        };
+    </script>
 
-
+    <script id="microloader" type="text/javascript" src="bootstrap.js"></script>
 </head>
-
 <body></body>
 </html>

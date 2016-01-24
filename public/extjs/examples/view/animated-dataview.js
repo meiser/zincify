@@ -8,6 +8,7 @@ Ext.require([
     'Ext.ux.DataView.Animated',
     'Ext.XTemplate',
     'Ext.panel.Panel',
+    'Ext.layout.container.Fit',
     'Ext.toolbar.*',
     'Ext.slider.Multi'
 ]);
@@ -63,14 +64,25 @@ Ext.onReady(function() {
         data: data
     });
 
+    //filters the store based on the current slider values
+    function filterData(slider) {
+        var values  = slider.getValues();
+
+        store.getFilters().replaceAll({
+            fn: function(record) {
+                return record.get('price') >= values[0] && record.get('price') <= values[1];
+            }
+        });
+
+        store.sort('name', 'ASC');
+    }
+
     var dataview = Ext.create('Ext.view.View', {
-        deferInitialRefresh: false,
         store: store,
         tpl  : Ext.create('Ext.XTemplate',
             '<tpl for=".">',
                 '<div class="phone">',
-                    (!Ext.isIE6? '<img width="64" height="64" src="images/phones/{[values.name.replace(/ /g, "-")]}.png" />' :
-                     '<div style="width:74px;height:74px;filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src=\'images/phones/{[values.name.replace(/ /g, "-")]}.png\',sizingMethod=\'scale\')"></div>'),
+                    '<img width="64" height="64" src="images/phones/{[values.name.replace(/ /g, "-")]}.png" />',
                     '<strong>{name}</strong>',
                     '<span>{price:usMoney} ({reviews} Review{[values.reviews == 1 ? "" : "s"]})</span>',
                 '</div>',
@@ -88,7 +100,7 @@ Ext.onReady(function() {
         itemSelector: 'div.phone',
         overItemCls : 'phone-hover',
         multiSelect : true,
-        autoScroll  : true
+        scrollable  : true
     });
 
     var phoneSlider = Ext.create('Ext.slider.Multi', {
@@ -99,10 +111,7 @@ Ext.onReady(function() {
         values   : [80, 320],
 
         listeners: {
-            change: {
-                buffer: 70,
-                fn    : filterData
-            }
+            changecomplete: filterData
         }
     });
 
@@ -119,25 +128,6 @@ Ext.onReady(function() {
         ],
         renderTo: 'docbody'
     });
-
-    //filters the store based on the current slider values
-    function filterData(slider) {
-        var values  = slider.getValues();
-
-        var test = [];
-
-        //TODO: the suspend/resume hack can be removed once Filtering has been updated
-        store.suspendEvents();
-        store.clearFilter();
-        store.resumeEvents();
-        store.filter([{
-            fn: function(record) {
-                return record.get('price') >= values[0] && record.get('price') <= values[1];
-            }
-        }]);
-
-        store.sort('name', 'ASC');
-    }
 
     //perform initial filter
     filterData(phoneSlider);

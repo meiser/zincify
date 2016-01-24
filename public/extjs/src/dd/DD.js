@@ -101,12 +101,13 @@ Ext.define('Ext.dd.DD', {
                 Math.max(0, Math.min(oCoord.y, vpSize.height - elSize.height))
             ];
             fly.setXY(aCoord);
-            newLeft = fly.getLocalX();
+            newLeft = this.getLocalX(fly);
             newTop  = fly.getLocalY();
             this.deltaSetXY = [newLeft - oCoord.x, newTop - oCoord.y];
         } else {
             vpSize = this.cachedViewportSize;
-            fly.setLeftTop(
+            this.setLocalXY(
+                fly,
                 Math.max(0, Math.min(oCoord.x + this.deltaSetXY[0], vpSize.width - elSize.width)),
                 Math.max(0, Math.min(oCoord.y + this.deltaSetXY[1], vpSize.height - elSize.height))
             );
@@ -132,7 +133,7 @@ Ext.define('Ext.dd.DD', {
             this.lastPageX = iPageX;
             this.lastPageY = iPageY;
         } else {
-            var aCoord = Ext.Element.getXY(this.getEl());
+            var aCoord = Ext.fly(this.getEl()).getXY();
             this.lastPageX = aCoord[0];
             this.lastPageY = aCoord[1];
         }
@@ -151,9 +152,9 @@ Ext.define('Ext.dd.DD', {
 
         if (this.scroll) {
             // The client height
-            var clientH = Ext.Element.getViewHeight(),
+            var clientH = Ext.Element.getViewportHeight(),
                 // The client width
-                clientW = Ext.Element.getViewWidth(),
+                clientW = Ext.Element.getViewportWidth(),
                 // The amt scrolled down
                 st = this.DDMInstance.getScrollTop(),
                 // The amt scrolled right
@@ -207,7 +208,9 @@ Ext.define('Ext.dd.DD', {
      * it to where the mouse location less the click offset would place us.
      * @param {Number} iPageX the X coordinate of the click
      * @param {Number} iPageY the Y coordinate of the click
-     * @return an object that contains the coordinates (Object.x and Object.y)
+     * @return {Object} An object that contains the coordinates (Object.x and Object.y)
+     * @return {Number} return.x
+     * @return {Number} return.y
      * @private
      */
     getTargetCoord: function(iPageX, iPageY) {
@@ -255,7 +258,8 @@ Ext.define('Ext.dd.DD', {
      */
     b4MouseDown: function(e) {
         // this.resetConstraints();
-        this.autoOffset(e.getPageX(), e.getPageY());
+        var xy = e.getXY();
+        this.autoOffset(xy[0], xy[1]);
     },
 
     /**
@@ -263,11 +267,20 @@ Ext.define('Ext.dd.DD', {
      * Ext.dd.DragDrop.
      */
     b4Drag: function(e) {
-        this.setDragElPos(e.getPageX(), e.getPageY());
+        var xy = e.getXY();
+        this.setDragElPos(xy[0], xy[1]);
     },
 
     toString: function() {
         return ("DD " + this.id);
+    },
+    
+    getLocalX: function(el) {
+        return el.getLocalX();
+    },
+
+    setLocalXY: function(el, x, y) {
+        el.setLocalXY(x, y);
     }
 
     //////////////////////////////////////////////////////////////////////////

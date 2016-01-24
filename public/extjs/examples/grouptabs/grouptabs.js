@@ -26,7 +26,7 @@ Ext.onReady(function () {
                     iconCls: 'x-icon-tickets',
                     tabTip: 'Tickets tabtip',
                     //border: false,
-                    xtype: 'gridportlet',
+                    xtype: 'stocks',
                     margin: '10',
                     height: null
                 }, {
@@ -43,7 +43,7 @@ Ext.onReady(function () {
 
                             title: 'Stock Portlet',
                             items: {
-                                xtype: 'chartportlet'
+                                xtype: 'markets'
                             }
                         }, {
                             title: 'Portlet 2',
@@ -59,7 +59,7 @@ Ext.onReady(function () {
                     layout: 'fit',
                     items: [{
                         xtype: 'tabpanel',
-                        activeTab: 1,
+                        activeTab: 0,
                         items: [{
                             title: 'Nested Tabs',
                             html: Ext.example.shortBogusMarkup

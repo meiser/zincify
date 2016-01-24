@@ -1,30 +1,33 @@
+<!DOCTYPE html>
 <html>
 <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title id="page-title">MVC Feed Viewer</title>
-
-    <link rel="stylesheet" type="text/css" href="../../../resources/css/ext-all.css">
 
     <!-- GC -->
     <!-- <x-compile> -->
     <!-- <x-bootstrap> -->
-    <script type="text/javascript" src="../../../ext.js"></script>
+    <script type="text/javascript" src="../../../examples/shared/include-ext.js"></script>
+    <script type="text/javascript" src="../../../examples/shared/options-toolbar.js"></script>
+
     <!-- </x-bootstrap> -->
+    <script type="text/javascript" src="all-classes.js"></script>
     <script type="text/javascript" src="app.js"></script>
 
     <!-- </x-compile> -->
 
     <style type="text/css" media="screen">
-            /**
-            * Icons
-            */
+        /**
+         * Icons
+         */
 
         .summary {
-            background-image: url(images/details.gif) !important;
+             background-image: url(images/details.gif) !important;
         }
 
         .reading {
-            background-image: url(images/article.gif) !important;
+             background-image: url(images/article.gif) !important;
         }
 
         .post-go {
@@ -61,15 +64,15 @@
             background-image: url(images/rss.gif) !important;
         }
 
-            /**
-            * Other styles
-            */
+        /**
+         * Other styles
+         */
         .feed-picker-url {
             float: left;
             width: 425px;
         }
         .feed-picker-title {
-            /*    float: left;*/
+        /*    float: left;*/
             color: #777;
             font-size: 10px;
         }
@@ -86,6 +89,14 @@
             cursor: pointer;
             background: url(images/rss.gif) no-repeat 0 2px;
             border: 1px solid #fff;
+        }
+
+        .feed-list-item.neptune {
+            margin-top: 0;
+            padding-left: 30px;
+            font-size: 15px;
+            line-height: 35px;
+            background: url(images/rss.gif) no-repeat 5px 10px;
         }
 
         .feed-list .x-item-selected {
@@ -125,7 +136,7 @@
             font-size: 11px;
         }
 
-            /* Preview classes */
+        /* Preview classes */
         .articlepreview .x-toolbar {
             border-top-width: 1px !important;
         }
@@ -184,6 +195,7 @@
     </style>
 </head>
 <body>
-
+    <!-- Hack to get around pop-up blocking in smart phones. -->
+    <a href="" target="_blank" id="hidden_link" style="display:none;"></a>
 </body>
 </html>

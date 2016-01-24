@@ -9,26 +9,22 @@ Ext.define('Ext.ux.event.Driver', {
         observable: 'Ext.util.Observable'
     },
 
+    /**
+     * @event start
+     * Fires when this object is started.
+     * @param {Ext.ux.event.Driver} this
+     */
+
+    /**
+     * @event stop
+     * Fires when this object is stopped.
+     * @param {Ext.ux.event.Driver} this
+     */
+
     constructor: function (config) {
         var me = this;
 
         me.mixins.observable.constructor.apply(this, arguments);
-
-        me.addEvents(
-            /**
-             * @event start
-             * Fires when this object is started.
-             * @param {Ext.ux.event.Driver} this
-             */
-            'start',
-
-            /**
-             * @event stop
-             * Fires when this object is stopped.
-             * @param {Ext.ux.event.Driver} this
-             */
-            'stop'
-        );
     },
 
     /**
@@ -192,30 +188,26 @@ Ext.define('Ext.ux.event.Player', {
     
     
     screenshotTimeout: 500,
+
+    /**
+     * @event beforeplay
+     * Fires before an event is played.
+     * @param {Ext.ux.event.Player} this
+     * @param {Object} eventDescriptor The event descriptor about to be played.
+     */
+
+    /**
+     * @event keyframe
+     * Fires when this player reaches a keyframe. Typically, this is after events
+     * like `click` are injected and any resulting animations have been completed.
+     * @param {Ext.ux.event.Player} this
+     * @param {Object} eventDescriptor The keyframe event descriptor.
+     */
     
     constructor: function (config) {
         var me = this;
         
         me.callParent(arguments);
-
-        me.addEvents(
-            /**
-             * @event beforeplay
-             * Fires before an event is played.
-             * @param {Ext.ux.event.Player} this
-             * @param {Object} eventDescriptor The event descriptor about to be played.
-             */
-            'beforeplay',
-
-            /**
-             * @event keyframe
-             * Fires when this player reaches a keyframe. Typically, this is after events
-             * like `click` are injected and any resulting animations have been completed.
-             * @param {Ext.ux.event.Player} this
-             * @param {Object} eventDescriptor The keyframe event descriptor.
-             */
-            'keyframe'
-        );
 
         me.eventObject = new Ext.EventObjectImpl();
 

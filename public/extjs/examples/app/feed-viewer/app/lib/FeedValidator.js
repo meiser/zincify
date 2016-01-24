@@ -26,8 +26,13 @@ Ext.define('FV.lib.FeedValidator', {
             },
             scope: this,
             success: function(response) {
-                if (this.checkResponse(response, feed)) {
+                var title = this.checkResponse(response, feed);
+                if (title) {
+                    feed.set('name', title);
                     options.success.call(options.scope, feed);
+                }
+                else {
+                    options.failure.call(options.scope);
                 }
             },
             failure: function() {
@@ -52,7 +57,7 @@ Ext.define('FV.lib.FeedValidator', {
             
             if (channel) {
                 title = dq.selectValue('title', channel, url);
-                return true;
+                return title;
             }
         } catch(e) {
         }

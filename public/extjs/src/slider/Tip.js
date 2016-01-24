@@ -33,14 +33,14 @@ Ext.define('Ext.slider.Tip', {
     
     /**
      * @cfg {Array} [offsets=null]
-     * Offsets for aligning the tip to the slider. See {@link Ext.dom.Element#alignTo}. Default values
+     * Offsets for aligning the tip to the slider. See {@link Ext.util.Positionable#alignTo}. Default values
      * for offsets are provided by specifying the {@link #position} config.
      */
     offsets : null,
     
     /**
      * @cfg {String} [align=null]
-     * Alignment configuration for the tip to the slider. See {@link Ext.dom.Element#alignTo}. Default
+     * Alignment configuration for the tip to the slider. See {@link Ext.util.Positionable#alignTo}. Default
      * values for alignment are provided by specifying the {@link #position} config.
      */
     align: null,
@@ -55,7 +55,7 @@ Ext.define('Ext.slider.Tip', {
     position: '',
     
     defaultVerticalPosition: 'left',
-    
+
     defaultHorizontalPosition: 'top',
 
     isSliderTip: true,
@@ -68,7 +68,7 @@ Ext.define('Ext.slider.Tip', {
         if (!me.position) {
             me.position = slider.vertical ? me.defaultVerticalPosition : me.defaultHorizontalPosition;
         }
-            
+
         switch (me.position) {
             case 'top':
                 offsets = [0, -10];
@@ -108,7 +108,7 @@ Ext.define('Ext.slider.Tip', {
      * Called whenever a dragstart or drag event is received on the associated Thumb.
      * Aligns the Tip with the Thumb's new position.
      * @param {Ext.slider.MultiSlider} slider The slider
-     * @param {Ext.EventObject} e The Event object
+     * @param {Ext.event.Event} e The Event object
      * @param {Ext.slider.Thumb} thumb The thumb that the Tip is attached to
      */
     onSlide : function(slider, e, thumb) {

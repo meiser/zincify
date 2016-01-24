@@ -13,6 +13,10 @@
 Ext.define('Ext.calendar.view.AbstractCalendar', {
     extend: 'Ext.Component',
     alias: 'widget.calendarview',
+    requires: [
+        'Ext.calendar.util.Date',
+        'Ext.calendar.data.EventMappings'
+    ],
     /**
      * @cfg {Number} startDay
      * The 0-based index for the day on which the calendar week begins (0=Sunday, which is the default)
@@ -125,103 +129,101 @@ Ext.define('Ext.calendar.view.AbstractCalendar', {
      * @return {Ext.XTemplate} The event XTemplate
      */
     getEventTemplate: Ext.emptyFn,
+
+    /**
+     * @event eventsrendered
+     * Fires after events are finished rendering in the view
+     * @param {Ext.calendar.view.AbstractCalendar} this 
+     */
+
+    /**
+     * @event eventclick
+     * Fires after the user clicks on an event element
+     * @param {Ext.calendar.view.AbstractCalendar} this
+     * @param {Ext.calendar.EventRecord} rec The {@link Ext.calendar.EventRecord record} for the event that was clicked on
+     * @param {HTMLNode} el The DOM node that was clicked on
+     */
+
+    /**
+     * @event eventover
+     * Fires anytime the mouse is over an event element
+     * @param {Ext.calendar.view.AbstractCalendar} this
+     * @param {Ext.calendar.EventRecord} rec The {@link Ext.calendar.EventRecord record} for the event that the cursor is over
+     * @param {HTMLNode} el The DOM node that is being moused over
+     */
+
+    /**
+     * @event eventout
+     * Fires anytime the mouse exits an event element
+     * @param {Ext.calendar.view.AbstractCalendar} this
+     * @param {Ext.calendar.EventRecord} rec The {@link Ext.calendar.EventRecord record} for the event that the cursor exited
+     * @param {HTMLNode} el The DOM node that was exited
+     */
+
+    /**
+     * @event datechange
+     * Fires after the start date of the view changes
+     * @param {Ext.calendar.view.AbstractCalendar} this
+     * @param {Date} startDate The start date of the view (as explained in {@link #getStartDate}
+     * @param {Date} viewStart The first displayed date in the view
+     * @param {Date} viewEnd The last displayed date in the view
+     */
+
+    /**
+     * @event rangeselect
+     * Fires after the user drags on the calendar to select a range of dates/times in which to create an event
+     * @param {Ext.calendar.view.AbstractCalendar} this
+     * @param {Object} dates An object containing the start (StartDate property) and end (EndDate property) dates selected
+     * @param {Function} callback A callback function that MUST be called after the event handling is complete so that
+     * the view is properly cleaned up (shim elements are persisted in the view while the user is prompted to handle the
+     * range selection). The callback is already created in the proper scope, so it simply needs to be executed as a standard
+     * function call (e.g., callback()).
+     */
+
+    /**
+     * @event eventmove
+     * Fires after an event element is dragged by the user and dropped in a new position
+     * @param {Ext.calendar.view.AbstractCalendar} this
+     * @param {Ext.calendar.EventRecord} rec The {@link Ext.calendar.EventRecord record} for the event that was moved with
+     * updated start and end dates
+     */
+
+    /**
+     * @event initdrag
+     * Fires when a drag operation is initiated in the view
+     * @param {Ext.calendar.view.AbstractCalendar} this
+     */
+
+    /**
+     * @event dayover
+     * Fires while the mouse is over a day element 
+     * @param {Ext.calendar.view.AbstractCalendar} this
+     * @param {Date} dt The date that is being moused over
+     * @param {Ext.core.Element} el The day Element that is being moused over
+     */
+
+    /**
+     * @event dayout
+     * Fires when the mouse exits a day element 
+     * @param {Ext.calendar.view.AbstractCalendar} this
+     * @param {Date} dt The date that is exited
+     * @param {Ext.core.Element} el The day Element that is exited
+     */
+
+    /*
+     * @event eventdelete
+     * Fires after an event element is deleted by the user. Not currently implemented directly at the view level -- currently 
+     * deletes only happen from one of the forms.
+     * @param {Ext.calendar.view.AbstractCalendar} this
+     * @param {Ext.calendar.EventRecord} rec The {@link Ext.calendar.EventRecord record} for the event that was deleted
+     */
+
     // must be implemented by a subclass
     // private
     initComponent: function() {
         this.setStartDate(this.startDate || new Date());
 
         this.callParent(arguments);
-
-        this.addEvents({
-            /**
-             * @event eventsrendered
-             * Fires after events are finished rendering in the view
-             * @param {Ext.calendar.view.AbstractCalendar} this 
-             */
-            eventsrendered: true,
-            /**
-             * @event eventclick
-             * Fires after the user clicks on an event element
-             * @param {Ext.calendar.view.AbstractCalendar} this
-             * @param {Ext.calendar.EventRecord} rec The {@link Ext.calendar.EventRecord record} for the event that was clicked on
-             * @param {HTMLNode} el The DOM node that was clicked on
-             */
-            eventclick: true,
-            /**
-             * @event eventover
-             * Fires anytime the mouse is over an event element
-             * @param {Ext.calendar.view.AbstractCalendar} this
-             * @param {Ext.calendar.EventRecord} rec The {@link Ext.calendar.EventRecord record} for the event that the cursor is over
-             * @param {HTMLNode} el The DOM node that is being moused over
-             */
-            eventover: true,
-            /**
-             * @event eventout
-             * Fires anytime the mouse exits an event element
-             * @param {Ext.calendar.view.AbstractCalendar} this
-             * @param {Ext.calendar.EventRecord} rec The {@link Ext.calendar.EventRecord record} for the event that the cursor exited
-             * @param {HTMLNode} el The DOM node that was exited
-             */
-            eventout: true,
-            /**
-             * @event datechange
-             * Fires after the start date of the view changes
-             * @param {Ext.calendar.view.AbstractCalendar} this
-             * @param {Date} startDate The start date of the view (as explained in {@link #getStartDate}
-             * @param {Date} viewStart The first displayed date in the view
-             * @param {Date} viewEnd The last displayed date in the view
-             */
-            datechange: true,
-            /**
-             * @event rangeselect
-             * Fires after the user drags on the calendar to select a range of dates/times in which to create an event
-             * @param {Ext.calendar.view.AbstractCalendar} this
-             * @param {Object} dates An object containing the start (StartDate property) and end (EndDate property) dates selected
-             * @param {Function} callback A callback function that MUST be called after the event handling is complete so that
-             * the view is properly cleaned up (shim elements are persisted in the view while the user is prompted to handle the
-             * range selection). The callback is already created in the proper scope, so it simply needs to be executed as a standard
-             * function call (e.g., callback()).
-             */
-            rangeselect: true,
-            /**
-             * @event eventmove
-             * Fires after an event element is dragged by the user and dropped in a new position
-             * @param {Ext.calendar.view.AbstractCalendar} this
-             * @param {Ext.calendar.EventRecord} rec The {@link Ext.calendar.EventRecord record} for the event that was moved with
-             * updated start and end dates
-             */
-            eventmove: true,
-            /**
-             * @event initdrag
-             * Fires when a drag operation is initiated in the view
-             * @param {Ext.calendar.view.AbstractCalendar} this
-             */
-            initdrag: true,
-            /**
-             * @event dayover
-             * Fires while the mouse is over a day element 
-             * @param {Ext.calendar.view.AbstractCalendar} this
-             * @param {Date} dt The date that is being moused over
-             * @param {Ext.core.Element} el The day Element that is being moused over
-             */
-            dayover: true,
-            /**
-             * @event dayout
-             * Fires when the mouse exits a day element 
-             * @param {Ext.calendar.view.AbstractCalendar} this
-             * @param {Date} dt The date that is exited
-             * @param {Ext.core.Element} el The day Element that is exited
-             */
-            dayout: true
-            /*
-             * @event eventdelete
-             * Fires after an event element is deleted by the user. Not currently implemented directly at the view level -- currently 
-             * deletes only happen from one of the forms.
-             * @param {Ext.calendar.view.AbstractCalendar} this
-             * @param {Ext.calendar.EventRecord} rec The {@link Ext.calendar.EventRecord record} for the event that was deleted
-             */
-            //eventdelete: true
-        });
     },
 
     // private
@@ -233,8 +235,6 @@ Ext.define('Ext.calendar.view.AbstractCalendar', {
         if (this.store) {
             this.setStore(this.store, true);
         }
-        
-        this.on('resize', this.onResize, this);
 
         this.el.on({
             'mouseover': this.onMouseOver,
@@ -285,15 +285,14 @@ Ext.define('Ext.calendar.view.AbstractCalendar', {
     // private
     prepareData: function() {
         var lastInMonth = Ext.Date.getLastDateOfMonth(this.startDate),
-        w = 0,
-        row = 0,
-        dt = Ext.Date.clone(this.viewStart),
-        weeks = this.weekCount < 1 ? 6: this.weekCount;
+            w = 0, d,
+            dt = Ext.Date.clone(this.viewStart),
+            weeks = this.weekCount < 1 ? 6: this.weekCount;
 
         this.eventGrid = [[]];
         this.allDayGrid = [[]];
         this.evtMaxCount = [];
-
+        
         var evtsInView = this.store.queryBy(function(rec) {
             return this.isEventVisible(rec.data);
         },
@@ -330,37 +329,36 @@ Ext.define('Ext.calendar.view.AbstractCalendar', {
 
     // private
     prepareEventGrid: function(evts, w, d) {
-        var row = 0,
-        dt = Ext.Date.clone(this.viewStart),
-        max = this.maxEventsPerDay ? this.maxEventsPerDay: 999;
+        var me = this,
+            row = 0,
+            max = me.maxEventsPerDay ? me.maxEventsPerDay: 999;
 
         evts.each(function(evt) {
             var M = Ext.calendar.data.EventMappings,
             days = Ext.calendar.util.Date.diffDays(
-            Ext.calendar.util.Date.max(this.viewStart, evt.data[M.StartDate.name]),
-            Ext.calendar.util.Date.min(this.viewEnd, evt.data[M.EndDate.name])) + 1;
+            Ext.calendar.util.Date.max(me.viewStart, evt.data[M.StartDate.name]),
+            Ext.calendar.util.Date.min(me.viewEnd, evt.data[M.EndDate.name])) + 1;
 
             if (days > 1 || Ext.calendar.util.Date.diffDays(evt.data[M.StartDate.name], evt.data[M.EndDate.name]) > 1) {
-                this.prepareEventGridSpans(evt, this.eventGrid, w, d, days);
-                this.prepareEventGridSpans(evt, this.allDayGrid, w, d, days, true);
+                me.prepareEventGridSpans(evt, me.eventGrid, w, d, days);
+                me.prepareEventGridSpans(evt, me.allDayGrid, w, d, days, true);
             } else {
-                row = this.findEmptyRowIndex(w, d);
-                this.eventGrid[w][d] = this.eventGrid[w][d] || [];
-                this.eventGrid[w][d][row] = evt;
+                row = me.findEmptyRowIndex(w, d);
+                me.eventGrid[w][d] = me.eventGrid[w][d] || [];
+                me.eventGrid[w][d][row] = evt;
 
                 if (evt.data[M.IsAllDay.name]) {
-                    row = this.findEmptyRowIndex(w, d, true);
-                    this.allDayGrid[w][d] = this.allDayGrid[w][d] || [];
-                    this.allDayGrid[w][d][row] = evt;
+                    row = me.findEmptyRowIndex(w, d, true);
+                    me.allDayGrid[w][d] = me.allDayGrid[w][d] || [];
+                    me.allDayGrid[w][d][row] = evt;
                 }
             }
 
-            if (this.evtMaxCount[w] < this.eventGrid[w][d].length) {
-                this.evtMaxCount[w] = Math.min(max + 1, this.eventGrid[w][d].length);
+            if (me.evtMaxCount[w] < me.eventGrid[w][d].length) {
+                me.evtMaxCount[w] = Math.min(max + 1, me.eventGrid[w][d].length);
             }
             return true;
-        },
-        this);
+        });
     },
 
     // private
@@ -425,6 +423,7 @@ Ext.define('Ext.calendar.view.AbstractCalendar', {
     // private
     renderTemplate: function() {
         if (this.tpl) {
+            this.el.select('*').destroy();
             this.tpl.overwrite(this.el, this.getParams());
             this.lastRenderStart = Ext.Date.clone(this.viewStart);
             this.lastRenderEnd = Ext.Date.clone(this.viewEnd);
@@ -444,6 +443,7 @@ Ext.define('Ext.calendar.view.AbstractCalendar', {
 
     // private
     onResize: function() {
+        this.callParent(arguments);
         this.refresh();
     },
 
@@ -521,7 +521,7 @@ Ext.define('Ext.calendar.view.AbstractCalendar', {
             this.doAddFx(this.getEventEls(rec.data[Ext.calendar.data.EventMappings.EventId.name]), {
                 scope: this
             });
-        };
+        }
     },
 
     doAddFx: function(els, o) {
@@ -531,20 +531,32 @@ Ext.define('Ext.calendar.view.AbstractCalendar', {
     },
 
     // private
-    onRemove: function(ds, rec) {
+    onRemove: function(ds, recs) {
+        var name = Ext.calendar.data.EventMappings.EventId.name,
+            i, len, rec, els;
+        
         if (this.monitorStoreEvents === false) {
             return;
         }
-        if (this.enableFx && this.enableRemoveFx) {
-            this.doRemoveFx(this.getEventEls(rec.data[Ext.calendar.data.EventMappings.EventId.name]), {
-                remove: true,
-                scope: this,
-                callback: this.refresh
-            });
-        }
-        else {
-            this.getEventEls(rec.data[Ext.calendar.data.EventMappings.EventId.name]).remove();
-            this.refresh();
+        
+        for (i = 0, len = recs.length; i < len; i++) {
+            rec = recs[i];
+            
+            if (this.enableFx && this.enableRemoveFx) {
+                els = this.getEventEls(rec.get(name));
+                
+                if (els.getCount() > 0) {
+                    this.doRemoveFx(els, {
+                        remove: true,
+                        scope: this,
+                        callback: this.refresh
+                    });
+                }
+            }
+            else {
+                this.getEventEls(rec.get(name)).remove();
+                this.refresh();
+            }
         }
     },
 
@@ -646,17 +658,22 @@ Ext.define('Ext.calendar.view.AbstractCalendar', {
 
     // private
     isEventVisible: function(evt) {
-        var start = this.viewStart.getTime(),
-        end = this.viewEnd.getTime(),
-        M = Ext.calendar.data.EventMappings,
-        data = evt.data || evt,
-        evStart = data[M.StartDate.name].getTime(),
-        evEnd = Ext.calendar.util.Date.add(data[M.EndDate.name], {seconds: -1}).getTime(),
+        var M = Ext.calendar.data.EventMappings,
+            data = evt.data || evt,
+            start = this.viewStart.getTime(),
+            end = this.viewEnd.getTime(),
+            evStart = data[M.StartDate.name].getTime(),
+            evEnd = data[M.EndDate.name].getTime();
+            evEnd = Ext.calendar.util.Date.add(data[M.EndDate.name], {seconds: -1}).getTime();
 
-        startsInRange = (evStart >= start && evStart <= end),
-        endsInRange = (evEnd >= start && evEnd <= end),
-        spansRange = (evStart < start && evEnd > end);
-
+        return this.rangesOverlap(start, end, evStart, evEnd);
+    },
+    
+    rangesOverlap: function(start1, end1, start2, end2) {
+        var startsInRange = (start1 >= start2 && start1 <= end2),
+            endsInRange = (end1 >= start2 && end1 <= end2),
+            spansRange = (start1 <= start2 && end1 >= end2);
+            
         return (startsInRange || endsInRange || spansRange);
     },
 
@@ -677,11 +694,7 @@ Ext.define('Ext.calendar.view.AbstractCalendar', {
             end2 = start2;
         }
 
-        var ev1startsInEv2 = (start1 >= start2 && start1 <= end2),
-        ev1EndsInEv2 = (end1 >= start2 && end1 <= end2),
-        ev1SpansEv2 = (start1 < start2 && end1 > end2);
-
-        return (ev1startsInEv2 || ev1EndsInEv2 || ev1SpansEv2);
+        return (start1 <= end2 && end1 >= start2);
     },
 
     getDayEl: function(dt) {
@@ -988,7 +1001,7 @@ Ext.define('Ext.calendar.view.AbstractCalendar', {
 
             evtId = this.getEventIdFromEl(el);
 
-            if (this.eventOverClass != '') {
+            if (this.eventOverClass) {
                 els = this.getEventEls(evtId);
                 els[type == 'over' ? 'addCls': 'removeCls'](this.eventOverClass);
             }

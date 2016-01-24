@@ -10,7 +10,7 @@ class Weighting < ActiveRecord::Base
   validates :barcode, :presence => {:if => Proc.new { |w| w.ref.nil? }}#, :uniqueness => true
     
   validates :ref, length: {minimum: 5, maximum: 5}, :if => Proc.new { |w| w.barcode.nil? }
-  validates_format_of :ref, :with => /^(30|31)\d{3}$/, :if => Proc.new { |w| w.barcode.nil? }
+  validates_format_of :ref, :with => /\A(30|31)\d{3}\z/, :if => Proc.new { |w| w.barcode.nil? }
   
   validates :sort_list, :presence => true
   validates :weight_brutto, :numericality => {:greater_than => 0}
@@ -26,7 +26,7 @@ class Weighting < ActiveRecord::Base
   after_save :set_shift
   
   
-  default_scope includes(:sort_list).includes(:item_base_data).order("#{self.table_name}.created_at ASC")
+  default_scope { includes(:sort_list).includes(:item_base_data).order("#{self.table_name}.created_at ASC")}
   
   
   def set_weight_netto

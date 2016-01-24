@@ -40,16 +40,21 @@ Ext.define('Ext.view.DragZone', {
         }
         me.callParent([el]);
 
-        me.ddel = Ext.get(document.createElement('div'));
-        me.ddel.addCls(Ext.baseCSSPrefix + 'grid-dd-wrap');
+        me.ddel = document.createElement('div');
+        me.ddel.className = Ext.baseCSSPrefix + 'grid-dd-wrap';
     },
 
     init: function(id, sGroup, config) {
-        this.initTarget(id, sGroup, config);
-        this.view.mon(this.view, {
-            itemmousedown: this.onItemMouseDown,
-            scope: this
-        });
+        var me = this,
+            // TODO: does multi-input device IE handle this correctly?
+            triggerEvent = Ext.supports.touchScroll ? 'itemlongpress' : 'itemmousedown',
+            eventSpec = {
+                scope: me
+            };
+
+        eventSpec[triggerEvent] = me.onItemMouseDown;
+        me.initTarget(id, sGroup, config);
+        me.view.mon(me.view, eventSpec);
     },
 
     onValidDrop: function(target, e, id) {
@@ -57,25 +62,31 @@ Ext.define('Ext.view.DragZone', {
         // focus the view that the node was dropped onto so that keynav will be enabled.
         target.el.focus();
     },
-    
+
     onItemMouseDown: function(view, record, item, index, e) {
         if (!this.isPreventDrag(e, record, item, index)) {
             // Since handleMouseDown prevents the default behavior of the event, which
             // is to focus the view, we focus the view now.  This ensures that the view
             // remains focused if the drag is cancelled, or if no drag occurs.
-            this.view.focus();
-            this.handleMouseDown(e);
-
-            // If we want to allow dragging of multi-selections, then veto the following handlers (which, in the absence of ctrlKey, would deselect)
-            // if the mousedowned record is selected
-            if (view.getSelectionModel().selectionMode == 'MULTI' && !e.ctrlKey && view.getSelectionModel().isSelected(record)) {
-                return false;
+            if (view.focusRow) {
+                view.focusRow(record);
             }
+            this.handleMouseDown(e);
         }
     },
 
-    // private template method
-    isPreventDrag: function(e) {
+    /**
+     * @protected
+     * Template method called upon mousedown. May be overridden in subclasses, or configured
+     * into an instance.
+     *
+     * Return `true` to prevent drag start.
+     * @param {Ext.event.Event} e The mousedown event.
+     * @param {Ext.data.Model} record The record mousedowned upon.
+     * @param {HTMLElement} item The grid row mousedowned upon.
+     * @param {Number} index The row number mousedowned upon.
+     */
+    isPreventDrag: function(e, record, item, index) {
         return false;
     },
 
@@ -86,7 +97,7 @@ Ext.define('Ext.view.DragZone', {
         if (item) {
             return {
                 copy: view.copy || (view.allowCopy && e.ctrlKey),
-                event: new Ext.EventObjectImpl(e),
+                event: e,
                 view: view,
                 ddel: this.ddel,
                 item: item,
@@ -101,25 +112,24 @@ Ext.define('Ext.view.DragZone', {
             data = me.dragData,
             view = data.view,
             selectionModel = view.getSelectionModel(),
-            record = view.getRecord(data.item),
-            e = data.event;
+            record = view.getRecord(data.item);
 
         // Update the selection to match what would have been selected if the user had
         // done a full click on the target node rather than starting a drag from it
         if (!selectionModel.isSelected(record)) {
-            selectionModel.select(record, true);
+            selectionModel.selectWithEvent(record, me.DDMInstance.mousedownEvent);
         }
         data.records = selectionModel.getSelection();
 
-        me.ddel.update(me.getDragText());
-        me.proxy.update(me.ddel.dom);
+        Ext.fly(me.ddel).setHtml(me.getDragText());
+        me.proxy.update(me.ddel);
         me.onStartDrag(x, y);
         return true;
     },
 
     getDragText: function() {
         var count = this.dragData.records.length;
-        return Ext.String.format(this.dragText, count, count == 1 ? '' : 's');
+        return Ext.String.format(this.dragText, count, count === 1 ? '' : 's');
     },
 
     getRepairXY : function(e, data){

@@ -1,6 +1,6 @@
 /*
  * @class Ext.calendar.dd.StatusProxy
- * A specialized drag proxy that supports a drop status icon, {@link Ext.Layer} styles and auto-repair. It also
+ * A specialized drag proxy that supports a drop status icon and auto-repair. It also
  * contains a calendar-specific drag status message containing details about the dragged event's target drop date range.  
  * This is the default drag proxy used by all calendar views.
  * @constructor
@@ -34,8 +34,8 @@ Ext.define('Ext.calendar.dd.StatusProxy', {
     renderTpl: [
         '<div class="' + Ext.baseCSSPrefix + 'dd-drop-icon"></div>' +
         '<div class="ext-dd-ghost-ct">' +
-            '<div id="{id}-ghost" class="' + Ext.baseCSSPrefix + 'dd-drag-ghost"></div>' +
-            '<div id="{id}-message" class="' + Ext.baseCSSPrefix + 'dd-msg"></div>' +
+            '<div id="{id}-ghost" data-ref="ghost" class="' + Ext.baseCSSPrefix + 'dd-drag-ghost"></div>' +
+            '<div id="{id}-message" data-ref="message" class="' + Ext.baseCSSPrefix + 'dd-msg"></div>' +
         '</div>'
     ],
 

@@ -1,7 +1,18 @@
+//@define Ext.calendar.data.EventMappings
 /**
  * @class Ext.calendar.data.EventMappings
- * @extends Object
- * A simple object that provides the field definitions for Event records so that they can be easily overridden.
+ * A simple object that provides the field definitions for Event records so that they can
+ * be easily overridden.
+ *
+ * To ensure the proper definition of Ext.calendar.data.EventModel the override should be
+ * written like this:
+ *
+ *      Ext.define('MyApp.data.EventMappings', {
+ *          override: 'Ext.calendar.data.EventMappings'
+ *      },
+ *      function () {
+ *          // Update "this" (this === Ext.calendar.data.EventMappings)
+ *      });
  */
 Ext.ns('Ext.calendar.data');
 

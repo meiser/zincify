@@ -20,7 +20,8 @@ Ext.define('Ext.calendar.CalendarPanel', {
         'Ext.calendar.view.Day',
         'Ext.calendar.view.Week',
         'Ext.calendar.view.Month',
-        'Ext.calendar.form.EventDetails'
+        'Ext.calendar.form.EventDetails',
+        'Ext.calendar.data.EventMappings'
     ],
     
     /**
@@ -78,15 +79,128 @@ Ext.define('Ext.calendar.CalendarPanel', {
      * Alternate text to use for the 'Month' nav bar button.
      */
     monthText: 'Month',
-
-    // private
-    layoutConfig: {
-        layoutOnCardChange: true,
-        deferredRender: true
-    },
+    
+    layout: 'card',
 
     // private property
     startDate: new Date(),
+
+    /**
+     * @event eventadd
+     * Fires after a new event is added to the underlying store
+     * @param {Ext.calendar.CalendarPanel} this
+     * @param {Ext.calendar.EventRecord} rec The new {@link Ext.calendar.EventRecord record} that was added
+     */
+
+    /**
+     * @event eventupdate
+     * Fires after an existing event is updated
+     * @param {Ext.calendar.CalendarPanel} this
+     * @param {Ext.calendar.EventRecord} rec The new {@link Ext.calendar.EventRecord record} that was updated
+     */
+
+    /**
+     * @event eventdelete
+     * Fires after an event is removed from the underlying store
+     * @param {Ext.calendar.CalendarPanel} this
+     * @param {Ext.calendar.EventRecord} rec The new {@link Ext.calendar.EventRecord record} that was removed
+     */
+
+    /**
+     * @event eventcancel
+     * Fires after an event add/edit operation is canceled by the user and no store update took place
+     * @param {Ext.calendar.CalendarPanel} this
+     * @param {Ext.calendar.EventRecord} rec The new {@link Ext.calendar.EventRecord record} that was canceled
+     */
+
+    /**
+     * @event viewchange
+     * Fires after a different calendar view is activated (but not when the event edit form is activated)
+     * @param {Ext.calendar.CalendarPanel} this
+     * @param {Ext.Ext.calendar.view.AbstractCalendar} view The view being activated (any valid {@link Ext.calendar.view.AbstractCalendar AbstractCalendar} subclass)
+     * @param {Object} info Extra information about the newly activated view. This is a plain object 
+     * with following properties:<div class="mdetail-params"><ul>
+     * <li><b><code>activeDate</code></b> : <div class="sub-desc">The currently-selected date</div></li>
+     * <li><b><code>viewStart</code></b> : <div class="sub-desc">The first date in the new view range</div></li>
+     * <li><b><code>viewEnd</code></b> : <div class="sub-desc">The last date in the new view range</div></li>
+     * </ul></div>
+     */
+
+
+    //
+    // NOTE: CalendarPanel also relays the following events from contained views as if they originated from this:
+    //
+    /**
+     * @event eventsrendered
+     * Fires after events are finished rendering in the view
+     * @param {Ext.calendar.CalendarPanel} this 
+     */
+    /**
+     * @event eventclick
+     * Fires after the user clicks on an event element
+     * @param {Ext.calendar.CalendarPanel} this
+     * @param {Ext.calendar.EventRecord} rec The {@link Ext.calendar.EventRecord record} for the event that was clicked on
+     * @param {HTMLNode} el The DOM node that was clicked on
+     */
+    /**
+     * @event eventover
+     * Fires anytime the mouse is over an event element
+     * @param {Ext.calendar.CalendarPanel} this
+     * @param {Ext.calendar.EventRecord} rec The {@link Ext.calendar.EventRecord record} for the event that the cursor is over
+     * @param {HTMLNode} el The DOM node that is being moused over
+     */
+    /**
+     * @event eventout
+     * Fires anytime the mouse exits an event element
+     * @param {Ext.calendar.CalendarPanel} this
+     * @param {Ext.calendar.EventRecord} rec The {@link Ext.calendar.EventRecord record} for the event that the cursor exited
+     * @param {HTMLNode} el The DOM node that was exited
+     */
+    /**
+     * @event datechange
+     * Fires after the start date of the view changes
+     * @param {Ext.calendar.CalendarPanel} this
+     * @param {Date} startDate The start date of the view (as explained in {@link #getStartDate}
+     * @param {Date} viewStart The first displayed date in the view
+     * @param {Date} viewEnd The last displayed date in the view
+     */
+    /**
+     * @event rangeselect
+     * Fires after the user drags on the calendar to select a range of dates/times in which to create an event
+     * @param {Ext.calendar.CalendarPanel} this
+     * @param {Object} dates An object containing the start (StartDate property) and end (EndDate property) dates selected
+     * @param {Function} callback A callback function that MUST be called after the event handling is complete so that
+     * the view is properly cleaned up (shim elements are persisted in the view while the user is prompted to handle the
+     * range selection). The callback is already created in the proper scope, so it simply needs to be executed as a standard
+     * function call (e.g., callback()).
+     */
+    /**
+     * @event eventmove
+     * Fires after an event element is dragged by the user and dropped in a new position
+     * @param {Ext.calendar.CalendarPanel} this
+     * @param {Ext.calendar.EventRecord} rec The {@link Ext.calendar.EventRecord record} for the event that was moved with
+     * updated start and end dates
+     */
+    /**
+     * @event initdrag
+     * Fires when a drag operation is initiated in the view
+     * @param {Ext.calendar.CalendarPanel} this
+     */
+    /**
+     * @event eventresize
+     * Fires after the user drags the resize handle of an event to resize it
+     * @param {Ext.calendar.CalendarPanel} this
+     * @param {Ext.calendar.EventRecord} rec The {@link Ext.calendar.EventRecord record} for the event that was resized
+     * containing the updated start and end dates
+     */
+    /**
+     * @event dayclick
+     * Fires after the user clicks within a day/week view container and not on an event element
+     * @param {Ext.calendar.CalendarPanel} this
+     * @param {Date} dt The date/time that was clicked on
+     * @param {Boolean} allday True if the day clicked on represents an all-day box, else false.
+     * @param {Ext.core.Element} el The Element that was clicked on
+     */
 
     // private
     initComponent: function() {
@@ -152,126 +266,6 @@ Ext.define('Ext.calendar.CalendarPanel', {
 
         this.callParent();
 
-        this.addEvents({
-            /**
-             * @event eventadd
-             * Fires after a new event is added to the underlying store
-             * @param {Ext.calendar.CalendarPanel} this
-             * @param {Ext.calendar.EventRecord} rec The new {@link Ext.calendar.EventRecord record} that was added
-             */
-            eventadd: true,
-            /**
-             * @event eventupdate
-             * Fires after an existing event is updated
-             * @param {Ext.calendar.CalendarPanel} this
-             * @param {Ext.calendar.EventRecord} rec The new {@link Ext.calendar.EventRecord record} that was updated
-             */
-            eventupdate: true,
-            /**
-             * @event eventdelete
-             * Fires after an event is removed from the underlying store
-             * @param {Ext.calendar.CalendarPanel} this
-             * @param {Ext.calendar.EventRecord} rec The new {@link Ext.calendar.EventRecord record} that was removed
-             */
-            eventdelete: true,
-            /**
-             * @event eventcancel
-             * Fires after an event add/edit operation is canceled by the user and no store update took place
-             * @param {Ext.calendar.CalendarPanel} this
-             * @param {Ext.calendar.EventRecord} rec The new {@link Ext.calendar.EventRecord record} that was canceled
-             */
-            eventcancel: true,
-            /**
-             * @event viewchange
-             * Fires after a different calendar view is activated (but not when the event edit form is activated)
-             * @param {Ext.calendar.CalendarPanel} this
-             * @param {Ext.Ext.calendar.view.AbstractCalendar} view The view being activated (any valid {@link Ext.calendar.view.AbstractCalendar AbstractCalendar} subclass)
-             * @param {Object} info Extra information about the newly activated view. This is a plain object 
-             * with following properties:<div class="mdetail-params"><ul>
-             * <li><b><code>activeDate</code></b> : <div class="sub-desc">The currently-selected date</div></li>
-             * <li><b><code>viewStart</code></b> : <div class="sub-desc">The first date in the new view range</div></li>
-             * <li><b><code>viewEnd</code></b> : <div class="sub-desc">The last date in the new view range</div></li>
-             * </ul></div>
-             */
-            viewchange: true
-
-            //
-            // NOTE: CalendarPanel also relays the following events from contained views as if they originated from this:
-            //
-            /**
-             * @event eventsrendered
-             * Fires after events are finished rendering in the view
-             * @param {Ext.calendar.CalendarPanel} this 
-             */
-            /**
-             * @event eventclick
-             * Fires after the user clicks on an event element
-             * @param {Ext.calendar.CalendarPanel} this
-             * @param {Ext.calendar.EventRecord} rec The {@link Ext.calendar.EventRecord record} for the event that was clicked on
-             * @param {HTMLNode} el The DOM node that was clicked on
-             */
-            /**
-             * @event eventover
-             * Fires anytime the mouse is over an event element
-             * @param {Ext.calendar.CalendarPanel} this
-             * @param {Ext.calendar.EventRecord} rec The {@link Ext.calendar.EventRecord record} for the event that the cursor is over
-             * @param {HTMLNode} el The DOM node that is being moused over
-             */
-            /**
-             * @event eventout
-             * Fires anytime the mouse exits an event element
-             * @param {Ext.calendar.CalendarPanel} this
-             * @param {Ext.calendar.EventRecord} rec The {@link Ext.calendar.EventRecord record} for the event that the cursor exited
-             * @param {HTMLNode} el The DOM node that was exited
-             */
-            /**
-             * @event datechange
-             * Fires after the start date of the view changes
-             * @param {Ext.calendar.CalendarPanel} this
-             * @param {Date} startDate The start date of the view (as explained in {@link #getStartDate}
-             * @param {Date} viewStart The first displayed date in the view
-             * @param {Date} viewEnd The last displayed date in the view
-             */
-            /**
-             * @event rangeselect
-             * Fires after the user drags on the calendar to select a range of dates/times in which to create an event
-             * @param {Ext.calendar.CalendarPanel} this
-             * @param {Object} dates An object containing the start (StartDate property) and end (EndDate property) dates selected
-             * @param {Function} callback A callback function that MUST be called after the event handling is complete so that
-             * the view is properly cleaned up (shim elements are persisted in the view while the user is prompted to handle the
-             * range selection). The callback is already created in the proper scope, so it simply needs to be executed as a standard
-             * function call (e.g., callback()).
-             */
-            /**
-             * @event eventmove
-             * Fires after an event element is dragged by the user and dropped in a new position
-             * @param {Ext.calendar.CalendarPanel} this
-             * @param {Ext.calendar.EventRecord} rec The {@link Ext.calendar.EventRecord record} for the event that was moved with
-             * updated start and end dates
-             */
-            /**
-             * @event initdrag
-             * Fires when a drag operation is initiated in the view
-             * @param {Ext.calendar.CalendarPanel} this
-             */
-            /**
-             * @event eventresize
-             * Fires after the user drags the resize handle of an event to resize it
-             * @param {Ext.calendar.CalendarPanel} this
-             * @param {Ext.calendar.EventRecord} rec The {@link Ext.calendar.EventRecord record} for the event that was resized
-             * containing the updated start and end dates
-             */
-            /**
-             * @event dayclick
-             * Fires after the user clicks within a day/week view container and not on an event element
-             * @param {Ext.calendar.CalendarPanel} this
-             * @param {Date} dt The date/time that was clicked on
-             * @param {Boolean} allday True if the day clicked on represents an all-day box, else false.
-             * @param {Ext.core.Element} el The Element that was clicked on
-             */
-        });
-
-        this.layout = 'card';
         // do not allow override
         if (this.showDayView) {
             var day = Ext.apply({
@@ -454,9 +448,10 @@ Ext.define('Ext.calendar.CalendarPanel', {
         if (tb) {
             tb[id === this.id+'-edit' ? 'hide' : 'show']();
         }
-        
+
+        Ext.suspendLayouts();
+
         l.setActiveItem(id);
-        this.doComponentLayout();
         this.activeView = l.getActiveItem();
         
         if(id !== this.id+'-edit'){
@@ -465,6 +460,8 @@ Ext.define('Ext.calendar.CalendarPanel', {
             }
            this.updateNavState();
         }
+        Ext.resumeLayouts(true);
+
         this.fireViewChange();
     },
 
@@ -473,13 +470,13 @@ Ext.define('Ext.calendar.CalendarPanel', {
         if (this.layout && this.layout.getActiveItem) {
             var view = this.layout.getActiveItem();
             if (view && view.getViewBounds) {
-                vb = view.getViewBounds();
+                var vb = view.getViewBounds();
                 var info = {
                     activeDate: view.getStartDate(),
                     viewStart: vb.start,
                     viewEnd: vb.end
                 };
-            };
+            }
             this.fireEvent('viewchange', this, view, info);
         }
     },

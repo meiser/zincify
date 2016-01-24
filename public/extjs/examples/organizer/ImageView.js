@@ -21,8 +21,7 @@ Ext.define('Ext.org.ImageView', {
         '<tpl for=".">',
             '<div class="thumb-wrap">',
                 '<div class="thumb">',
-                    (!Ext.isIE6? '<img src="../view/chooser/icons/{thumb}" />' : 
-                    '<div style="width:76px;height:76px;filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src=\'../view/chooser/icons/{thumb}\')"></div>'),
+                    '<img src="../view/chooser/icons/{thumb}" />',
                 '</div>',
                 '<span>{name}</span>',
             '</div>',
@@ -33,18 +32,17 @@ Ext.define('Ext.org.ImageView', {
     multiSelect: true,
     singleSelect: false,
     cls: 'x-image-view',
-    autoScroll: true,
+    scrollable: true,
     
     initComponent: function() {
-        this.store = Ext.create('Ext.data.Store', {
+        this.store = new Ext.data.Store({
             autoLoad: true,
-            fields: ['name', 'thumb', {name: 'leaf', defaultValue: true}],
+            model: 'Ext.org.Image',
             proxy: {
                 type: 'ajax',
                 url : '../view/chooser/icons.json',
                 reader: {
-                    type: 'json',
-                    root: ''
+                    type: 'json'
                 }
             }
         });

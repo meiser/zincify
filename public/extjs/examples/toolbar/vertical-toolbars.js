@@ -13,7 +13,7 @@ Ext.onReady(function() {
     Ext.QuickTips.init();
 
     // The default dockedItem weights have TLRB order, but TBLR matches border layout:
-    Ext.panel.AbstractPanel.prototype.defaultDockWeights = { top: 1, bottom: 3, left: 5, right: 7 };
+    Ext.panel.Panel.prototype.defaultDockWeights = { top: 1, bottom: 3, left: 5, right: 7 };
 
     var SamplePanel = Ext.extend(Ext.Panel, {
         width    : 500,
@@ -22,7 +22,7 @@ Ext.onReady(function() {
         bodyStyle: 'padding:10px',
         renderTo : Ext.getBody(),
         html     : fakeHTML,
-        autoScroll: true
+        scrollable: true
     });
     
     new SamplePanel({

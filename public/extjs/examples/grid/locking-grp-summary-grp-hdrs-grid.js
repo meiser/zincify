@@ -1,9 +1,16 @@
+Ext.Loader.setConfig({
+    enabled: true
+});
+Ext.Loader.setPath('Ext.ux', '../ux');
+
 Ext.require([
     'Ext.grid.*',
+    'Ext.layout.container.Border',
     'Ext.data.*',
     'Ext.form.field.Number',
     'Ext.form.field.Date',
-    'Ext.tip.QuickTipManager'
+    'Ext.tip.QuickTipManager',
+    'Ext.ux.DataTip'
 ]);
 
 Ext.define('Task', {
@@ -23,7 +30,7 @@ Ext.define('Task', {
 var data = [
     {projectId: 100, project: 'Ext Forms: Field Anchoring', taskId: 112, description: 'Integrate 2.0 Forms with 2.0 Layouts', estimate: 6, rate: 150, due:'06/24/2007'},
     {projectId: 100, project: 'Ext Forms: Field Anchoring', taskId: 113, description: 'Implement AnchorLayout', estimate: 4, rate: 150, due:'06/25/2007'},
-    {projectId: 100, project: 'Ext Forms: Field Anchoring', taskId: 114, description: 'Add support for multiple types of anchors', estimate: 4, rate: 150, due:'06/27/2007'},
+    {projectId: 100, project: 'Ext Forms: Field Anchoring', taskId: 114, description: 'Add support for multiple<br>types of anchors', estimate: 4, rate: 150, due:'06/27/2007'},
     {projectId: 100, project: 'Ext Forms: Field Anchoring', taskId: 115, description: 'Testing and debugging', estimate: 8, rate: 0, due:'06/29/2007'},
     {projectId: 101, project: 'Ext Grid: Single-level Grouping', taskId: 101, description: 'Add required rendering "hooks" to GridView', estimate: 6, rate: 100, due:'07/01/2007'},
     {projectId: 101, project: 'Ext Grid: Single-level Grouping', taskId: 102, description: 'Extend GridView and override rendering functions', estimate: 6, rate: 100, due:'07/03/2007'},
@@ -53,7 +60,7 @@ Ext.onReady(function(){
     var cellEditing = Ext.create('Ext.grid.plugin.CellEditing', {
         clicksToEdit: 1
     });
-    var showSummary = true;
+
     var grid = Ext.create('Ext.grid.Panel', {
         width: 800,
         height: 450,
@@ -61,8 +68,24 @@ Ext.onReady(function(){
         title: 'Sponsored Projects',
         iconCls: 'icon-grid',
         renderTo: document.body,
+        columnLines : true,
         store: store,
-        plugins: [cellEditing],
+        layout: 'border',
+        plugins: [
+            cellEditing,
+            {
+                ptype: 'datatip',
+                tpl: 'Click to edit {description}'
+            }
+        ],
+        listeners: {
+            beforeshowtip: function(grid, tip, data) {
+                var cellNode = tip.triggerEvent.getTarget(tip.view.getCellSelector());
+                if (cellNode) {
+                    data.colName = tip.view.headerCt.columnManager.getHeaderAtIndex(cellNode.cellIndex).text;
+                }
+            }
+        },
         selModel: {
             selType: 'cellmodel'
         },
@@ -74,14 +97,8 @@ Ext.onReady(function(){
                 text: 'Toggle Summary',
                 enableToggle: true,
                 pressed: true,
-                handler: function(){
-                    showSummary = !showSummary;
-                    var view = grid.lockedGrid.getView();
-                    view.getFeature('group').toggleSummaryRow(showSummary);
-                    view.refresh();
-                    view = grid.normalGrid.getView();
-                    view.getFeature('group').toggleSummaryRow(showSummary);
-                    view.refresh();
+                handler: function() {
+                    grid.lockedGrid.getView().getFeature('group').toggleSummaryRow();
                 }
             }]
         }],
@@ -90,15 +107,31 @@ Ext.onReady(function(){
             ftype: 'groupingsummary',
             groupHeaderTpl: '{name}',
             hideGroupedHeader: true,
-            enableGroupingMenu: false
+            enableGroupingMenu: true
+        }, {
+            ftype: 'summary',
+            dock: 'bottom'
         }],
+        split: true,
+        lockedGridConfig: {
+            header: false,
+            collapsible: true,
+            width: 300,
+            forceFit: true
+        },
+        lockedViewConfig: {
+            scroll: 'horizontal'
+        },
         columns: [{
             text: 'Task',
-            width: 300,
+            flex: 1,
             locked: true,
             tdCls: 'task',
             sortable: true,
             dataIndex: 'description',
+
+            // This may have wrapped HTML which causes unpredictable row heights
+            variableRowHeight: true,
             hideable: false,
             summaryType: 'count',
             summaryRenderer: function(value, summaryData, dataIndex) {
@@ -116,7 +149,7 @@ Ext.onReady(function(){
             header: 'Schedule',
             columns: [{
                 header: 'Due Date',
-                width: 130,
+                width: 125,
                 sortable: true,
                 dataIndex: 'due',
                 summaryType: 'max',
@@ -127,7 +160,7 @@ Ext.onReady(function(){
                 }
             }, {
                 header: 'Estimate',
-                width: 130,
+                width: 125,
                 sortable: true,
                 dataIndex: 'estimate',
                 summaryType: 'sum',
@@ -142,7 +175,7 @@ Ext.onReady(function(){
                 }
             }, {
                 header: 'Rate',
-                width: 130,
+                width: 125,
                 sortable: true,
                 renderer: Ext.util.Format.usMoney,
                 summaryRenderer: Ext.util.Format.usMoney,
@@ -153,13 +186,13 @@ Ext.onReady(function(){
                 }
             }, {
                 header: 'Cost',
-                width: 130,
+                width: 114,
                 sortable: false,
                 groupable: false,
                 renderer: function(value, metaData, record, rowIdx, colIdx, store, view) {
                     return Ext.util.Format.usMoney(record.get('estimate') * record.get('rate'));
                 },
-                summaryType: function(records){
+                summaryType: function(records, values) {
                     var i = 0,
                         length = records.length,
                         total = 0,

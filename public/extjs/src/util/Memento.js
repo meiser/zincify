@@ -64,6 +64,8 @@ Ext.define('Ext.util.Memento', (function () {
          * @param {String/String[]} props The property or array of properties to capture.
          */
         constructor: function (target, props) {
+            this.data = {};
+
             if (target) {
                 this.target = target;
                 if (props) {
@@ -117,15 +119,17 @@ Ext.define('Ext.util.Memento', (function () {
                 data = me.data,
                 prop;
 
+            clear = clear !== false;
+
             for (prop in data) {
                 if (data.hasOwnProperty(prop)) {
                     restoreValue(t, prop, data[prop]);
+                    if (clear) {
+                        delete data[prop];
+                    }
                 }
             }
 
-            if (clear !== false) {
-                delete me.data;
-            }
         }
     };
 }()));

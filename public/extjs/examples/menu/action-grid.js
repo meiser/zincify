@@ -124,7 +124,7 @@ Ext.onReady(function() {
                 text     : 'Price',
                 width    : 75,
                 sortable : true,
-                renderer : 'usMoney',
+                formatter: 'usMoney',
                 dataIndex: 'price'
             },
             {
@@ -145,7 +145,7 @@ Ext.onReady(function() {
                 text     : 'Last Updated',
                 width    : 85,
                 sortable : true,
-                renderer : Ext.util.Format.dateRenderer('m/d/Y'),
+                formatter: 'date("m/d/Y")',
                 dataIndex: 'lastChange'
             }
         ],

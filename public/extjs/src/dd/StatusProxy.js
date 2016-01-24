@@ -1,6 +1,6 @@
 /**
- * A specialized floating Component that supports a drop status icon, {@link Ext.Layer} styles
- * and auto-repair.  This is the default drag proxy used by all Ext.dd components.
+ * A specialized floating Component that supports a drop status icon and auto-repair.
+ * This is the default drag proxy used by all Ext.dd components.
  */
 Ext.define('Ext.dd.StatusProxy', {
     extend: 'Ext.Component',
@@ -11,9 +11,13 @@ Ext.define('Ext.dd.StatusProxy', {
     ],
 
     renderTpl: [
-        '<div class="' + Ext.baseCSSPrefix + 'dd-drop-icon"></div>' +
-        '<div id="{id}-ghost" class="' + Ext.baseCSSPrefix + 'dd-drag-ghost"></div>'
+        '<div class="' + Ext.baseCSSPrefix + 'dd-drop-icon" role="presentation"></div>' +
+        '<div id="{id}-ghost" data-ref="ghost" class="' + Ext.baseCSSPrefix + 'dd-drag-ghost" role="presentation"></div>'
     ],
+    
+    repairCls: Ext.baseCSSPrefix + 'dd-drag-repair',
+    
+    ariaRole: 'presentation',
 
     /**
      * Creates new StatusProxy.
@@ -73,7 +77,7 @@ Ext.define('Ext.dd.StatusProxy', {
         me.el.replaceCls(clsPrefix + me.dropAllowed, clsPrefix + me.dropNotAllowed);
         me.dropStatus = me.dropNotAllowed;
         if (clearGhost) {
-            me.ghost.update('');
+            me.ghost.setHtml('');
         }
     },
 
@@ -84,9 +88,9 @@ Ext.define('Ext.dd.StatusProxy', {
      */
     update : function(html){
         if (typeof html == "string") {
-            this.ghost.update(html);
+            this.ghost.setHtml(html);
         } else {
-            this.ghost.update("");
+            this.ghost.setHtml('');
             html.style.margin = "0";
             this.ghost.dom.appendChild(html);
         }
@@ -98,7 +102,7 @@ Ext.define('Ext.dd.StatusProxy', {
 
     /**
      * Returns the ghost element
-     * @return {Ext.Element} el
+     * @return {Ext.dom.Element} el
      */
     getGhost : function(){
         return this.ghost;
@@ -126,10 +130,10 @@ Ext.define('Ext.dd.StatusProxy', {
     },
 
     /**
-     * Force the Layer to sync its shadow and shim positions to the element
+     * Force the Element to sync its shadow and shim positions
      */
     sync : function(){
-        this.el.sync();
+        this.el.syncUnderlays();
     },
 
     /**
@@ -146,8 +150,8 @@ Ext.define('Ext.dd.StatusProxy', {
         me.callback = callback;
         me.scope = scope;
         if (xy && me.animRepair !== false) {
-            me.el.addCls(Ext.baseCSSPrefix + 'dd-drag-repair');
-            me.el.hideUnders(true);
+            me.el.addCls(me.repairCls);
+            me.el.setUnderlaysVisible(false);
             me.anim = me.el.animate({
                 duration: me.repairDuration || 500,
                 easing: 'ease-out',
@@ -169,7 +173,7 @@ Ext.define('Ext.dd.StatusProxy', {
         var me = this;
     
         me.hide(true);
-        me.el.removeCls(Ext.baseCSSPrefix + 'dd-drag-repair');
+        me.el.removeCls(me.repairCls);
         if (typeof me.callback == "function") {
             me.callback.call(me.scope || me);
         }

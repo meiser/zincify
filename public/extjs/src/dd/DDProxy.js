@@ -72,7 +72,7 @@ Ext.define('Ext.dd.DDProxy', {
             s;
 
         if (!body || !body.firstChild) {
-            setTimeout( function() { self.createFrame(); }, 50 );
+            Ext.defer( function() { self.createFrame(); }, 50 );
             return;
         }
 
@@ -81,6 +81,7 @@ Ext.define('Ext.dd.DDProxy', {
         if (!div) {
             div    = document.createElement("div");
             div.id = this.dragElId;
+            div.setAttribute('role', 'presentation');
             s  = div.style;
 
             s.position   = "absolute";
@@ -150,8 +151,10 @@ Ext.define('Ext.dd.DDProxy', {
 
     // overrides Ext.dd.DragDrop
     b4MouseDown: function(e) {
-        var x = e.getPageX(),
-            y = e.getPageY();
+        var xy = e.getXY(),
+            x = xy[0],
+            y = xy[1];
+
         this.autoOffset(x, y);
         this.setDragElPos(x, y);
     },

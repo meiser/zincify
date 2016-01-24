@@ -2,197 +2,171 @@
  * Simple header class which is used for on {@link Ext.panel.Panel} and {@link Ext.window.Window}.
  */
 Ext.define('Ext.panel.Header', {
-    extend: 'Ext.container.Container',
-    uses: ['Ext.panel.Tool', 'Ext.draw.Component', 'Ext.util.CSS', 'Ext.layout.component.Body', 'Ext.Img'],
-    alias: 'widget.header',
+    extend: 'Ext.panel.Bar',
+    requires: [
+        'Ext.panel.Title',
+        'Ext.panel.Tool'
+    ],
+    xtype: 'header',
 
     /**
      * @property {Boolean} isHeader
-     * `true` in this class to identify an objact as an instantiated Header, or subclass thereof.
+     * `true` in this class to identify an object as an instantiated Header, or subclass thereof.
      */
-    isHeader       : true,
-    defaultType    : 'tool',
-    indicateDrag   : false,
-    weight         : -1,
-    componentLayout: 'body',
+    isHeader: true,
 
-    /**
-     * @cfg {String} [titleAlign='left']
-     * May be `"left"`, `"right"` or `"center"`.
-     *
-     * The alignment of the title text within the available space between the icon and the tools.
-     */
-    titleAlign: 'left',
-
-    childEls: [
-        'body'
-    ],
-
-    renderTpl: [
-        '<div id="{id}-body" class="{baseCls}-body {bodyCls}',
-        '<tpl for="uiCls"> {parent.baseCls}-body-{parent.ui}-{.}</tpl>"',
-        '<tpl if="bodyStyle"> style="{bodyStyle}"</tpl>>',
-            '{%this.renderContainer(out,values)%}',
-        '</div>'
-    ],
-
-    headingTpl: '<span id="{id}-textEl" class="{cls}-text {cls}-text-{ui}">{title}</span>',
-
+    defaultType: 'tool',
+    indicateDrag: false,
+    weight: -1,
     shrinkWrap: 3,
 
+    // For performance reasons we give the following configs their default values on
+    // the class body.  This prevents the updaters from running on initialization in the
+    // default configuration scenario
+    iconAlign: 'left',
+    titleAlign: 'left',
+    titlePosition: 0,
+    titleRotation: 'default',
+
+    beforeRenderConfig: {
+        /**
+         * @cfg {Number/String} glyph
+         * A numeric unicode character code to use as the icon for the panel header. The
+         * default font-family for glyphs can be set globally using
+         * {@link Ext#setGlyphFontFamily Ext.setGlyphFontFamily()}. Alternatively, this
+         * config option accepts a string with the charCode and font-family separated by the
+         * `@` symbol. For example '65@My Font Family'.
+         */
+        glyph: null,
+
+        /**
+         * @cfg {String} icon
+         * Path to image for an icon.
+         *
+         * There are no default icons that come with Ext JS.
+         */
+        icon: null,
+
+        /**
+         * @cfg {String} iconCls
+         * CSS class for an icon.
+         *
+         * There are no default icon classes that come with Ext JS.
+         */
+        iconCls: null,
+
+        /**
+         * @cfg {'top'/'right'/'bottom'/'left'} [iconAlign='left']
+         * The side of the title to render the icon.
+         */
+        iconAlign: null,
+
+        /**
+         * @cfg {String/Ext.panel.Title}
+         * The title text or config object for the {@link Ext.panel.Title Title} component.
+         */
+        title: {
+            $value: {
+                ariaRole: 'presentation',
+                xtype: 'title',
+                flex: 1
+            },
+            merge: function(newValue, oldValue) {
+                if (typeof newValue == 'string') {
+                    newValue = {
+                        text: newValue
+                    };
+                }
+
+                return Ext.merge(oldValue ? Ext.Object.chain(oldValue) : {}, newValue);
+            }
+        },
+
+        /**
+         * @cfg {String} [titleAlign='left']
+         * The alignment of the title text.
+         */
+        titleAlign: null,
+
+        /**
+         * @cfg {Number} [titlePosition=0]
+         * The ordinal position among the header items (tools and other components specified using the {@link #cfg-items} config)
+         * at which the title component is inserted. See {@link Ext.panel.Panel#cfg-header Panel's header config}.
+         *
+         * If not specified, the title is inserted after any {@link #cfg-items}, but *before* any {@link Ext.panel.Panel#tools}.
+         *
+         * Note that if an {@link #icon} or {@link #iconCls} has been configured, then the icon component will be the
+         * first item before all specified tools or {@link #cfg-items}. This configuration does not include the icon.
+         */
+        titlePosition: null,
+        
+        /**
+         * @cfg {'default'/0/1/2} [titleRotation='default']
+         * The rotation of the header's title text.  Can be one of the following values:
+         *
+         * - `'default'` - use the default rotation, depending on the dock position of the header
+         * - `0` - no rotation
+         * - `1` - rotate 90deg clockwise
+         * - `2` - rotate 90deg counter-clockwise
+         *
+         * The default behavior of this config depends on the dock position of the header:
+         *
+         * - `'top'` or `'bottom'` - `0`
+         * - `'right'` - `1`
+         * - `'left'` - `1`
+         */
+        titleRotation: null
+    },
+
+    // a class for styling that is shared between panel and window headers
+    headerCls: Ext.baseCSSPrefix + 'header',
+
     /**
-     * @cfg {String} title
-     * The title text to display.
+     * @event click
+     * Fires when the header is clicked. This event will not be fired
+     * if the click was on a {@link Ext.panel.Tool}
+     * @param {Ext.panel.Header} this
+     * @param {Ext.event.Event} e
      */
 
     /**
-     * @cfg {String} iconCls
-     * CSS class for an icon in the header. Used for displaying an icon to the left of a title.
-     */
-    
-    /**
-     * @cfg {String} icon
-     * Path to image for an icon in the header. Used for displaying an icon to the left of a title.
+     * @event dblclick
+     * Fires when the header is double clicked. This event will not
+     * be fired if the click was on a {@link Ext.panel.Tool}
+     * @param {Ext.panel.Header} this
+     * @param {Ext.event.Event} e
      */
 
     initComponent: function() {
         var me = this,
-            ruleStyle,
-            rule,
-            style,
-            ui,
-            tempEl;
-            
-        me.addEvents(
-            /**
-             * @event click
-             * Fires when the header is clicked. This event will not be fired 
-             * if the click was on a {@link Ext.panel.Tool}
-             * @param {Ext.panel.Header} this
-             * @param {Ext.EventObject} e
-             */
-            'click',
-            
-            /**
-             * @event dblclick
-             * Fires when the header is double clicked. This event will not 
-             * be fired if the click was on a {@link Ext.panel.Tool}
-             * @param {Ext.panel.Header} this
-             * @param {Ext.EventObject} e
-             */
-            'dblclick'
-        );
+            items = me.items,
+            itemPosition = me.itemPosition,
+            cls = [me.headerCls];
 
-        me.indicateDragCls = me.baseCls + '-draggable';
-        me.title = me.title || '&#160;';
         me.tools = me.tools || [];
-        me.items = me.items || [];
-        me.orientation = me.orientation || 'horizontal';
-        me.dock = (me.dock) ? me.dock : (me.orientation == 'horizontal') ? 'top' : 'left';
+        me.items = items = (items ? items.slice() : []);
 
-        //add the dock as a ui
-        //this is so we support top/right/left/bottom headers
-        me.addClsWithUI([me.orientation, me.dock]);
+        if (itemPosition !== undefined) {
+            me._userItems = items.slice();
+            me.items = items = [];
+        }
 
+        me.indicateDragCls = me.headerCls + '-draggable';
         if (me.indicateDrag) {
-            me.addCls(me.indicateDragCls);
+            cls.push(me.indicateDragCls);
         }
 
-        // Add Icon
-        if (!Ext.isEmpty(me.iconCls) || !Ext.isEmpty(me.icon)) {
-            me.initIconCmp();
-            me.items.push(me.iconCmp);
-        }
+        me.addCls(cls);
 
-        // Add Title
-        if (me.orientation == 'vertical') {
-            me.layout = {
-                type : 'vbox',
-                align: 'center'
-            };
-            me.textConfig = {
-                width: 16,
-                cls: me.baseCls + '-text',
-                type: 'text',
-                text: me.title,
-                rotate: {
-                    degrees: 90
-                }
-            };
-            ui = me.ui;
-            if (Ext.isArray(ui)) {
-                ui = ui[0];
-            }
-            ruleStyle = '.' + me.baseCls + '-text-' + ui;
-            if (Ext.scopeResetCSS) {
-                ruleStyle = '.' + Ext.baseCSSPrefix + 'reset ' + ruleStyle;
-            }
-            rule = Ext.util.CSS.getRule(ruleStyle);
-
-            // We might have been disallowed access to the stylesheet: https://sencha.jira.com/browse/EXTJSIV-5084
-            if (rule) {
-                style = rule.style;
-            } else {
-                style = (tempEl = Ext.resetElement.createChild({style: 'position:absolute', cls: me.baseCls + '-text-' + ui})).getStyles('fontFamily', 'fontWeight', 'fontSize', 'color');
-                tempEl.remove();
-            }
-            if (style) {
-                Ext.apply(me.textConfig, {
-                    'font-family': style.fontFamily,
-                    'font-weight': style.fontWeight,
-                    'font-size': style.fontSize,
-                    fill: style.color
-                });
-            }
-            me.titleCmp = new Ext.draw.Component({
-                width     : 16,
-                ariaRole  : 'heading',
-                focusable : false,
-                viewBox   : false,
-                flex      : 1,
-                id        : me.id + '_hd',
-                autoSize  : true,
-                items     : me.textConfig,
-                xhooks: {
-                    setSize: function (width) {
-                        // don't pass 2nd arg (height) on to setSize or we break 'flex:1'
-                        this.callParent([width]);
-                    }
-                },
-                // this is a bit of a cheat: we are not selecting an element of titleCmp
-                // but rather of titleCmp.items[0]
-                childEls  : [
-                    { name: 'textEl', select: '.' + me.baseCls + '-text' }
-                ]
-            });
-        } else {
-            me.layout = {
-                type : 'hbox',
-                align: 'middle'
-            };
-            me.titleCmp = new Ext.Component({
-                ariaRole  : 'heading',
-                focusable : false,
-                noWrap    : true,
-                flex      : 1,
-                id        : me.id + '_hd',
-                style     : 'text-align:' + me.titleAlign,
-                cls       : me.baseCls + '-text-container',
-                renderTpl : me.getTpl('headingTpl'),
-                renderData: {
-                    title: me.title,
-                    cls  : me.baseCls,
-                    ui   : me.ui
-                },
-                childEls  : ['textEl']
-            });
-        }
-        me.items.push(me.titleCmp);
+        me.syncNoBorderCls();
 
         // Add Tools
-        me.items = me.items.concat(me.tools);
+        Ext.Array.push(items, me.tools);
+        // Clear the tools so we can have only the instances. Intentional mutation of passed in array
+        // Owning code in Panel uses this array as its public tools property.
+        me.tools.length = 0;
         me.callParent();
-        
+
         me.on({
             dblclick: me.onDblClick,
             click: me.onClick,
@@ -201,318 +175,273 @@ Ext.define('Ext.panel.Header', {
         });
     },
 
-    initIconCmp: function() {
-        var me = this,
-            cfg = {
-                focusable: false,
-                src: Ext.BLANK_IMAGE_URL,
-                cls: [me.baseCls + '-icon', me.iconCls],
-                id: me.id + '-iconEl',
-                iconCls: me.iconCls
-            };
-            
-        if (!Ext.isEmpty(me.icon)) {
-            delete cfg.iconCls;
-            cfg.src = me.icon;
-        }
-        
-        me.iconCmp = new Ext.Img(cfg);
-    },
-
-    afterRender: function() {
-        this.el.unselectable();
-        this.callParent();
-    },
-
-    // inherit docs
-    addUIClsToElement: function(cls) {
-        var me = this,
-            result = me.callParent(arguments),
-            classes = [me.baseCls + '-body-' + cls, me.baseCls + '-body-' + me.ui + '-' + cls],
-            array, i;
-
-        if (me.bodyCls) {
-            array = me.bodyCls.split(' ');
-
-            for (i = 0; i < classes.length; i++) {
-                if (!Ext.Array.contains(array, classes[i])) {
-                    array.push(classes[i]);
-                }
-            }
-
-            me.bodyCls = array.join(' ');
-        } else {
-            me.bodyCls = classes.join(' ');
-        }
-
-        return result;
-    },
-
-    // inherit docs
-    removeUIClsFromElement: function(cls) {
-        var me = this,
-            result = me.callParent(arguments),
-            classes = [me.baseCls + '-body-' + cls, me.baseCls + '-body-' + me.ui + '-' + cls],
-            array, i;
-
-        if (me.bodyCls) {
-            array = me.bodyCls.split(' ');
-
-            for (i = 0; i < classes.length; i++) {
-                Ext.Array.remove(array, classes[i]);
-            }
-
-            me.bodyCls = array.join(' ');
-        }
-
-        return result;
-    },
-
-    // inherit docs
-    addUIToElement: function() {
-        var me = this,
-            array, cls;
-
-        me.callParent(arguments);
-
-        cls = me.baseCls + '-body-' + me.ui;
-        if (me.rendered) {
-            if (me.bodyCls) {
-                me.body.addCls(me.bodyCls);
-            } else {
-                me.body.addCls(cls);
-            }
-        } else {
-            if (me.bodyCls) {
-                array = me.bodyCls.split(' ');
-
-                if (!Ext.Array.contains(array, cls)) {
-                    array.push(cls);
-                }
-
-                me.bodyCls = array.join(' ');
-            } else {
-                me.bodyCls = cls;
-            }
-        }
-
-        if (me.titleCmp && me.titleCmp.rendered && me.titleCmp.textEl) {
-            me.titleCmp.textEl.addCls(me.baseCls + '-text-' + me.ui);
-        }
-    },
-
-    // inherit docs
-    removeUIFromElement: function() {
-        var me = this,
-            array, cls;
-
-        me.callParent(arguments);
-
-        cls = me.baseCls + '-body-' + me.ui;
-        if (me.rendered) {
-            if (me.bodyCls) {
-                me.body.removeCls(me.bodyCls);
-            } else {
-                me.body.removeCls(cls);
-            }
-        } else {
-            if (me.bodyCls) {
-                array = me.bodyCls.split(' ');
-                Ext.Array.remove(array, cls);
-                me.bodyCls = array.join(' ');
-            } else {
-                me.bodyCls = cls;
-            }
-        }
-
-        if (me.titleCmp && me.titleCmp.rendered && me.titleCmp.textEl) {
-            me.titleCmp.textEl.removeCls(me.baseCls + '-text-' + me.ui);
-        }
-    },
-
-    onClick: function(e) {
-        this.fireClickEvent('click', e);
-    },
-    
-    onDblClick: function(e){
-        this.fireClickEvent('dblclick', e);
-    },
-    
-    fireClickEvent: function(type, e){
-        var toolCls = '.' + Ext.panel.Tool.prototype.baseCls;
-        if (!e.getTarget(toolCls)) {
-            this.fireEvent(type, this, e);
-        }    
-    },
-
-    getFocusEl: function() {
-        return this.el;
-    },
-
-    getTargetEl: function() {
-        return this.body || this.frameBody || this.el;
-    },
-
-    /**
-     * Sets the title of the header.
-     * @param {String} title The title to be set
-     */
-    setTitle: function(title) {
-        var me = this,
-            sprite,
-            surface;
-        if (me.rendered) {
-            if (me.titleCmp.rendered) {
-                if (me.titleCmp.surface) {
-                    me.title = title || '';
-                    sprite = me.titleCmp.surface.items.items[0];
-                    surface = me.titleCmp.surface;
-
-                    surface.remove(sprite);
-                    me.textConfig.type = 'text';
-                    me.textConfig.text = title;
-                    sprite = surface.add(me.textConfig);
-                    sprite.setAttributes({
-                        rotate: {
-                            degrees: 90
-                        }
-                    }, true);
-                    me.titleCmp.autoSizeSurface();
-                } else {
-                    me.title = title;
-                    me.titleCmp.textEl.update(me.title || '&#160;');
-                }
-                me.titleCmp.updateLayout();
-            } else {
-                me.titleCmp.on({
-                    render: function() {
-                        me.setTitle(title);
-                    },
-                    single: true
-                });
-            }
-        } else {
-            me.title = title;
-        }
-    },
-
-    /**
-     * @private
-     * Used when shrink wrapping a Panel to either content width or header width.
-     * This returns the minimum width required to display the header, icon and tools.
-     * **This is only intended for use with horizontal headers.**
-     */
-    getMinWidth: function() {
-        var me = this,
-            textEl = me.titleCmp.textEl.dom,
-            result,
-            tools = me.tools,
-            l, i;
-
-        // Measure text width as inline element so it doesn't stretch
-        textEl.style.display = 'inline';
-        result = textEl.offsetWidth;
-        textEl.style.display = '';
-
-        // Add tools width
-        if (tools && (l = tools.length)) {
-            for (i = 0; i < l; i++) {
-                if (tools[i].el) {
-                    result += tools[i].el.dom.offsetWidth;
-                }
-            }
-        }
-
-        // Add iconWidth
-        if (me.iconCmp) {
-            result += me.iconCmp.el.dom.offsetWidth;
-        }
-
-        // Return with some space between title and tools/end of header.
-        return result + 10;
-    },
-
-    /**
-     * Sets the CSS class that provides the icon image for this header.  This method will replace any existing
-     * icon class if one has already been set.
-     * @param {String} cls The new CSS class name
-     */
-    setIconCls: function(cls) {
-        var me = this,
-            isEmpty = !cls || !cls.length,
-            iconCmp = me.iconCmp;
-        
-        me.iconCls = cls;
-        if (!me.iconCmp && !isEmpty) {
-            me.initIconCmp();
-            me.insert(0, me.iconCmp);
-        } else if (iconCmp) {
-            if (isEmpty) {
-                me.iconCmp.destroy();
-                delete me.iconCmp;
-            } else {
-                iconCmp.removeCls(iconCmp.iconCls);
-                iconCmp.addCls(cls);
-                iconCmp.iconCls = cls;
-            }
-        }
-    },
-    
-    /**
-     * Sets the image path that provides the icon image for this header.  This method will replace any existing
-     * icon if one has already been set.
-     * @param {String} icon The new icon path
-     */
-    setIcon: function(icon) {
-        var me = this,
-            isEmpty = !icon || !icon.length,
-            iconCmp = me.iconCmp;
-        
-        me.icon = icon;
-        if (!me.iconCmp && !isEmpty) {
-            me.initIconCmp();
-            me.insert(0, me.iconCmp);
-        } else if (iconCmp) {
-            if (isEmpty) {
-                me.iconCmp.destroy();
-                delete me.iconCmp;
-            } else {
-                iconCmp.setSrc(me.icon);
-            }
-        }
-    },
-
     /**
      * Add a tool to the header
      * @param {Object} tool
      */
     addTool: function(tool) {
-        this.tools.push(this.add(tool));
+        // Even though the defaultType is tool, it may be changed,
+        // so let's be safe and forcibly specify tool
+        this.add(Ext.ComponentManager.create(tool, 'tool'));
     },
 
-    /**
-     * @protected
-     * Set up the `tools.<tool type>` link in the owning Panel.
-     * Bind the tool to its owning Panel.
-     * @param component
-     * @param index
-     */
-    onAdd: function(component, index) {
-        this.callParent(arguments);
-        if (component instanceof Ext.panel.Tool) {
-            component.bindTo(this.ownerCt);
-            this.tools[component.type] = component;
+    afterLayout: function() {
+        var me = this,
+            frameBR, frameTR, frameTL, xPos;
+
+        if (me.vertical) {
+            frameTR = me.frameTR;
+            if (frameTR) {
+                // The corners sprite currently requires knowledge of the vertical header's
+                // width to correctly set the background position of the bottom right corner.
+                // TODO: rearrange the sprite so that this can be done with pure css.
+                frameBR = me.frameBR;
+                frameTL = me.frameTL;
+                xPos = (me.getWidth() - frameTR.getPadding('r') -
+                    ((frameTL) ? frameTL.getPadding('l') : me.el.getBorderWidth('l'))) + 'px';
+                frameBR.setStyle('background-position-x', xPos);
+                frameTR.setStyle('background-position-x', xPos);
+            }
+        }
+        this.callParent();
+    },
+
+    applyTitle: function(title, oldTitle) {
+        var me = this,
+            isString, configHasRotation;
+
+        title = title || '';
+
+        isString = typeof title === 'string';
+        if (isString) {
+            title = {
+                text: title
+            };
+        }
+
+        if (oldTitle) {
+            // several title configs can trigger layouts, so suspend before setting
+            // configs in bulk
+            Ext.suspendLayouts();
+            oldTitle.setConfig(title);
+            Ext.resumeLayouts(true);
+            title = oldTitle;
+        } else {
+            if (isString) {
+                title.xtype = 'title';
+            }
+            title.ui = me.ui;
+            title.headerRole = me.headerRole;
+            configHasRotation = ('rotation' in title);
+
+            title = Ext.create(title);
+            
+            // avoid calling the title's rotation updater on initial startup in the default scenario
+            if (!configHasRotation && me.vertical && me.titleRotation === 'default') {
+                title.rotation = 1;
+            }
+        }
+
+        return title;
+    },
+
+    applyTitlePosition: function(position) {
+        var max = this.items.getCount();
+
+        if (this._titleInItems) {
+            --max;
+        }
+        return Math.max(Math.min(position, max), 0);
+    },
+
+    beforeLayout: function () {
+        this.callParent();
+        this.syncBeforeAfterTitleClasses();
+    },
+
+    beforeRender: function() {
+        var me = this,
+            itemPosition = me.itemPosition;
+
+        me.protoEl.unselectable();
+        me.callParent();
+
+        if (itemPosition !== undefined) {
+            me.insert(itemPosition, me._userItems);
         }
     },
 
     /**
-     * Add bodyCls to the renderData object
-     * @return {Object} Object with keys and values that are going to be applied to the renderTpl
-     * @private
+     * Gets the tools for this header.
+     * @return {Ext.panel.Tool[]} The tools
      */
-    initRenderData: function() {
-        return Ext.applyIf(this.callParent(), {
-            bodyCls: this.bodyCls
-        });
-    }
+    getTools: function(){
+        return this.tools.slice();
+    },
+
+    onAdd: function(component, index) {
+        var tools = this.tools;
+        this.callParent([component, index]);
+        if (component.isTool) {
+            tools.push(component);
+            tools[component.type] = component;
+        }
+    },
+
+    onAdded: function(container, pos, instanced) {
+        this.syncNoBorderCls();
+        this.callParent([container, pos, instanced]);
+    },
+
+    onRemoved: function(container, pos, instanced) {
+        this.syncNoBorderCls();
+        this.callParent([container, pos, instanced]);
+    },
+
+    setDock: function(dock) {
+        var me = this,
+            title = me.getTitle(),
+            rotation = me.getTitleRotation(),
+            titleRotation = title.getRotation();
+
+        Ext.suspendLayouts();
+
+        me.callParent([dock]);
+
+        if (rotation === 'default') {
+            rotation = (me.vertical ? 1 : 0);
+
+            if (rotation !== titleRotation) {
+                title.setRotation(rotation);
+            }
+            
+            if (me.rendered) {
+                // remove margins set on items by box layout last time around.
+                // TODO: this will no longer be needed when EXTJS-13359 is fixed
+                me.resetItemMargins();
+            }
+        }
+
+        Ext.resumeLayouts(true);
+    },
+
+    updateGlyph: function(glyph) {
+        this.getTitle().setGlyph(glyph);
+    },
+
+    updateIcon: function(icon) {
+        this.getTitle().setIcon(icon);
+    },
+
+    updateIconAlign: function(align, oldAlign) {
+        this.getTitle().setIconAlign(align);
+    },
+
+    updateIconCls: function(cls) {
+        this.getTitle().setIconCls(cls);
+    },
+
+    updateTitle: function(title, oldTitle) {
+        if (!oldTitle) {
+            this.insert(this.getTitlePosition(), title);
+            this._titleInItems = true;
+        }
+        // for backward compat with 4.x, set titleCmp property
+        this.titleCmp = title;
+    },
+
+    updateTitleAlign: function(align, oldAlign) {
+        this.getTitle().setTextAlign(align);
+    },
+
+    updateTitlePosition: function(position) {
+        this.insert(position, this.getTitle());
+    },
+
+    updateTitleRotation: function(rotation) {
+        if (rotation === 'default') {
+            rotation = (this.vertical ? 1 : 0);
+        }
+        this.getTitle().setRotation(rotation);
+    },
+
+    privates: {
+        fireClickEvent: function(type, e){
+            var toolCls = '.' + Ext.panel.Tool.prototype.baseCls;
+            if (!e.getTarget(toolCls)) {
+                this.fireEvent(type, this, e);
+            }
+        },
+
+        getFocusEl: function() {
+            return this.el;
+        },
+
+        getFramingInfoCls: function(){
+            var me = this,
+                cls = me.callParent(),
+                owner = me.ownerCt;
+
+            if (!me.expanding && owner && (owner.collapsed || me.isCollapsedExpander)) {
+                cls += '-' + owner.collapsedCls;
+            }
+            return cls + '-' + me.dock;
+        },
+
+        onClick: function(e) {
+            this.fireClickEvent('click', e);
+        },
+
+        onDblClick: function(e){
+            this.fireClickEvent('dblclick', e);
+        },
+
+        syncBeforeAfterTitleClasses: function(force) {
+            var me = this,
+                items = me.items,
+                childItems = items.items,
+                titlePosition = me.getTitlePosition(),
+                itemCount = childItems.length,
+                itemGeneration = items.generation,
+                syncGen = me.syncBeforeAfterGen,
+                afterCls, beforeCls, i, item;
+
+            if (!force && (syncGen === itemGeneration)) {
+                return;
+            }
+            me.syncBeforeAfterGen = itemGeneration;
+
+            for (i = 0; i < itemCount; ++i) {
+                item = childItems[i];
+
+                afterCls  = item.afterTitleCls  || (item.afterTitleCls  = item.baseCls + '-after-title');
+                beforeCls = item.beforeTitleCls || (item.beforeTitleCls = item.baseCls + '-before-title');
+
+                if (!me.title || i < titlePosition) {
+                    if (syncGen) {
+                        item.removeCls(afterCls);
+                    } // else first time we won't need to remove anything...
+                    item.addCls(beforeCls);
+                } else if (i > titlePosition) {
+                    if (syncGen) {
+                        item.removeCls(beforeCls);
+                    }
+                    item.addCls(afterCls);
+                }
+            }
+        },
+
+        syncNoBorderCls: function() {
+            var me = this,
+                ownerCt = this.ownerCt,
+                noBorderCls = me.headerCls + '-noborder';
+
+            // test for border === false is needed because undefined is the same as true
+            if (ownerCt ? (ownerCt.border === false && !ownerCt.frame) : me.border === false) {
+                me.addCls(noBorderCls);
+            } else {
+                me.removeCls(noBorderCls);
+            }
+        }
+    } // private
 });

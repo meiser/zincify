@@ -26,7 +26,7 @@ Ext.define('Ext.calendar.data.MemoryEventStore', {
         type: 'memory',
         reader: {
             type: 'json',
-            root: 'evts'
+            rootProperty: 'evts'
         },
         writer: {
             type: 'json'
@@ -43,7 +43,7 @@ Ext.define('Ext.calendar.data.MemoryEventStore', {
         }];
         
         this.idProperty = this.idProperty || Ext.calendar.data.EventMappings.EventId.mapping || 'id';
-        this.fields = Ext.calendar.data.EventModel.prototype.fields.getRange();
+        this.fields = Ext.calendar.data.EventModel.getFields();
         this.onCreateRecords = Ext.Function.createInterceptor(this.onCreateRecords, this.interceptCreateRecords);
         this.initRecs();
     },

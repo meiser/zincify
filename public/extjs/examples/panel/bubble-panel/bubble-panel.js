@@ -22,7 +22,7 @@ Ext.onReady(function() {
             
             this.setText('Toggle UI: ' + panel.ui);
         }
-    })
+    });
     
     // Normal panel
     Ext.create('widget.panel', {

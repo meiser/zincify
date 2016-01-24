@@ -1,7 +1,7 @@
 /**
  * A basic hidden field for storing hidden values in forms that need to be passed in the form submit.
  *
- * This creates an actual input element with type="submit" in the DOM. While its label is
+ * This creates an actual input element with type="hidden" in the DOM. While its label is
  * {@link #hideLabel not rendered} by default, it is still a real component and may be sized according
  * to its owner container's layout.
  *
@@ -11,6 +11,7 @@
  *
  * Example:
  *
+ *     @example
  *     new Ext.form.Panel({
  *         title: 'My Form',
  *         items: [{
@@ -47,10 +48,15 @@ Ext.define('Ext.form.field.Hidden', {
     alternateClassName: 'Ext.form.Hidden',
 
     // private
+    focusable: false,
     inputType : 'hidden',
+    isTextInput: false,
     hideLabel: true,
+    hidden: true,
     
-    initComponent: function(){
+    ariaRole: 'presentation',
+    
+    initComponent: function() {
         this.formItemCls += '-hidden';
         this.callParent();    
     },

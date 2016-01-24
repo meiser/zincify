@@ -10,9 +10,26 @@
  *   container, to facilitate uniform configuration of all fields.
  *
  * This mixin is primarily for internal use by {@link Ext.form.Panel} and {@link Ext.form.FieldContainer},
- * and should not normally need to be used directly. @docauthor Jason Johnston <jason@sencha.com>
+ * and should not normally need to be used directly.
+ *
+ * @docauthor Jason Johnston <jason@sencha.com>
  */
 Ext.define('Ext.form.FieldAncestor', {
+    extend: 'Ext.Mixin',
+
+    requires: [
+        'Ext.container.Monitor'
+    ],
+
+    mixinConfig: {
+        id: 'fieldAncestor',
+        after: {
+            initInheritedState: 'initFieldInheritedState'
+        },
+        before: {
+            destroy: 'onBeforeDestroy'
+        }
+    },
 
     /**
      * @cfg {Object} fieldDefaults
@@ -55,6 +72,23 @@ Ext.define('Ext.form.FieldAncestor', {
      * the labelWidth:150 from its own config.
      */
 
+    /**
+     * @event fieldvaliditychange
+     * Fires when the validity state of any one of the {@link Ext.form.field.Field} instances within this
+     * container changes.
+     * @param {Ext.form.FieldAncestor} this
+     * @param {Ext.form.Labelable} field The Field instance whose validity changed
+     * @param {String} isValid The field's new validity state
+     */
+
+    /**
+     * @event fielderrorchange
+     * Fires when the active error message is changed for any one of the {@link Ext.form.Labelable} instances
+     * within this container.
+     * @param {Ext.form.FieldAncestor} this
+     * @param {Ext.form.Labelable} field The Labelable instance whose active error was changed
+     * @param {String} error The active error message
+     */
 
     /**
      * Initializes the FieldAncestor's state; this must be called from the initComponent method of any components
@@ -62,36 +96,48 @@ Ext.define('Ext.form.FieldAncestor', {
      * @protected
      */
     initFieldAncestor: function() {
-        var me = this,
-            onSubtreeChange = me.onFieldAncestorSubtreeChange;
+        var me = this;
 
-        me.addEvents(
-            /**
-             * @event fieldvaliditychange
-             * Fires when the validity state of any one of the {@link Ext.form.field.Field} instances within this
-             * container changes.
-             * @param {Ext.form.FieldAncestor} this
-             * @param {Ext.form.Labelable} The Field instance whose validity changed
-             * @param {String} isValid The field's new validity state
-             */
-            'fieldvaliditychange',
-
-            /**
-             * @event fielderrorchange
-             * Fires when the active error message is changed for any one of the {@link Ext.form.Labelable} instances
-             * within this container.
-             * @param {Ext.form.FieldAncestor} this
-             * @param {Ext.form.Labelable} The Labelable instance whose active error was changed
-             * @param {String} error The active error message
-             */
-            'fielderrorchange'
-        );
-
-        // Catch addition and removal of descendant fields
-        me.on('add', onSubtreeChange, me);
-        me.on('remove', onSubtreeChange, me);
-
+        // We use the monitor here as opposed to event bubbling. The problem with bubbling is it doesn't
+        // let us react to items being added/remove at different places in the hierarchy which may have an
+        // impact on the error/valid state.
+        me.monitor = new Ext.container.Monitor({
+            scope: me,
+            selector: '[isFormField]:not([excludeForm])',
+            addHandler: me.onChildFieldAdd,
+            removeHandler: me.onChildFieldRemove
+        });
         me.initFieldDefaults();
+    },
+    
+    initMonitor: function() {
+        this.monitor.bind(this);    
+    },
+
+    initFieldInheritedState: function (inheritedState) {
+        var inheritedFieldDefaults = inheritedState.fieldDefaults,
+            fieldDefaults = this.fieldDefaults;
+
+        if (fieldDefaults) {
+            if (inheritedFieldDefaults) {
+                inheritedState.fieldDefaults =
+                        Ext.apply(Ext.Object.chain(inheritedFieldDefaults), fieldDefaults);
+            } else {
+                inheritedState.fieldDefaults = fieldDefaults;
+            }
+        }
+    },
+
+    onChildFieldAdd: function(field) {
+        var me = this;
+        me.mon(field, 'errorchange', me.handleFieldErrorChange, me);
+        me.mon(field, 'validitychange', me.handleFieldValidityChange, me);
+    },
+    
+    onChildFieldRemove: function(field) {
+        var me = this;
+        me.mun(field, 'errorchange', me.handleFieldErrorChange, me);
+        me.mun(field, 'validitychange', me.handleFieldValidityChange, me);
     },
 
     /**
@@ -104,91 +150,25 @@ Ext.define('Ext.form.FieldAncestor', {
     },
 
     /**
-     * @private
-     * Handle the addition and removal of components in the FieldAncestor component's child tree.
-     */
-    onFieldAncestorSubtreeChange: function(parent, child) {
-        var me = this,
-            isAdding = !!child.ownerCt;
-
-        function handleCmp(cmp) {
-            var isLabelable = cmp.isFieldLabelable,
-                isField = cmp.isFormField;
-            if (isLabelable || isField) {
-                if (isLabelable) {
-                    me['onLabelable' + (isAdding ? 'Added' : 'Removed')](cmp);
-                }
-                if (isField) {
-                    me['onField' + (isAdding ? 'Added' : 'Removed')](cmp);
-                }
-            }
-            else if (cmp.isContainer) {
-                Ext.Array.forEach(cmp.getRefItems(), handleCmp);
-            }
-        }
-        handleCmp(child);
-    },
-
-    /**
-     * Called when a {@link Ext.form.Labelable} instance is added to the container's subtree.
-     * @param {Ext.form.Labelable} labelable The instance that was added
-     * @protected
-     */
-    onLabelableAdded: function(labelable) {
-        var me = this;
-
-        // buffer slightly to avoid excessive firing while sub-fields are changing en masse
-        me.mon(labelable, 'errorchange', me.handleFieldErrorChange, me, {buffer: 10});
-
-        labelable.setFieldDefaults(me.fieldDefaults);
-    },
-
-    /**
-     * Called when a {@link Ext.form.field.Field} instance is added to the container's subtree.
-     * @param {Ext.form.field.Field} field The field which was added
-     * @protected
-     */
-    onFieldAdded: function(field) {
-        var me = this;
-        me.mon(field, 'validitychange', me.handleFieldValidityChange, me);
-    },
-
-    /**
-     * Called when a {@link Ext.form.Labelable} instance is removed from the container's subtree.
-     * @param {Ext.form.Labelable} labelable The instance that was removed
-     * @protected
-     */
-    onLabelableRemoved: function(labelable) {
-        var me = this;
-        me.mun(labelable, 'errorchange', me.handleFieldErrorChange, me);
-    },
-
-    /**
-     * Called when a {@link Ext.form.field.Field} instance is removed from the container's subtree.
-     * @param {Ext.form.field.Field} field The field which was removed
-     * @protected
-     */
-    onFieldRemoved: function(field) {
-        var me = this;
-        me.mun(field, 'validitychange', me.handleFieldValidityChange, me);
-    },
-
-    /**
-     * @private Handle validitychange events on sub-fields; invoke the aggregated event and method
+     * @private Handle bubbled validitychange events from descendants; invoke the aggregated event and method
      */
     handleFieldValidityChange: function(field, isValid) {
         var me = this;
-        me.fireEvent('fieldvaliditychange', me, field, isValid);
-        me.onFieldValidityChange(field, isValid);
+        if (field !== me) {
+            me.fireEvent('fieldvaliditychange', me, field, isValid);
+            me.onFieldValidityChange(field, isValid);
+        }
     },
 
     /**
-     * @private Handle errorchange events on sub-fields; invoke the aggregated event and method
+     * @private Handle bubbled errorchange events from descendants; invoke the aggregated event and method
      */
     handleFieldErrorChange: function(labelable, activeError) {
         var me = this;
-        me.fireEvent('fielderrorchange', me, labelable, activeError);
-        me.onFieldErrorChange(labelable, activeError);
+        if (labelable !== me) {
+            me.fireEvent('fielderrorchange', me, labelable, activeError);
+            me.onFieldErrorChange(labelable, activeError);
+        }
     },
 
     /**
@@ -205,6 +185,10 @@ Ext.define('Ext.form.FieldAncestor', {
      * @param {String} error The new active error message
      * @protected
      */
-    onFieldErrorChange: Ext.emptyFn
+    onFieldErrorChange: Ext.emptyFn,
+
+    onBeforeDestroy: function(){
+        this.monitor.unbind();
+    }
 
 });

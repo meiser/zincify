@@ -4,8 +4,7 @@ Ext.Loader.setPath('Ext.ux', '../ux/');
 Ext.require([
     'Ext.grid.*',
     'Ext.data.*',
-    'Ext.util.*',
-    'Ext.grid.PagingScroller'
+    'Ext.util.*'
 ]);
 
 Ext.onReady(function(){
@@ -27,12 +26,10 @@ Ext.onReady(function(){
     });
 
     // create the Data Store
-    var store = Ext.create('Ext.data.Store', {
+    var store = Ext.create('Ext.data.BufferedStore', {
         id: 'store',
         model: 'ForumThread',
         remoteSort: true,
-        // allow the grid to interact with the paging scroller by buffering
-        buffered: true,
         pageSize: 100,
         proxy: {
             // load using script tags for cross domain, if the data in on the same domain as
@@ -40,7 +37,7 @@ Ext.onReady(function(){
             type: 'jsonp',
             url: 'http://www.sencha.com/forum/remote_topics/index.php',
             reader: {
-                root: 'topics',
+                rootProperty: 'topics',
                 totalProperty: 'totalCount'
             },
             // sends single sort as multi parameter

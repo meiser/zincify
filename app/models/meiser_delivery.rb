@@ -1,7 +1,7 @@
 class MeiserDelivery < ActiveRecord::Base
   attr_accessible :tag, :indate, :outdate, :remarks
 
-  default_scope order("#{self.table_name}.created_at DESC")
+  default_scope {order("#{self.table_name}.created_at DESC")}
 
   validate :regular_tag
   

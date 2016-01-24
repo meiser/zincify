@@ -38,7 +38,7 @@ Ext.onReady(function() {
     // Handle this change event in order to restore the UI to the appropriate history state
     function onAfterRender() {
         Ext.History.on('change', function(token) {
-            var parts, tabPanel, length, i;
+            var parts, length, i;
             
             if (token) {
                 parts = token.split(tokenDelimiter);

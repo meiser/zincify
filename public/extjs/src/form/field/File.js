@@ -51,11 +51,30 @@
  *         }]
  *     });
  */
-Ext.define("Ext.form.field.File", {
-    extend: 'Ext.form.field.Trigger',
+Ext.define('Ext.form.field.File', {
+    extend: 'Ext.form.field.Text',
     alias: ['widget.filefield', 'widget.fileuploadfield'],
     alternateClassName: ['Ext.form.FileUploadField', 'Ext.ux.form.FileUploadField', 'Ext.form.File'],
-    uses: ['Ext.button.Button', 'Ext.layout.component.field.Field'],
+    requires: [
+        'Ext.form.field.FileButton',
+        'Ext.form.trigger.Component'
+    ],
+    
+    needArrowKeys: false,
+
+    triggers: {
+        filebutton: {
+            type: 'component',
+            hideOnReadOnly: false,
+            // Most form fields prevent the default browser action on mousedown of the trigger.
+            // This is intended to prevent the field's input element from losing focus when
+            // the trigger is clicked.  File fields disable this behavior because:
+            // 1. The input element does not receive focus when the field is focused. The button does.
+            // 2. Preventing the default action of touchstart (translated from mousedown
+            // on mobile browsers) prevents the browser's file dialog from opening.
+            preventMouseDown: false
+        }
+    },
 
     //<locale>
     /**
@@ -79,10 +98,17 @@ Ext.define("Ext.form.field.File", {
      * applies if {@link #buttonOnly} = false.
      */
     buttonMargin: 3,
+    
+    /**
+     * @cfg {Boolean} clearOnSubmit
+     * True to clear the selected file value when the form this field belongs to
+     * is submitted to the server.
+     */
+    clearOnSubmit: true,
 
     /**
      * @cfg {Object} buttonConfig
-     * A standard {@link Ext.button.Button} config object.
+     * Specify optional custom button {@link Ext.button.Button} config (eg. iconCls, text) for the upload button
      */
 
     /**
@@ -94,7 +120,7 @@ Ext.define("Ext.form.field.File", {
      */
 
     /**
-     * @property {Ext.Element} fileInputEl
+     * @property {Ext.dom.Element} fileInputEl
      * A reference to the invisible file input element created for this upload field. Only populated after this
      * component is rendered.
      */
@@ -105,17 +131,25 @@ Ext.define("Ext.form.field.File", {
      * rendered.
      */
 
-    /**
-     * @cfg {String} [fieldBodyCls='x-form-file-wrap']
-     * An extra CSS class to be applied to the body content element in addition to {@link #fieldBodyCls}.
-     */
-    fieldBodyCls: Ext.baseCSSPrefix + 'form-file-wrap',
+
+    // private
+    extraFieldBodyCls: Ext.baseCSSPrefix + 'form-file-wrap',
+    // private
+    inputCls: Ext.baseCSSPrefix + 'form-text-file',
 
     /**
-     * @cfg {Boolean} readOnly
+     * @cfg {Boolean} [readOnly=true]
      * Unlike with other form fields, the readOnly config defaults to true in File field.
      */
     readOnly: true,
+
+    /**
+     * @cfg {Boolean} editable
+     * @inheritdoc
+     */
+    editable: false,
+
+    submitValue: false,
 
     /**
      * Do not show hand pointer over text field since file choose dialog is only shown when clicking in the button
@@ -123,36 +157,75 @@ Ext.define("Ext.form.field.File", {
      */
     triggerNoEditCls: '',
 
-    // private
-    componentLayout: 'triggerfield',
+    // @private
+    // Extract the file element, button outer element, and button active element.
+    childEls: ['browseButtonWrap'],
 
-    // private. Extract the file element, button outer element, and button active element.
-    childEls: ['fileInputEl', 'buttonEl', 'buttonEl-btnEl', 'browseButtonWrap'],
+    // @private
+    applyTriggers: function(triggers) {
+        var me = this,
+            triggerCfg = (triggers || {}).filebutton;
 
-    // private
+        if (triggerCfg) {
+            triggerCfg.component = Ext.apply({
+                xtype: 'filebutton',
+                ownerCt: me,
+                id: me.id + '-button',
+                ui: me.ui,
+                disabled: me.disabled,
+                text: me.buttonText,
+                style: me.buttonOnly ? '' : me.getButtonMarginProp() + me.buttonMargin + 'px',
+                inputName: me.getName(),
+                listeners: {
+                    scope: me,
+                    change: me.onFileChange
+                }
+            }, me.buttonConfig);
+
+            return me.callParent([triggers]);
+        }
+        // <debug>
+        else {
+            Ext.Error.raise(me.$className + ' requires a valid trigger config containing "filebutton" specification');
+        }
+        // </debug>
+    },
+    
+    getSubTplData: function(fieldData) {
+        var data = this.callParent([fieldData]);
+        
+        // Input field itself should not be focusable since it's always decorative;
+        // however the input element is naturally focusable (and tabbable) so we have to
+        // deactivate it by setting its tabIndex to -1.
+        data.tabIdx = -1;
+        
+        return data;
+    },
+
+    // @private
     onRender: function() {
         var me = this,
-            inputEl;
+            inputEl, button, buttonEl, trigger;
 
         me.callParent(arguments);
 
         inputEl = me.inputEl;
         inputEl.dom.name = ''; //name goes on the fileInput, not the text input
 
-        me.fileInputEl.dom.name = me.getName();
-        me.fileInputEl.on({
-            scope: me,
-            change: me.onFileChange
-        });
+        trigger = me.getTrigger('filebutton');
+        button = me.button = trigger.component;
+        me.fileInputEl = button.fileInputEl;
+        buttonEl = button.el;
 
         if (me.buttonOnly) {
-            me.inputCell.setDisplayed(false);
+            me.inputWrap.setDisplayed(false);
+            me.shrinkWrap = 3;
         }
 
-        // Ensure the trigger cell is sized correctly upon render
-        me.browseButtonWrap.dom.style.width = (me.browseButtonWrap.dom.lastChild.offsetWidth + me.buttonEl.getMargin('lr')) + 'px';
+        // Ensure the trigger element is sized correctly upon render
+        trigger.el.setWidth(buttonEl.getWidth() + buttonEl.getMargin('lr'));
         if (Ext.isIE) {
-            me.buttonEl.repaint();
+            me.button.getEl().repaint();
         }
     },
 
@@ -160,62 +233,24 @@ Ext.define("Ext.form.field.File", {
      * Gets the markup to be inserted into the subTplMarkup.
      */
     getTriggerMarkup: function() {
-        var me = this,
-            result,
-            btn = Ext.widget('button', Ext.apply({
-                id: me.id + '-buttonEl',
-                ui: me.ui,
-                disabled: me.disabled,
-                text: me.buttonText,
-                cls: Ext.baseCSSPrefix + 'form-file-btn',
-                preventDefault: false,
-                style: me.buttonOnly ? '' : 'margin-left:' + me.buttonMargin + 'px'
-            }, me.buttonConfig)),
-            btnCfg = btn.getRenderTree(),
-            inputElCfg = {
-                id: me.id + '-fileInputEl',
-                cls: Ext.baseCSSPrefix + 'form-file-input',
-                tag: 'input',
-                type: 'file',
-                size: 1
-            };
-        if (me.disabled) {
-            inputElCfg.disabled = true;
-        }
-        btnCfg.cn = inputElCfg;
-        result = '<td id="' + me.id + '-browseButtonWrap">' + Ext.DomHelper.markup(btnCfg) + '</td>';
-        btn.destroy();
-        return result;
-    },
-
-    /**
-     * @private
-     * Creates the file input element. It is inserted into the trigger button component, made
-     * invisible, and floated on top of the button's other content so that it will receive the
-     * button's clicks.
-     */
-    createFileInput : function() {
-        var me = this;
-        me.fileInputEl = me.buttonEl.createChild({
-            name: me.getName(),
-            id: me.id + '-fileInputEl',
-            cls: Ext.baseCSSPrefix + 'form-file-input',
-            tag: 'input',
-            type: 'file',
-            size: 1
-        });
-        me.fileInputEl.on({
-            scope: me,
-            change: me.onFileChange
-        });
+        return '<td id="' + this.id + '-browseButtonWrap" data-ref="browseButtonWrap" role="presentation"></td>';
     },
 
     /**
      * @private Event handler fired when the user selects a file.
      */
-    onFileChange: function() {
-        this.lastValue = null; // force change event to get fired even if the user selects a file with the same name
-        Ext.form.field.File.superclass.setValue.call(this, this.fileInputEl.dom.value);
+    onFileChange: function(button, e, value) {
+        this.duringFileSelect = true;
+        Ext.form.field.File.superclass.setValue.call(this, value);
+        delete this.duringFileSelect;
+    },
+    
+    didValueChange: function(){
+        // In the case of the file field, the change event will only ever fire 
+        // if the value actually changes, so we always want to fire the change event
+        // This affects Chrome specifically, because hitting the cancel button will
+        // reset the file upload.
+        return !!this.duringFileSelect;
     },
 
     /**
@@ -225,47 +260,83 @@ Ext.define("Ext.form.field.File", {
     setValue: Ext.emptyFn,
 
     reset : function(){
-        var me = this;
+        var me = this,
+            clear = me.clearOnSubmit;
         if (me.rendered) {
-            me.fileInputEl.remove();
-            me.createFileInput();
-            me.inputEl.dom.value = '';
+            me.button.reset(clear);
+            me.fileInputEl = me.button.fileInputEl;
+            if (clear) {
+                me.inputEl.dom.value = '';
+                // Reset the underlying value if we're clearing it
+                Ext.form.field.File.superclass.setValue.call(this, null);
+            }
         }
         me.callParent();
+    },
+    
+    onShow: function(){
+        this.callParent();
+        // If we started out hidden, the button may have a messed up layout
+        // since we don't act like a container
+        this.button.updateLayout();    
     },
 
     onDisable: function(){
         this.callParent();
-        this.disableItems();
-    },
-    
-    disableItems: function(){
-        var file = this.fileInputEl;
-        if (file) {
-            file.dom.disabled = true;
-        }
-        this['buttonEl-btnEl'].dom.disabled = true;
+        this.button.disable();
     },
 
     onEnable: function(){
-        var me = this;
-        me.callParent();
-        me.fileInputEl.dom.disabled = false;
-        this['buttonEl-btnEl'].dom.disabled = false;
+        this.callParent();
+        this.button.enable();
     },
 
-    isFileUpload: function() {
-        return true;
-    },
+    /**
+     * @method
+     * @inheritdoc
+     */
+    isFileUpload: Ext.returnTrue,
 
     extractFileInput: function() {
-        var fileInput = this.fileInputEl.dom;
-        this.reset();
+        var me = this,
+            fileInput;
+            
+        if (me.rendered) {
+            fileInput = me.button.fileInputEl.dom;
+            me.reset();
+        } else {
+            // Create a fake empty field here so it will still be submitted.
+            // All other unrendered fields provide a value.
+            fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            fileInput.className = Ext.baseCSSPrefix + 'hidden-display';
+            fileInput.name = me.getName();
+        }
         return fileInput;
+    },
+    
+    restoreInput: function(el) {
+        // If we're not rendered we don't need to do anything, it will be created
+        // when we get flushed to the DOM.
+        if (this.rendered) {
+            var button = this.button;
+            button.restoreInput(el);
+            this.fileInputEl = button.fileInputEl;
+        }
     },
 
     onDestroy: function(){
-        Ext.destroyMembers(this, 'fileInputEl', 'buttonEl');
+        this.fileInputEl = this.button = null;
         this.callParent();
+    },
+
+    getButtonMarginProp: function() {
+        return 'margin-left:';
+    },
+    
+    privates: {
+        getFocusEl: function() {
+            return this.button;
+        }
     }
 });

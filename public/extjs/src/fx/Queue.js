@@ -109,15 +109,20 @@ Ext.define('Ext.fx.Queue', {
         }
         anim.on('afteranimate', function() {
             Ext.Array.remove(queue, anim);
+            if (queue.length === 0) {
+                me.targets.remove(anim.target);
+            }
             if (anim.remove) {
                 if (target.type == 'element') {
                     var el = Ext.get(target.id);
                     if (el) {
-                        el.remove();
+                        el.destroy();
                     }
                 }
             }
-        }, this);
+        }, me, {
+            single: true
+        });
         queue.push(anim);
     }
 });

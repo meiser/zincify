@@ -42,123 +42,77 @@
  *             maxValue: '6:00pm'
  *         }]
  *     });
- *
- * Note that any configured {@link Ext.Component#padding padding} will be ignored on items within a Form layout.
  */
 Ext.define('Ext.layout.container.Form', {
-
-    /* Begin Definitions */
-
-    alias: 'layout.form',
     extend: 'Ext.layout.container.Auto',
     alternateClassName: 'Ext.layout.FormLayout',
-
-    /* End Definitions */
-   
-    tableCls: Ext.baseCSSPrefix + 'form-layout-table',
-
+    alias: 'layout.form',
     type: 'form',
 
-    manageOverflow: 2,
+    formWrapCls: Ext.baseCSSPrefix + 'form-layout-wrap',
+    formWrapAutoLabelCls: Ext.baseCSSPrefix + 'form-layout-auto-label',
+    formWrapSizedLabelCls: Ext.baseCSSPrefix + 'form-layout-sized-label',
+    formColGroupCls: Ext.baseCSSPrefix + 'form-layout-colgroup',
+    formColumnCls: Ext.baseCSSPrefix + 'form-layout-column',
+    formLabelColumnCls: Ext.baseCSSPrefix + 'form-layout-label-column',
 
-    childEls: ['formTable'],
-    
-    padRow: '<tr><td class="' + Ext.baseCSSPrefix + 'form-item-pad" colspan="3"></td></tr>',
+    /**
+     * @cfg {Number} itemSpacing
+     * The amount of space, in pixels, to use between the items. Defaults to the value
+     * inherited from the theme's stylesheet as configured by
+     * {@link Ext.form.Labelable#$form-item-margin-bottom $form-item-margin-bottom}.
+     */
 
-    renderTpl: [
-        '<table id="{ownerId}-formTable" class="{tableCls}" style="width:100%" cellpadding="0">',
-            '{%this.renderBody(out,values)%}',
-        '</table>',
-        '{%this.renderPadder(out,values)%}'
-    ],
-    
-    getRenderData: function(){
-        var data = this.callParent();
-        data.tableCls = this.tableCls;
-        return data;    
-    },
+    /**
+     * @cfg {Number/String} labelWidth
+     * The width of the labels. This can be either a number in pixels, or a valid CSS
+     * "width" style, e.g. `'100px'`, or `'30%'`.  When configured, all labels will assume
+     * this width, and any {@link Ext.form.Labelable#labelWidth labelWidth} specified
+     * on the items will be ignored.
+     *
+     * The default behavior of this layout when no no labelWidth is specified is to size
+     * the labels to the text-width of the label with the longest text.
+     */
 
-    calculate : function (ownerContext) {
+    childEls: ['formWrap', 'labelColumn'],
+
+    beforeBodyTpl:
+        '<div id="{ownerId}-formWrap" data-ref="formWrap" class="{formWrapCls}"' +
+            '<tpl if="itemSpacing"> style="border-spacing:{itemSpacing}px"</tpl>>' +
+            '<div class="{formColGroupCls}">' +
+                '<div id="{ownerId}-labelColumn" data-ref="labelColumn" class="{formColumnCls} {formLabelColumnCls}"' +
+                    '<tpl if="labelWidth"> style="width:{labelWidth}"</tpl>>' +
+                '</div>' +
+                '<div class="{formColumnCls}"></div>' +
+            '</div>',
+
+    afterBodyTpl: '</div>',
+
+    getRenderData: function() {
         var me = this,
-            containerSize = me.getContainerSize(ownerContext, true),
-            tableWidth,
-            childItems,
-            i = 0, length;
+            labelWidth = me.labelWidth,
+            formWrapCls = me.formWrapCls,
+            data = me.callParent();
 
-        // Once we have been widthed, we can impose that width (in a non-dirty setting) upon all children at once
-        if (containerSize.gotWidth) {
-            this.callParent(arguments);
-            tableWidth = me.formTable.dom.offsetWidth;
-            childItems = ownerContext.childItems;
-
-            for (length = childItems.length; i < length; ++i) {
-                childItems[i].setWidth(tableWidth, false);
+        if (labelWidth) {
+            if (typeof labelWidth === 'number') {
+                labelWidth += 'px';
             }
+            data.labelWidth = labelWidth;
+            formWrapCls += ' ' + me.formWrapSizedLabelCls;
         } else {
-            me.done = false;
+            formWrapCls += ' ' + me.formWrapAutoLabelCls;
         }
+
+        data.formWrapCls = formWrapCls;
+        data.formColGroupCls = me.formColGroupCls;
+        data.formColumnCls = me.formColumnCls;
+        data.formLabelColumnCls = me.formLabelColumnCls;
+
+        return data;
     },
 
     getRenderTarget: function() {
-        return this.formTable;
-    },
-
-    getRenderTree: function() {
-        var me = this,
-            result = me.callParent(arguments),
-            i, len;
-
-        for (i = 0, len = result.length; i < len; i++) {
-            result[i] = me.transformItemRenderTree(result[i]);
-        }
-        return result;
-    },
-
-    transformItemRenderTree: function(item) {
-
-        if (item.tag && item.tag == 'table') {
-            item.tag = 'tbody';
-            delete item.cellspacing;
-            delete item.cellpadding;
-
-            // IE6 doesn't separate cells nicely to provide input field
-            // vertical separation. It also does not support transparent borders
-            // which is how the extra 1px is added to the 2px each side cell spacing.
-            // So it needs a 5px high pad row.
-            if (Ext.isIE6) {
-                item.cn = this.padRow;
-            }
-
-            return item;
-        }
-
-        return {
-            tag: 'tbody',
-            cn: {
-                tag: 'tr',
-                cn: {
-                    tag: 'td',
-                    colspan: 3,
-                    style: 'width:100%',
-                    cn: item
-                }
-            }
-        };
-
-    },
-
-    isValidParent: function(item, target, position) {
-        return true;
-    },
-
-    isItemShrinkWrap: function(item) {
-        return ((item.shrinkWrap === true) ? 3 : item.shrinkWrap||0) & 2;
-    },
-
-    getItemSizePolicy: function(item) {
-        return {
-            setsWidth: 1,
-            setsHeight: 0
-        };
+        return this.formWrap;
     }
 });

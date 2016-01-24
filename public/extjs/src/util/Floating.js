@@ -2,8 +2,9 @@
  * A mixin to add floating capability to a Component.
  */
 Ext.define('Ext.util.Floating', {
+    mixinId: 'floating',
 
-    uses: ['Ext.Layer', 'Ext.window.Window'],
+    uses: ['Ext.ZIndexManager'],
 
     /**
      * @cfg {Boolean} focusOnToFront
@@ -21,72 +22,168 @@ Ext.define('Ext.util.Floating', {
     shadow: 'sides',
 
     /**
-     * @cfg {String/Boolean} shadowOffset
+     * @cfg {Boolean} [animateShadow=false]
+     * `true` to animate the shadow along with the component while the component is animating.
+     * By default the shadow is hidden while the component is animating
+     */
+    animateShadow: false,
+
+    /**
+     * @cfg {Boolean} constrain
+     * True to constrain this Components within its containing element, false to allow it to fall outside of its containing
+     * element. By default this Component will be rendered to `document.body`. To render and constrain this Component within
+     * another element specify {@link Ext.Component#renderTo renderTo}.
+     */
+    constrain: false,
+
+    /**
+     * @cfg {Boolean} [fixed=false]
+     * Configure as `true` to have this Component fixed at its `X, Y` coordinates in the browser viewport, immune
+     * to scrolling the document.
+     */
+
+    /**
+     * @cfg {Number} shadowOffset
      * Number of pixels to offset the shadow.
      */
 
-    constructor: function (dom) {
-        var me = this;
+    /**
+     * @cfg {Boolean} shim `true` to enable an iframe shim for this Component to keep
+     * windowed objects from showing through.
+     */
 
-        me.el = new Ext.Layer(Ext.apply({
-            hideMode     : me.hideMode,
-            hidden       : me.hidden,
-            shadow       : (typeof me.shadow != 'undefined') ? me.shadow : 'sides',
-            shadowOffset : me.shadowOffset,
-            constrain    : false,
-            shim         : (me.shim === false) ? false : undefined
-        }, me.floating), dom);
+    /**
+     * @property {Boolean}
+     * The value `true` indicates that this Component is floating.
+     * @private
+     * @readonly
+     */
 
-        // release config object (if it was one)
-        me.floating = true;
-        
+    /**
+     * @property {Ext.ZIndexManager} zIndexManager
+     * Only present for {@link Ext.Component#floating floating} Components after they have been rendered.
+     *
+     * A reference to the ZIndexManager which is managing this Component's z-index.
+     *
+     * The {@link Ext.ZIndexManager ZIndexManager} maintains a stack of floating Component z-indices, and also provides
+     * a single modal mask which is insert just beneath the topmost visible modal floating Component.
+     *
+     * Floating Components may be {@link Ext.Component#toFront brought to the front} or {@link Ext.Component#toBack sent to the back} of the
+     * z-index stack.
+     *
+     * This defaults to the global {@link Ext.WindowManager ZIndexManager} for floating Components that are
+     * programatically {@link Ext.Component#method-render rendered}.
+     *
+     * For {@link #floating} Components which are added to a Container, the ZIndexManager is acquired from the first
+     * ancestor Container found which is floating. If no floating ancestor is found, the global {@link Ext.WindowManager ZIndexManager} is
+     * used.
+     *
+     * See {@link Ext.Component#floating} and {@link #zIndexParent}
+     * @readonly
+     */
+
+    /**
+     * @property {Ext.Container} zIndexParent
+     * Only present for {@link Ext.Component#floating} Components which were inserted as child items of Containers, and which have a floating
+     * Container in their containment ancestry.
+     *
+     * For {@link Ext.Component#floating} Components which are child items of a Container, the zIndexParent will be a floating
+     * ancestor Container which is responsible for the base z-index value of all its floating descendants. It provides
+     * a {@link Ext.ZIndexManager ZIndexManager} which provides z-indexing services for all its descendant floating
+     * Components.
+     *
+     * Floating Components that are programatically {@link Ext.Component#method-render rendered} will not have a `zIndexParent`
+     * property.
+     *
+     * For example, the dropdown {@link Ext.view.BoundList BoundList} of a ComboBox which is in a Window will have the
+     * Window as its `zIndexParent`, and will always show above that Window, wherever the Window is placed in the z-index stack.
+     *
+     * See {@link Ext.Component#floating} and {@link #zIndexManager}
+     * @readonly
+     */
+
+    config: {
+        /**
+         * @private
+         * @cfg {Number} activeCounter An incrementing numeric counter indicating activation index for use by the {@link #zIndexManager}
+         * to sort its stack.
+         */
+        activeCounter: 0,
+
+        /**
+         * @cfg {Boolean/Number} [alwaysOnTop=false] A flag indicating that this component should be on the top of the z-index stack for use by the {@link #zIndexManager}
+         * to sort its stack.
+         *
+         * This may be a positive number to prioritize the ordering of multiple visible always on top components.
+         *
+         * This may be set to a *negative* number to prioritize a component to the *bottom* of the z-index stack.
+         */
+        alwaysOnTop: false
+    },
+
+    preventDefaultAlign: false,
+
+    _visModeMap: {
+        visibility: 1,
+        display: 2,
+        offsets: 3
+    },
+
+    constructor: function () {
+        var me = this,
+            el = me.el,
+            shadow = me.shadow,
+            shadowOffset, shadowConfig;
+
+        if (shadow) {
+            shadowConfig = {
+                mode: (shadow === true) ? 'sides' : shadow
+            };
+            shadowOffset = me.shadowOffset;
+            if (shadowOffset) {
+                shadowConfig.offset = shadowOffset;
+            }
+            shadowConfig.animate = me.animateShadow;
+            shadowConfig.fixed = me.fixed;
+            el.enableShadow(shadowConfig, false);
+        }
+
+        if (me.shim || Ext.useShims) {
+            el.enableShim({
+                fixed: me.fixed
+            }, false);
+        }
+
+        el.setVisibilityMode(me._visModeMap[me.hideMode]);
+
+        // If modal, and focus navigation not being handled by the FocusManager,
+        // catch tab navigation, and loop back in on tab off first or last item.
+        if (me.modal && !(Ext.enableFocusManager)) {
+            me.mon(me.el, {
+                keydown: me.onKeyDown,
+                scope: me
+            });
+        }
+
+        // mousedown brings to front
+        // Use capture to see the event first before any contained DD instance stop the event.
+        me.mon(me.el, {
+            mousedown: me.onMouseDown,
+            scope: me,
+            capture: true
+        });
+
         // Register with the configured ownerCt.
         // With this we acquire a floatParent for relative positioning, and a zIndexParent which is an
         // ancestor floater which provides zIndex management.
         me.registerWithOwnerCt();
+
+        me.initHierarchyEvents();
     },
 
-    registerWithOwnerCt: function() {
-        var me = this;
-
-        if (me.zIndexParent) {
-            me.zIndexParent.unregisterFloatingItem(me);
-        }
-
-        // Acquire a zIndexParent by traversing the ownerCt axis for the nearest floating ancestor
-        me.zIndexParent = me.up('[floating]');
-        me.setFloatParent(me.ownerCt);
-        delete me.ownerCt;
-
-        if (me.zIndexParent) {
-            me.zIndexParent.registerFloatingItem(me);
-        } else {
-            Ext.WindowManager.register(me);
-        }
-    },
-
-    setFloatParent: function(floatParent) {
-        var me = this;
-
-        // Remove listeners from previous floatParent
-        if (me.floatParent) {
-            me.mun(me.floatParent, {
-                hide: me.onFloatParentHide,
-                show: me.onFloatParentShow,
-                scope: me
-            });
-        }
-
-        me.floatParent = floatParent;
-
-        // Floating Components as children of Containers must hide when their parent hides.
-        if (floatParent) {
-            me.mon(me.floatParent, {
-                hide: me.onFloatParentHide,
-                show: me.onFloatParentShow,
-                scope: me
-            });
-        }
+    initFloatConstrain: function () {
+        var me = this,
+            floatParent = me.floatParent;
 
         // If a floating Component is configured to be constrained, but has no configured
         // constrainTo setting, set its constrainTo to be it's ownerCt before rendering.
@@ -94,28 +191,177 @@ Ext.define('Ext.util.Floating', {
             me.constrainTo = floatParent ? floatParent.getTargetEl() : me.container;
         }
     },
-    
+
+    initHierarchyEvents: function() {
+        var me = this,
+            syncHidden = this.syncHidden;
+
+        if (!me.hasHierarchyEventListeners) {
+            me.mon(Ext.GlobalEvents, {
+                hide: syncHidden,
+                collapse: syncHidden,
+                show: syncHidden,
+                expand: syncHidden,
+                added: syncHidden,
+                scope: me
+            });
+            me.hasHierarchyEventListeners = true;
+        }
+    },
+
+    registerWithOwnerCt: function() {
+        var me = this,
+            ownerCt = me.ownerCt,
+            zip = me.zIndexParent;
+
+        if (zip) {
+            zip.unregisterFloatingItem(me);
+        }
+
+        // Acquire a zIndexParent by traversing the ownerCt axis for the nearest floating ancestor.
+        // This is to find a base which can allocate relative z-index values
+        zip = me.zIndexParent = me.up('[floating]');
+
+        // Set the floatParent to the ownertCt if one has been provided.
+        // Otherwise use the zIndexParent.
+        // Developers must only use ownerCt if there is really a containing relationship.
+        me.floatParent = ownerCt || zip;
+        me.initFloatConstrain();
+        delete me.ownerCt;
+
+        if (zip) {
+            zip.registerFloatingItem(me);
+        } else {
+            Ext.WindowManager.register(me);
+        }
+    },
+
+    // Listen for TAB events and wrap round if tabbing of either end of the Floater
+    onKeyDown: function(e) {
+        var me = this,
+            shift,
+            focusables,
+            first,
+            last;
+
+        // If tabbing off either end, wrap round.
+        // See Ext.dom.Element.isFocusable
+        // Certain browsers always report tabIndex zero in the absence of the tabIndex attribute.
+        // Testing the specified property (Standards: http://www.w3.org/TR/DOM-Level-2-Core/core.html#ID-862529273)
+        // Should filter out these cases.
+        // The exception is IE8. In this browser, all elements will yield a tabIndex
+        // and therefore all elements will appear to be focusable.
+        // This adversely affects modal Floating components.
+        // These listen for the TAB key, and then test whether the event target === last focusable
+        // or first focusable element, and forcibly to a circular navigation.
+        // We cannot know the true first or last focusable element, so this problem still exists for IE8
+        if (e.getKey() === e.TAB) {
+            shift = e.shiftKey;
+            focusables = me.query(':focusable');
+            if (focusables.length) {
+                first = focusables[0];
+                last = focusables[focusables.length - 1];
+                if (!shift && last.hasFocus) {
+                    e.stopEvent();
+                    first.focus();
+                } else if (shift && first.hasFocus) {
+                    e.stopEvent();
+                    last.focus();
+                }
+            }
+        }
+    },
+
+    // @private
+    // Mousedown brings to front, and programatically grabs focus
+    // *unless the mousedown was on a focusable element*
+    onMouseDown: function (e) {
+        var me = this,
+            focusTask = me.focusTask,
+            
+            // Do not autofocus the Component (which delegates onto the getFocusEl() descendant)
+            // for touch events.
+            parentEvent = e.parentEvent,
+            preventFocus = parentEvent && parentEvent.type === 'touchstart',
+            target, dom, skipFronting;
+
+        if (me.floating &&
+            // get out of here if there is already a pending focus.  This usually means
+            // that the handler for a mousedown on a child element set the focus on some
+            // other component, and we so not want to steal it back. See EXTJSIV-9458
+            (!focusTask || !focusTask.id)) {
+
+            target = e.target;
+            dom = me.el.dom;
+            
+            // loop the target's ancestors to see if we clicked on a focusable element
+            // or a descendant of a focusable element,  If so we don't want to focus
+            // this floating component. If we end up with no target, it probably means
+            // it's been removed from the DOM, so we should attempt to bring ourselves
+            // to front anyway
+            while (!preventFocus && target && target !== dom) {
+                if (Ext.fly(target).isFocusable()) {
+                    preventFocus = true;
+                }
+                target = target.parentNode;
+            }
+            
+            // We can skip toFront() if we're already active and the click was
+            // within our element but not on something focusable.
+            skipFronting = Ext.WindowManager.getActive() === me &&
+                           (target === dom || preventFocus);
+
+            // If what was mousedowned upon is going to claim focus anyway, pass
+            // preventFocus as true.
+            if (!skipFronting) {
+                me.toFront(preventFocus);
+            }
+        }
+    },
+
+    onBeforeFloatLayout: function(){
+        this.el.preventSync = true;
+    },
+
     onAfterFloatLayout: function(){
-        this.syncShadow();   
-    },
+        var el = this.el;
 
-    onFloatParentHide: function() {
-        var me = this;
-
-        if (me.hideOnParentHide !== false && me.isVisible()) {
-            me.hide();
-            me.showOnParentShow = true;
+        if (el.shadow || el.shim) {
+            // An element's underlays (shadow and shim) are automatically synced in response
+            // to any calls to Ext.Element APIs that change the element's size or position
+            // (setXY, setWidth, etc).  Since the layout system bypasses these APIs and
+            // sets the element's styles directly, we need to trigger a sync now.
+            el.setUnderlaysVisible(true);
+            el.syncUnderlays();
         }
     },
 
-    onFloatParentShow: function() {
-        if (this.showOnParentShow) {
-            delete this.showOnParentShow;
-            this.show();
+    /**
+     * synchronizes the hidden state of this component with the state of its hierarchy
+     * @private
+     */
+    syncHidden: function() {
+        var me = this,
+            hidden = me.hidden || !me.rendered,
+            hierarchicallyHidden = me.hierarchicallyHidden = me.isHierarchicallyHidden(),
+            pendingShow = me.pendingShow;
+
+        if (hidden !== hierarchicallyHidden) {
+            if (hierarchicallyHidden) {
+                me.hide();
+                me.pendingShow = true;
+            } else if (pendingShow) {
+                delete me.pendingShow;
+                if (pendingShow.length) {
+                    me.show.apply(me, pendingShow);
+                } else {
+                    me.show();
+                }
+            }
         }
     },
 
-    // private
+    // @private
     // z-index is managed by the zIndexManager and may be overwritten at any time.
     // Returns the next z-index to be used.
     // If this is a Container, then it will have rebased any managed floating Components,
@@ -143,61 +389,44 @@ Ext.define('Ext.util.Floating', {
      * rendered to.
      *
      * An alternative constraint may be passed.
-     * @param {String/HTMLElement/Ext.Element/Ext.util.Region} [constrainTo] The Element or {@link Ext.util.Region Region}
+     * @param {String/HTMLElement/Ext.dom.Element/Ext.util.Region} [constrainTo] The Element or {@link Ext.util.Region Region}
      * into which this Component is to be constrained. Defaults to the element into which this floating Component
      * was rendered.
      */
     doConstrain: function(constrainTo) {
         var me = this,
-
-            // Calculate the constrain vector to coerce our position to within our
-            // constrainTo setting. getConstrainVector will provide a default constraint
+            // Calculate the constrained poition.
+            // calculateConstrainedPosition will provide a default constraint
             // region if there is no explicit constrainTo, *and* there is no floatParent owner Component.
-            vector = me.getConstrainVector(constrainTo),
-            xy;
+            xy = me.calculateConstrainedPosition(constrainTo, null, true);
 
-        if (vector) {
-            xy = me.getPosition(!!me.floatParent);
-            xy[0] += vector[0];
-            xy[1] += vector[1];
+        // false is returned if no movement is needed
+        if (xy) {
             me.setPosition(xy);
         }
     },
 
+    updateActiveCounter: function(activeCounter) {
+        var z = this.zIndexParent;
 
-    /**
-     * Gets the x/y offsets to constrain this float
-     * @private
-     * @param {String/HTMLElement/Ext.Element/Ext.util.Region} [constrainTo] The Element or {@link Ext.util.Region Region}
-     * into which this Component is to be constrained.
-     * @return {Number[]} The x/y constraints
-     */
-    getConstrainVector: function(constrainTo){
-        var me = this;
+        // If we have a zIndexParent, it has to rebase its own zIndices
+        if (z && this.bringParentToFront !== false) {
+            z.setActiveCounter(++Ext.ZIndexManager.activeCounter);
+        }
 
-        if (me.constrain || me.constrainHeader) {
-            constrainTo = constrainTo || (me.floatParent && me.floatParent.getTargetEl()) || me.container || me.el.getScopeParent();
-            return (me.constrainHeader ? me.header.el : me.el).getConstrainVector(constrainTo);
+        // Rebase the local zIndices
+        if (z = this.zIndexManager) {
+            z.onComponentUpdate(this);
         }
     },
 
-    /**
-     * Aligns this floating Component to the specified element
-     *
-     * @param {Ext.Component/Ext.Element/HTMLElement/String} element
-     * The element or {@link Ext.Component} to align to. If passing a component, it must be a
-     * component instance. If a string id is passed, it will be used as an element id.
-     * @param {String} [position="tl-bl?"] The position to align to
-     * (see {@link Ext.Element#alignTo} for more details).
-     * @param {Number[]} [offsets] Offset the positioning by [x, y]
-     * @return {Ext.Component} this
-     */
-    alignTo: function(element, position, offsets) {
+    updateAlwaysOnTop: function(alwaysOnTop) {
+        var z = this.zIndexManager;
 
-        // element may be a Component, so first attempt to use its el to align to.
-        // When aligning to an Element's X,Y position, we must use setPagePosition which disregards any floatParent
-        this.setPagePosition(this.el.getAlignToXY(element.el || element, position, offsets));
-        return this;
+        // Rebase the local zIndices
+        if (z) {
+            z.onComponentUpdate(this);
+        }
     },
 
     /**
@@ -212,32 +441,18 @@ Ext.define('Ext.util.Floating', {
     toFront: function(preventFocus) {
         var me = this;
 
-        // Find the floating Component which provides the base for this Component's zIndexing.
-        // That must move to front to then be able to rebase its zIndex stack and move this to the front
-        if (me.zIndexParent && me.bringParentToFront !== false) {
-            me.zIndexParent.toFront(true);
-        }
-        
-        if (!Ext.isDefined(preventFocus)) {
-            preventFocus = !me.focusOnToFront;
-        }
-        
-        if (preventFocus) {
-            me.preventFocusOnActivate = true;
-        }
-        if (me.zIndexManager.bringToFront(me)) {    
-            if (!preventFocus) {
-                // Kick off a delayed focus request.
-                // If another floating Component is toFronted before the delay expires
-                // this will not receive focus.
-                me.focus(false, true);
+        // ZIndexManager#onCollectionSort will call setActive if this component ends up on the top.
+        // That will focus it if we have been requested to do so.
+        if (me.zIndexManager.bringToFront(me, preventFocus || !me.focusOnToFront)) {
+            if (me.hasListeners.tofront) {
+                me.fireEvent('tofront', me, me.el.getZIndex());
             }
         }
-        delete me.preventFocusOnActivate;
         return me;
     },
 
     /**
+     * @private
      * This method is called internally by {@link Ext.ZIndexManager} to signal that a floating Component has either been
      * moved to the top of its zIndex stack, or pushed from the top of its zIndex stack.
      *
@@ -247,25 +462,33 @@ Ext.define('Ext.util.Floating', {
      * {@link Ext.Component#deactivate deactivate} event depending on which action occurred.
      *
      * @param {Boolean} [active=false] True to activate the Component, false to deactivate it.
-     * @param {Ext.Component} [newActive] The newly active Component which is taking over topmost zIndex position.
+     * @param {Ext.Component} [newActive] If deactivating, the newly active Component which is taking over topmost zIndex position.
+     * @param {Boolean} [doFocus] When activating, set to true to focus the component;
+     * when deactivating, set to false to avoid returning focus to previous element.
+     * 
      */
-    setActive: function(active, newActive) {
+    setActive: function(active, newActive, doFocus) {
         var me = this;
-        
+
         if (active) {
             if (me.el.shadow && !me.maximized) {
-                me.el.enableShadow(true);
+                me.el.enableShadow(null, true);
             }
-            if (me.modal && !me.preventFocusOnActivate) {
-                me.focus(false, true);
-            }
+
+            // We only do focus processing upon activate, which means theis component
+            // has been brought to the front by its ZIndexManager
+            if (doFocus) {
+                // Skip focusing if we already contain focused element
+                if (!me.el.contains(Ext.Element.getActiveElement())) {
+                    me.focus();
+                }
+            }            
             me.fireEvent('activate', me);
-        } else {
-            // Only the *Windows* in a zIndex stack share a shadow. All other types of floaters
-            // can keep their shadows all the time
-            if (me.isWindow && (newActive && newActive.isWindow)) {
-                me.el.disableShadow();
-            }
+        }
+        // Deactivate carries no operations. It may be that this component jas just moved down and another
+        // component has been brout to the top, so that will automatically receive focus.
+        // If we have been hidden, Component#onHide handles reverting focus to the previousExternalFocus element.
+        else {
             me.fireEvent('deactivate', me);
         }
     },
@@ -286,9 +509,9 @@ Ext.define('Ext.util.Floating', {
     center: function() {
         var me = this,
             xy;
-            
+
         if (me.isVisible()) {
-            xy = me.el.getAlignToXY(me.container, 'c-c');
+            xy = me.getAlignToXY(me.container, 'c-c');
             me.setPagePosition(xy);
         } else {
             me.needsCenter = true;
@@ -301,22 +524,26 @@ Ext.define('Ext.util.Floating', {
             this.center();    
         }
         delete this.needsCenter;
-    },
 
-    // private
-    syncShadow : function() {
-        if (this.floating) {
-            this.el.sync(true);
+        if (this.toFrontOnShow) {
+            this.toFront();
         }
     },
 
-    // private
-    fitContainer: function() {
+    // @private
+    fitContainer: function(animate) {
         var me = this,
             parent = me.floatParent,
-            container = parent ? parent.getTargetEl() : me.container;
+            container = parent ? parent.getTargetEl() : me.container,
+            newBox = container.getViewSize(),
+            newPosition = parent || (container.dom !== document.body) ?
+                // If we are a contained floater, or rendered to a div, maximized position is (0,0)
+                [0, 0] :
+                // If no parent and rendered to body, align with origin of container el.
+                container.getXY();
 
-        me.setSize(container.getViewSize(false));
-        me.setPosition.apply(me, parent ? [0, 0] : container.getXY());
+        newBox.x = newPosition[0];
+        newBox.y = newPosition[1];
+        me.setBox(newBox, animate);
     }
 });

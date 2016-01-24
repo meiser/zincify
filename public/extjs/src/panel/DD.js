@@ -44,10 +44,11 @@ Ext.define('Ext.panel.DD', {
     },
     
     b4MouseDown: function(e) {
-        var x = e.getPageX(),
-            y = e.getPageY();
+        var xy = e.getXY(),
+            x = xy[0],
+            y = xy[1];
             
-        this.autoOffset(x, y);
+       this.autoOffset(x, y);
     },
     
     onInitDrag : function(x, y){
@@ -58,7 +59,10 @@ Ext.define('Ext.panel.DD', {
     createFrame : Ext.emptyFn,
     
     getDragEl : function(e){
-        return this.panelProxy.ghost.el.dom;
+        var ghost = this.panelProxy.ghost;
+        if (ghost) {
+            return ghost.el.dom;
+        }
     },
     
     endDrag : function(e){
@@ -77,23 +81,24 @@ Ext.define('Ext.panel.DD', {
     onInvalidDrop: function(target, e, id) {
         var me = this;
         
-        me.beforeInvalidDrop(target, e, id);
-        if (me.cachedTarget) {
-            if(me.cachedTarget.isNotifyTarget){
-                me.cachedTarget.notifyOut(me, e, me.dragData);
+        if (me.beforeInvalidDrop(target, e, id) !== false) {
+            if (me.cachedTarget) {
+                if(me.cachedTarget.isNotifyTarget){
+                    me.cachedTarget.notifyOut(me, e, me.dragData);
+                }
+                me.cacheTarget = null;
             }
-            me.cacheTarget = null;
-        }
 
-        if (me.afterInvalidDrop) {
-            /**
-             * An empty function by default, but provided so that you can perform a custom action
-             * after an invalid drop has occurred by providing an implementation.
-             * @param {Event} e The event object
-             * @param {String} id The id of the dropped element
-             * @method afterInvalidDrop
-             */
-            me.afterInvalidDrop(e, id);
+            if (me.afterInvalidDrop) {
+                /**
+                * An empty function by default, but provided so that you can perform a custom action
+                * after an invalid drop has occurred by providing an implementation.
+                * @param {Event} e The event object
+                * @param {String} id The id of the dropped element
+                * @method afterInvalidDrop
+                */
+                me.afterInvalidDrop(e, id);
+            }
         }
     }
 });

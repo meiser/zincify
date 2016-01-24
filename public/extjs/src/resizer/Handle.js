@@ -8,22 +8,20 @@ Ext.define('Ext.resizer.Handle', {
     // Ext.resizer.Resizer.prototype.possiblePositions define the regions
     // which will be passed in as a region configuration.
     region: '',
+    
+    ariaRole: 'presentation',
 
     beforeRender: function() {
         var me = this;
 
         me.callParent();
 
+        me.protoEl.unselectable();
+
         me.addCls(
             me.baseHandleCls,
             me.baseHandleCls + '-' + me.region,
             me.handleCls
         );
-    },
-
-    onRender: function() {
-        this.callParent(arguments);
-
-        this.el.unselectable();
     }
 });

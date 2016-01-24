@@ -19,7 +19,7 @@
                         {leaf: true, text: 'Rest'},
                         {leaf: true, text: 'Server'},
                         {leaf: true, text: 'SessionStorage'},
-                        {leaf: true, text: 'WebStorage'},
+                        {leaf: true, text: 'WebStorage'}
                     ]
                 },
                 {

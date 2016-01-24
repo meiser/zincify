@@ -384,7 +384,7 @@ td.ext-cal-dtitle-today div {
 /* Event cells */
 .ext-cal-ev {
     font-family:Verdana,sans-serif;
-    padding:1px 1px 0 2px;
+    padding: 0 1px 0 2px;
     vertical-align:top;
 }
 /* Event overflow more link */
@@ -396,12 +396,14 @@ td.ext-cal-dtitle-today div {
     font-family: verdana;
     color: #777;
     font-size: 10px;
-	cursor: pointer;
+    cursor: pointer;
 }
 /* More view */
 .ext-cal-mvd-tbl {
-	width: 100%;
-	table-layout: fixed;
+    width: 100%;
+    table-layout: fixed;
+    border-spacing: 1;
+    border-collapse: separate;
 }
 
 .ext-cal-evt {
@@ -608,6 +610,10 @@ td.ext-cal-dtitle-today div {
 }
 
 /* Calendar Picker */
+.ext-calendar-picker.x-form-text-wrap {
+    position: relative;
+}
+
 .ext-calendar-picker .x-form-text {
     padding-left: 23px;
 }
@@ -685,8 +691,8 @@ td.ext-cal-dtitle-today div {
 }
 
 .ext-color-1,
-.x-ie .ext-color-1-ad,
-.x-opera .ext-color-1-ad {
+.x-ie7m .ext-color-1-ad,
+.x-opera .ext-operaLT11.ext-color-1-ad {
 	color: #306da6;
 }
 .ext-cal-day-col .ext-color-1,
@@ -706,8 +712,8 @@ td.ext-cal-dtitle-today div {
 }
 
 .ext-color-2,
-.x-ie .ext-color-2-ad,
-.x-opera .ext-color-2-ad {
+.x-ie7m .ext-color-2-ad,
+.x-opera .ext-operaLT11.ext-color-2-ad {
 	color: #86a723;
 }
 .ext-cal-day-col .ext-color-2,
@@ -726,8 +732,8 @@ td.ext-cal-dtitle-today div {
     border-color: #86a723;
 }
 .ext-color-3,
-.x-ie .ext-color-3-ad,
-.x-opera .ext-color-3-ad {
+.x-ie7m .ext-color-3-ad,
+.x-opera .ext-operaLT11.ext-color-3-ad {
     color: #b6a980;
 }
 .ext-cal-day-col .ext-color-3,
@@ -795,62 +801,6 @@ td.ext-cal-dtitle-today div {
 
 /*******************************************
  * 
- * Calendar navigation picker styles
- * 
- ******************************************/
-.ext-cal-nav-picker {
-    border-style: none none solid;
-    border-color: #99BBE8;
-}
-.ext-cal-nav-picker .x-datepicker-header {
-    background: #D3E1F1 url(../images/default/bg.gif) repeat-x;
-}
-.ext-cal-nav-picker .x-datepicker-month,
-.ext-cal-nav-picker .x-datepicker-prev,
-.ext-cal-nav-picker .x-datepicker-next {
-    background: transparent;
-}
-.ext-cal-nav-picker .x-datepicker-prev a {
-    background-image: url(../images/default/page-prev.gif);
-}
-.ext-cal-nav-picker .x-datepicker-next a {
-    background-image: url(../images/default/page-next.gif);
-}
-.ext-cal-nav-picker .x-datepicker-month {
-    padding: 3px 0;
-}
-.ext-cal-nav-picker .x-datepicker-month .x-btn-inner {
-    color: #555 !important;
-    font-weight: bold;
-    font-family: arial,tahoma,verdana,helvetica;
-}
-.ext-cal-nav-picker .x-datepicker-month .x-btn-split-right {
-    background-image: url(../images/default/arrow.gif) !important;
-    background-position: right 4px;
-}
-.ext-cal-nav-picker .x-datepicker-inner {
-    border-top: 1px solid #BBCCFF;
-}
-.ext-cal-nav-picker .x-datepicker-inner th {
-    background: none;
-    border-bottom: 1px solid #BBCCFF;
-}
-.ext-cal-nav-picker .x-datepicker-inner .x-datepicker-today a {
-    border-color: #BFA52F;
-    background: #FFF4BF;
-}
-.ext-cal-nav-picker .x-monthpicker {
-    border: 0;
-    border-bottom: 1px solid #99BBE8;
-    top: 0 !important;
-    left: 0 !important;
-}
-.ext-cal-nav-picker .x-datepicker-footer {
-    background: #D3E1F1 url(../images/default/bg.gif) repeat-x;
-}
-
-/*******************************************
- * 
  * Calendar form styles
  *
  ******************************************/
@@ -882,10 +832,6 @@ td.ext-cal-dtitle-today div {
  * DateRangeField styles
  *
  ******************************************/
-.ext-dt-range {
-    /* Don't double the bottom margin, use the contained fields' margin */
-    margin-bottom: 0 !important;
-}
 .ext-dt-range label {
     font-size: 12px;
 }

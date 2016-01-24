@@ -6,7 +6,10 @@ Ext.require([
 ]);
 
 Ext.onReady(function(){
-    Ext.create('Ext.form.Panel', {
+    var isLargeTheme = Ext.themeName !== 'classic',
+        titleOffset = isLargeTheme ? -6 : -4;
+
+    new Ext.form.Panel({
         renderTo: 'container',
         width: 700,
         height: 400,
@@ -40,12 +43,11 @@ Ext.onReady(function(){
                     ignoreNoChange: true
                 }, height = form.child('textfield').getHeight();
 
-                var labelEditor = Ext.create('Ext.Editor', Ext.apply({
+                var labelEditor = new Ext.Editor(Ext.apply({
                     autoSize: {
                         width: 'field'
                     },
                     height: height,
-                    offsets: [0, (Ext.isIEQuirks ? 0 : 2)],
                     alignment: 'l-l',
                     listeners: {
                         beforecomplete: function(ed, value){
@@ -65,7 +67,7 @@ Ext.onReady(function(){
                         enforceMaxLength: true
                     }
                 }, cfg));
-                form.body.on('dblclick', function(e, t){
+                form.getTargetEl().on('dblclick', function(e, t) {
                     labelEditor.startEdit(t);
                     // Manually focus, since clicking on the label will focus the text field
                     labelEditor.field.focus(50, true);
@@ -73,9 +75,9 @@ Ext.onReady(function(){
                     delegate: 'label.x-form-item-label'
                 });
 
-                var titleEditor = Ext.create('Ext.Editor', Ext.apply({
+                var titleEditor = new Ext.Editor(Ext.apply({
                     alignment: 'tl',
-                    offsets: [0, -3],
+                    offsets: [0, titleOffset],
                     field: {
                         width: 130,
                         xtype: 'combo',
@@ -97,7 +99,7 @@ Ext.onReady(function(){
                     }
                 }, cfg));
 
-                form.header.titleCmp.textEl.on('dblclick', function(e, t){
+                form.header.getTitle().textEl.on('dblclick', function(e, t){
                     titleEditor.startEdit(t);
                 });
             }

@@ -12,28 +12,28 @@
  *        data:{'items':[
  *            { 'framework': "Ext JS 4",     'rocks': true  },
  *            { 'framework': "Sencha Touch", 'rocks': true  },
- *            { 'framework': "Ext GWT",      'rocks': true  }, 
- *            { 'framework': "Other Guys",   'rocks': false } 
+ *            { 'framework': "Ext GWT",      'rocks': true  },
+ *            { 'framework': "Other Guys",   'rocks': false }
  *        ]},
  *        proxy: {
  *            type: 'memory',
  *            reader: {
  *                type: 'json',
- *                root: 'items'
+ *                rootProperty: 'items'
  *            }
  *        }
  *     });
- *     
+ *
  *     Ext.create('Ext.grid.Panel', {
  *         title: 'Boolean Column Demo',
  *         store: Ext.data.StoreManager.lookup('sampleStore'),
  *         columns: [
  *             { text: 'Framework',  dataIndex: 'framework', flex: 1 },
  *             {
- *                 xtype: 'booleancolumn', 
+ *                 xtype: 'booleancolumn',
  *                 text: 'Rocks',
  *                 trueText: 'Yes',
- *                 falseText: 'No', 
+ *                 falseText: 'No',
  *                 dataIndex: 'rocks'
  *             }
  *         ],
@@ -69,23 +69,36 @@ Ext.define('Ext.grid.column.Boolean', {
      */
     undefinedText: '&#160;',
 
+    defaultFilterType: 'boolean',
+
     /**
-     * @cfg renderer
+     * @cfg {Object} renderer
      * @hide
      */
+
     /**
-     * @cfg scope
+     * @cfg {Object} scope
      * @hide
      */
+
+     /**
+     * @cfg {Boolean} producesHTML
+     * @inheritdoc
+     */
+    producesHTML: false,
 
     defaultRenderer: function(value){
         if (value === undefined) {
             return this.undefinedText;
         }
-        
+
         if (!value || value === 'false') {
             return this.falseText;
         }
         return this.trueText;
+    },
+
+    updater: function(cell, value) {
+        cell.firstChild.innerHTML = Ext.grid.column.Boolean.prototype.defaultRenderer.call(this, value);
     }
 });

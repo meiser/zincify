@@ -1,18 +1,18 @@
-SimpleTasksSettings = {
-    // This property is used to turn on local storage.  If set to false the php backend will be used.
-    useLocalStorage: true
-};
+/*
+ * This file is generated and updated by Sencha Cmd. You can edit this file as
+ * needed for your application, but these edits will have to be merged by
+ * Sencha Cmd when upgrading.
+ */
+Ext.application({
+    name: 'SimpleTasks',
 
-if (SimpleTasksSettings.useLocalStorage && !window.localStorage) {
-    alert('Simple Tasks is configured to use HTML5 Local Storage, but your browser does not support Local Storage');
-} else {
-    Ext.Loader.setPath('Ext.ux', '../ux/')
-    Ext.Loader.setConfig({
-        enabled: true
-    });
-    Ext.application({
-        name: 'SimpleTasks',
-        autoCreateViewport: true,
-        controllers: ['Lists', 'Tasks']
-    });
-}
+    extend: 'SimpleTasks.Application',
+    
+    autoCreateViewport: true
+	
+    //-------------------------------------------------------------------------
+    // Most customizations should be made to SimpleTasks.Application. If you need to
+    // customize this file, doing so below this section reduces the likelihood
+    // of merge conflicts when upgrading to new versions of Sencha Cmd.
+    //-------------------------------------------------------------------------
+});

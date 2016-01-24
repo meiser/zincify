@@ -17,8 +17,7 @@ Ext.define('Ext.chooser.InfoPanel', {
     tpl: [
         '<div class="details">',
             '<tpl for=".">',
-                    (!Ext.isIE6? '<img src="icons/{thumb}" />' : 
-                    '<div style="width:74px;height:74px;filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src=\'icons/{thumb}\')"></div>'),
+                '<img src="icons/{thumb}" />',
                 '<div class="details-info">',
                     '<b>Example Name:</b>',
                     '<span>{name}</span>',
@@ -49,5 +48,9 @@ Ext.define('Ext.chooser.InfoPanel', {
         this.body.slideIn('l', {
             duration: 250
         });
+    },
+    
+    clear: function(){
+        this.body.update('');
     }
 });

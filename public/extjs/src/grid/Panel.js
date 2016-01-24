@@ -1,7 +1,4 @@
 /**
- * @author Aaron Conran
- * @docauthor Ed Spencer
- *
  * Grids are an excellent way of showing large amounts of tabular data on the client side. Essentially a supercharged
  * `<table>`, GridPanel makes it easy to fetch, sort and filter large amounts of data.
  *
@@ -16,14 +13,14 @@
  *         data:{'items':[
  *             { 'name': 'Lisa',  "email":"lisa@simpsons.com",  "phone":"555-111-1224"  },
  *             { 'name': 'Bart',  "email":"bart@simpsons.com",  "phone":"555-222-1234" },
- *             { 'name': 'Homer', "email":"home@simpsons.com",  "phone":"555-222-1244"  },
+ *             { 'name': 'Homer', "email":"homer@simpsons.com",  "phone":"555-222-1244"  },
  *             { 'name': 'Marge', "email":"marge@simpsons.com", "phone":"555-222-1254"  }
  *         ]},
  *         proxy: {
  *             type: 'memory',
  *             reader: {
  *                 type: 'json',
- *                 root: 'items'
+ *                 rootProperty: 'items'
  *             }
  *         }
  *     });
@@ -108,7 +105,7 @@
  * Grids use a Row Selection Model by default, but this is easy to customise like so:
  *
  *     Ext.create('Ext.grid.Panel', {
- *         selType: 'cellmodel',
+ *         selModel: 'cellmodel',
  *         store: ...
  *     });
  *
@@ -163,7 +160,7 @@
  *
  * - {@link Ext.toolbar.Paging Paging toolbar} - paging through large sets of data.
  *
- * - {@link Ext.grid.PagingScroller Infinite scrolling} - another way to handle large sets of data.
+ * - {@link Ext.grid.plugin.BufferedRenderer Infinite scrolling} - another way to handle large sets of data.
  *
  * - {@link Ext.grid.RowNumberer RowNumberer} - automatically numbered rows.
  *
@@ -175,30 +172,12 @@
  */
 Ext.define('Ext.grid.Panel', {
     extend: 'Ext.panel.Table',
-    requires: ['Ext.grid.View'],
+    requires: ['Ext.view.Table'],
     alias: ['widget.gridpanel', 'widget.grid'],
     alternateClassName: ['Ext.list.ListView', 'Ext.ListView', 'Ext.grid.GridPanel'],
-    viewType: 'gridview',
+    viewType: 'tableview',
 
     lockable: false,
-
-    // Required for the Lockable Mixin. These are the configurations which will be copied to the
-    // normal and locked sub tablepanels
-    bothCfgCopy: [
-        'invalidateScrollerOnRefresh',
-        'hideHeaders',
-        'enableColumnHide',
-        'enableColumnMove',
-        'enableColumnResize',
-        'sortableColumns'
-    ],
-    normalCfgCopy: [ 
-        'verticalScroller', 
-        'verticalScrollDock', 
-        'verticalScrollerType', 
-        'scroll'
-    ],
-    lockedCfgCopy: [],
 
     /**
      * @cfg {Boolean} rowLines False to remove row line styling
@@ -212,18 +191,22 @@ Ext.define('Ext.grid.Panel', {
      */
 
     /**
+     * @event beforereconfigure
+     * Fires before a reconfigure to enable modification of incoming Store and columns.
+     * @param {Ext.grid.Panel} this
+     * @param {Ext.data.Store} store The store that was passed to the {@link #method-reconfigure} method
+     * @param {Object[]} columns The column configs that were passed to the {@link #method-reconfigure} method
+     * @param {Ext.data.Store} oldStore The store that will be replaced
+     * @param {Ext.grid.column.Column[]} oldColumns The column headers that will be replaced.
+     */
+
+    /**
      * @event reconfigure
      * Fires after a reconfigure.
      * @param {Ext.grid.Panel} this
      * @param {Ext.data.Store} store The store that was passed to the {@link #method-reconfigure} method
      * @param {Object[]} columns The column configs that were passed to the {@link #method-reconfigure} method
-     */
-
-    /**
-     * @method reconfigure
-     * Reconfigures the grid with a new store/columns. Either the store or the columns can be omitted if you don't wish
-     * to change them.
-     * @param {Ext.data.Store} store (Optional) The new store.
-     * @param {Object[]} columns (Optional) An array of column configs
+     * @param {Ext.data.Store} oldStore The store that was replaced
+     * @param {Ext.grid.column.Column[]} oldColumns The column headers that were replaced.
      */
 });

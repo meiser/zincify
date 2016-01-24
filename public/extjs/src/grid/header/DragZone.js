@@ -3,34 +3,41 @@
  */
 Ext.define('Ext.grid.header.DragZone', {
     extend: 'Ext.dd.DragZone',
-    colHeaderCls: Ext.baseCSSPrefix + 'column-header',
+    colHeaderSelector: '.' + Ext.baseCSSPrefix + 'column-header',
+    colInnerSelector: '.' + Ext.baseCSSPrefix + 'column-header-inner',
     maxProxyWidth: 120,
 
     constructor: function(headerCt) {
-        this.headerCt = headerCt;
-        this.ddGroup =  this.getDDGroup();
-        this.callParent([headerCt.el]);
-        this.proxy.el.addCls(Ext.baseCSSPrefix + 'grid-col-dd');
+        var me = this;
+        
+        me.headerCt = headerCt;
+        me.ddGroup =  me.getDDGroup();
+        me.autoGroup = true;
+        me.callParent([headerCt.el]);
+        me.proxy.el.addCls(Ext.baseCSSPrefix + 'grid-col-dd');
     },
-
+    
     getDDGroup: function() {
         return 'header-dd-zone-' + this.headerCt.up('[scrollerOwner]').id;
     },
 
     getDragData: function(e) {
-        var header = e.getTarget('.'+this.colHeaderCls),
-            headerCmp,
-            ddel;
+        if (e.getTarget(this.colInnerSelector)) {
+            var header = e.getTarget(this.colHeaderSelector),
+                headerCmp,
+                ddel;
 
-        if (header) {
-            headerCmp = Ext.getCmp(header.id);
-            if (!this.headerCt.dragging && headerCmp.draggable && !(headerCmp.isOnLeftEdge(e) || headerCmp.isOnRightEdge(e))) {
-                ddel = document.createElement('div');
-                ddel.innerHTML = Ext.getCmp(header.id).text;
-                return {
-                    ddel: ddel,
-                    header: headerCmp
-                };
+            if (header) {
+                headerCmp = Ext.getCmp(header.id);
+                if (!this.headerCt.dragging && headerCmp.draggable && !(headerCmp.isOnLeftEdge(e) || headerCmp.isOnRightEdge(e))) {
+                    ddel = document.createElement('div');
+                    ddel.role = 'presentation';
+                    ddel.innerHTML = headerCmp.text;
+                    return {
+                        ddel: ddel,
+                        header: headerCmp
+                    };
+                }
             }
         }
         return false;
@@ -42,6 +49,7 @@ Ext.define('Ext.grid.header.DragZone', {
 
     onInitDrag: function() {
         this.headerCt.dragging = true;
+        this.headerCt.hideMenu();
         this.callParent(arguments);
     },
 

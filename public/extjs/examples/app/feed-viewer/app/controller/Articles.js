@@ -66,8 +66,32 @@ Ext.define('FV.controller.Articles', {
         }
     },
 
+    /**
+     * Hack to avoid pop-up blocking by smartphones browser.
+     */
+    openLinkMobile: function(url){
+        var link = Ext.getDom('hidden_link'),
+            clickEvent = document.createEvent('Event');
+
+        link.href = url;
+        clickEvent.initEvent('click', true, false);
+        link.dispatchEvent(clickEvent);
+    },
+
     openArticle: function(btn) {
-        window.open(btn.up('articlepreview').article.get('link'));
+        var open,
+            url = btn.up('articlepreview').article.get('link'),
+            deviceType = Ext.os.deviceType;
+
+        if(Ext.os.name !== 'iOS' && deviceType !== 'Desktop'){
+            this.openLinkMobile(url);
+        }else{
+            open = window.open(url); // Workaround for iOS! Assigning result to variable brings up prompt on iOS. On desktop it should return Window object
+            if(!open){
+                //If null or undefined, then we inform user that popup blocker should be disabled
+                Ext.Msg.alert('Popups disabled!', 'To view selected article in the new window disable Pop-up blocker or choose Allow, when promted by your device.<br><br>');
+            }
+        }
     },
     
     openAllArticles: function() {
@@ -81,6 +105,7 @@ Ext.define('FV.controller.Articles', {
     loadArticles: function(articles){
         var viewer = this.getViewer(),
             toAdd = [],
+            tab,
             id;
             
         Ext.Array.forEach(articles, function(article){

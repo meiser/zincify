@@ -81,7 +81,59 @@ Ext.define('Ext.menu.CheckItem', {
      * True to prevent the checked item from being toggled. Any submenu will still be accessible.
      */
     checkChangeDisabled: false,
+    
+    ariaRole: 'menuitemcheckbox',
 
+    childEls: [
+        'checkEl'
+    ],
+    
+    showCheckbox: true,
+
+    isMenuCheckItem: true,
+
+    checkboxCls: Ext.baseCSSPrefix + 'menu-item-checkbox',
+
+    /**
+     * @event beforecheckchange
+     * Fires before a change event. Return false to cancel.
+     * @param {Ext.menu.CheckItem} this
+     * @param {Boolean} checked
+     */
+
+    /**
+     * @event checkchange
+     * Fires after a change event.
+     * @param {Ext.menu.CheckItem} this
+     * @param {Boolean} checked
+     */
+
+    initComponent: function() {
+        var me = this;
+        
+        // coerce to bool straight away
+        me.checked = !!me.checked;
+
+        me.callParent(arguments);
+
+        if (me.group) {
+            Ext.menu.Manager.registerCheckable(me);
+            if (me.initialConfig.hideOnClick !== false) {
+                me.hideOnClick = true;
+            }
+        }
+    },
+    
+    beforeRender: function() {
+        var me = this;
+
+        me.callParent();
+        Ext.apply(me.renderData, {
+            checkboxCls: me.checkboxCls,
+            showCheckbox: me.showCheckbox
+        });
+    },
+    
     afterRender: function() {
         var me = this;
         me.callParent();
@@ -91,55 +143,20 @@ Ext.define('Ext.menu.CheckItem', {
             me.disableCheckChange();
         }
     },
-
-    initComponent: function() {
-        var me = this;
-        me.addEvents(
-            /**
-             * @event beforecheckchange
-             * Fires before a change event. Return false to cancel.
-             * @param {Ext.menu.CheckItem} this
-             * @param {Boolean} checked
-             */
-            'beforecheckchange',
-
-            /**
-             * @event checkchange
-             * Fires after a change event.
-             * @param {Ext.menu.CheckItem} this
-             * @param {Boolean} checked
-             */
-            'checkchange'
-        );
-
-        me.callParent(arguments);
-
-        Ext.menu.Manager.registerCheckable(me);
-
-        if (me.group) {
-            if (!me.iconCls) {
-                me.iconCls = me.groupCls;
-            }
-            if (me.initialConfig.hideOnClick !== false) {
-                me.hideOnClick = true;
-            }
-        }
-    },
-
+    
     /**
      * Disables just the checkbox functionality of this menu Item. If this menu item has a submenu, that submenu
      * will still be accessible
      */
     disableCheckChange: function() {
         var me = this,
-            iconEl = me.iconEl;
+            checkEl = me.checkEl;
 
-        if (iconEl) {
-            iconEl.addCls(me.disabledCls);
+        if (checkEl) {
+            checkEl.addCls(me.disabledCls);
         }
-        // In some cases the checkbox will disappear until repainted
-        // Happens in everything except IE9 strict, see: EXTJSIV-6412
-        if (!(Ext.isIE9 && Ext.isStrict) && me.rendered) {
+        // In some cases the checkbox will disappear until repainted, see: EXTJSIV-6412
+        if (Ext.isIE8 && me.rendered) {
             me.el.repaint();
         }
         me.checkChangeDisabled = true;
@@ -150,18 +167,25 @@ Ext.define('Ext.menu.CheckItem', {
      */
     enableCheckChange: function() {
         var me = this,
-            iconEl = me.iconEl;
+            checkEl = me.checkEl;
             
-        if (iconEl) {
-            iconEl.removeCls(me.disabledCls);
+        if (checkEl) {
+            checkEl.removeCls(me.disabledCls);
         }
         me.checkChangeDisabled = false;
     },
 
     onClick: function(e) {
         var me = this;
-        if(!me.disabled && !me.checkChangeDisabled && !(me.checked && me.group)) {
+
+        if (!me.disabled && !me.checkChangeDisabled && !(me.checked && me.group)) {
             me.setChecked(!me.checked);
+
+            // Clicked using SPACE or ENTER just unchecks.
+            // RightArrow to invoke any submenu
+            if (e.type === 'keydown' && me.menu) {
+                return false;
+            }
         }
         this.callParent([e]);
     },
@@ -177,15 +201,27 @@ Ext.define('Ext.menu.CheckItem', {
      * @param {Boolean} [suppressEvents=false] True to prevent firing the checkchange events.
      */
     setChecked: function(checked, suppressEvents) {
-        var me = this;
+        var me = this,
+            checkedCls = me.checkedCls,
+            uncheckedCls = me.uncheckedCls,
+            el = me.el;
+
         if (me.checked !== checked && (suppressEvents || me.fireEvent('beforecheckchange', me, checked) !== false)) {
-            if (me.el) {
-                me.el[checked  ? 'addCls' : 'removeCls'](me.checkedCls)[!checked ? 'addCls' : 'removeCls'](me.uncheckedCls);
+            if (el) {
+                if (checked) {
+                    el.addCls(checkedCls);
+                    el.removeCls(uncheckedCls);
+                } else {
+                    el.addCls(uncheckedCls);
+                    el.removeCls(checkedCls);
+                }
             }
+
             me.checked = checked;
             Ext.menu.Manager.onCheckChange(me, checked);
+
             if (!suppressEvents) {
-                Ext.callback(me.checkHandler, me.scope, [me, checked]);
+                Ext.callback(me.checkHandler, me.scope || me, [me, checked]);
                 me.fireEvent('checkchange', me, checked);
             }
         }

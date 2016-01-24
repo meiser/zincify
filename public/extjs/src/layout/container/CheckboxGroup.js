@@ -17,19 +17,22 @@ Ext.define('Ext.layout.container.CheckboxGroup', {
     autoFlex: true,
 
     type: 'checkboxgroup',
+    
+    createsInnerCt: true,
 
     childEls: [
         'innerCt'
     ],
 
     renderTpl: [
-        '<table id="{ownerId}-innerCt" role="presentation" style="{tableStyle}"><tbody><tr>',
+        '<table id="{ownerId}-innerCt" data-ref="innerCt" class="' + Ext.baseCSSPrefix + 'table-plain" cellpadding="0"',
+            'role="presentation" style="{tableStyle}"><tr role="presentation">',
             '<tpl for="columns">',
-                '<td class="{parent.colCls}" valign="top" style="{style}">',
+                '<td class="{parent.colCls}" valign="top" style="{style}" role="presentation">',
                     '{% this.renderColumn(out,parent,xindex-1) %}',
                 '</td>',
             '</tpl>',
-        '</tr></tbody></table>'
+        '</tr></table>'
     ],
 
     lastOwnerItemsGeneration : null,
@@ -137,7 +140,7 @@ Ext.define('Ext.layout.container.CheckboxGroup', {
 
         // The columnNodes are widthed using their own width attributes, we just need to wait
         // for all children to have arranged themselves in that width, and then collect our height.
-        if (!ownerContext.getDomProp('containerChildrenDone')) {
+        if (!ownerContext.getDomProp('containerChildrenSizeDone')) {
             me.done = false;
         } else {
             targetContext = ownerContext.innerCtContext;
@@ -299,9 +302,7 @@ Ext.define('Ext.layout.container.CheckboxGroup', {
     },
 
     // Always valid. beginLayout ensures the encapsulating elements of all children are in the correct place
-    isValidParent: function() {
-        return true;
-    },
+    isValidParent: Ext.returnTrue,
 
     setupRenderTpl: function (renderTpl) {
         this.callParent(arguments);
@@ -404,7 +405,8 @@ Ext.define('Ext.layout.container.CheckboxGroup', {
                 row.createChild({
                     cls: cls,
                     tag: 'td',
-                    vAlign: 'top'
+                    vAlign: 'top',
+                    role: 'presentation'
                 });
             }
         }
@@ -420,7 +422,7 @@ Ext.define('Ext.layout.container.CheckboxGroup', {
             exceedingColumnsCount = existingColumnsCount - itemsCount;
             row = me.rowEl;
             for (i = 0; i < exceedingColumnsCount; i++) {
-                row.last().remove();
+                row.last().destroy();
             }
         }
     },
@@ -436,8 +438,8 @@ Ext.define('Ext.layout.container.CheckboxGroup', {
         var me = this;
 
         me.configureItem(item);
+
         item.render(Ext.get(me.columnNodes[columnIndex]), rowIndex);
-        me.afterRenderItem(item);
     },
 
     /**

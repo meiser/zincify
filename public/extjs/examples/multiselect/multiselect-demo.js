@@ -42,11 +42,11 @@ Ext.onReady(function(){
                         if (checked) {
                             field.delimiter = ',';
                             Ext.Msg.alert('Delimiter Changed', 'The delimiter is now set to <b>","</b>. Click Save to ' +
-                                          'see that values are now submitted as a single parameter separated by the delimiter.');
+                                          'see that values are now submitted as a single parameter separated by the delimiter.<br><br>');
                         } else {
                             field.delimiter = null;
                             Ext.Msg.alert('Delimiter Changed', 'The delimiter is now set to <b>null</b>. Click Save to ' +
-                                          'see that values are now submitted as separate parameters.');
+                                          'see that values are now submitted as separate parameters.<br><br>');
                         }
                     }
                 }]
@@ -151,7 +151,7 @@ Ext.onReady(function(){
         title: 'ItemSelector Test',
         width: 700,
         bodyPadding: 10,
-        height: 300,
+        height: 400,
         renderTo: 'itemselector',
         layout: 'fit',
         items:[{

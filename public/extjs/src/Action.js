@@ -83,6 +83,8 @@ Ext.define('Ext.Action', {
      *
      *     // css class that specifies background image to be used as the icon image:
      *     .do-something { background-image: url(../images/my-icon.gif) 0 6px no-repeat !important; }
+     *
+     * There are no default icon classes that come with Ext JS.
      */
     /**
      * @cfg {Boolean} [disabled=false]
@@ -242,7 +244,7 @@ Ext.define('Ext.Action', {
         Ext.each(this.items, fn, scope);
     },
 
-    // private
+    // @private
     callEach : function(fnName, args){
         var items = this.items,
             i = 0,
@@ -257,13 +259,13 @@ Ext.define('Ext.Action', {
         Ext.resumeLayouts(true);
     },
 
-    // private
+    // @private
     addComponent : function(comp){
         this.items.push(comp);
         comp.on('destroy', this.removeComponent, this);
     },
 
-    // private
+    // @private
     removeComponent : function(comp){
         Ext.Array.remove(this.items, comp);
     },

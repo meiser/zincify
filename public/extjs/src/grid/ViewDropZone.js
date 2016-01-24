@@ -4,7 +4,7 @@
 Ext.define('Ext.grid.ViewDropZone', {
     extend: 'Ext.view.DropZone',
 
-    indicatorHtml: '<div class="' + Ext.baseCSSPrefix + 'grid-drop-indicator-left"></div><div class="' + Ext.baseCSSPrefix + 'grid-drop-indicator-right"></div>',
+    indicatorHtml: '<div class="' + Ext.baseCSSPrefix + 'grid-drop-indicator-left" role="presentation"></div><div class="' + Ext.baseCSSPrefix + 'grid-drop-indicator-right" role="presentation"></div>',
     indicatorCls: Ext.baseCSSPrefix + 'grid-drop-indicator',
 
     handleNodeDrop : function(data, record, position) {
@@ -12,12 +12,12 @@ Ext.define('Ext.grid.ViewDropZone', {
             store = view.getStore(),
             index, records, i, len;
 
-        // If the copy flag is set, create a copy of the Models with the same IDs
+        // If the copy flag is set, create a copy of the models
         if (data.copy) {
             records = data.records;
             data.records = [];
             for (i = 0, len = records.length; i < len; i++) {
-                data.records.push(records[i].copy(records[i].getId()));
+                data.records.push(records[i].copy());
             }
         } else {
             /*
@@ -29,13 +29,24 @@ Ext.define('Ext.grid.ViewDropZone', {
             data.view.store.remove(data.records, data.view === view);
         }
 
-        index = store.indexOf(record);
+        if (record && position) {
+            index = store.indexOf(record);
 
-        // 'after', or undefined (meaning a drop at index -1 on an empty View)...
-        if (position !== 'before') {
-            index++;
+            // 'after', or undefined (meaning a drop at index -1 on an empty View)...
+            if (position !== 'before') {
+                index++;
+            }
+            store.insert(index, data.records);
         }
-        store.insert(index, data.records);
+        // No position specified - append.
+        else {
+            store.add(data.records);
+        }
+
+        // Select the dropped nodes
         view.getSelectionModel().select(data.records);
+
+        // Focus the first dropped node.
+        view.getNavigationModel().setPosition(data.records[0]);
     }
 });

@@ -1,6 +1,5 @@
 /**
- * @class Ext.ux.DataView.LabelEditor
- * @extends Ext.Editor
+ *
  */
 Ext.define('Ext.ux.DataView.LabelEditor', {
 
@@ -27,7 +26,7 @@ Ext.define('Ext.ux.DataView.LabelEditor', {
 
     constructor: function(config) {
         config.field = config.field || Ext.create('Ext.form.field.Text', {
-            allowBlank: false,
+            allowOnlyWhitespace: false,
             selectOnFocus:true
         });
         this.callParent([config]);
@@ -35,7 +34,7 @@ Ext.define('Ext.ux.DataView.LabelEditor', {
 
     init: function(view) {
         this.view = view;
-        this.mon(view, 'render', this.bindEvents, this);
+        this.mon(view, 'afterrender', this.bindEvents, this);
         this.on('complete', this.onSave, this);
     },
 

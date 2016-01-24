@@ -264,7 +264,7 @@ Ext.onReady(function() {
                     'stroke':'#0677BD',
                     fill: 'none'
                 }
-            }
+            };
             
             if(config.series) {        
                 config.series.push(avgSeries);     // if a series is passed in then append the average to it
@@ -559,7 +559,7 @@ Ext.onReady(function() {
             xtype:'panel',
             region:'center',
             layout:'auto',
-            autoScroll:true,
+            scrollable:true,
             title:'Employee Performance Manager',
             tbar:[{
                 text:'Add Employee',

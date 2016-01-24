@@ -1,57 +1,64 @@
 /**
- * Layout class for {@link Ext.form.field.HtmlEditor} fields. Sizes the toolbar, textarea, and iframe elements.
+ * Layout class for {@link Ext.form.field.HtmlEditor} fields. Sizes textarea and iframe elements.
  * @private
  */
 Ext.define('Ext.layout.component.field.HtmlEditor', {
-    extend: 'Ext.layout.component.field.Field',
+    extend: 'Ext.layout.component.field.FieldContainer',
     alias: ['layout.htmleditor'],
 
     type: 'htmleditor',
-
-    // Flags to say that the item is autosizing itself.
-    toolbarSizePolicy: {
-        setsWidth: 0,
-        setsHeight: 0
-    },
+    
+    naturalHeight: 150,
+    naturalWidth: 300,
 
     beginLayout: function(ownerContext) {
+        var owner = this.owner,
+            dom;
+            
+        // In gecko, it can cause the browser to hang if we're running a layout with
+        // a heap of data in the textarea (think several images with data urls).
+        // So clear the value at the start, then re-insert it once we're done
+        if (Ext.isGecko) {
+            dom = owner.textareaEl.dom;
+            this.lastValue = dom.value;
+            dom.value = '';
+        }
         this.callParent(arguments);
 
+        ownerContext.toolbarContext  = ownerContext.context.getCmp(owner.toolbar);
+        ownerContext.inputCmpContext = ownerContext.context.getCmp(owner.inputCmp);
+        ownerContext.bodyCellContext = ownerContext.getEl('bodyEl');
         ownerContext.textAreaContext = ownerContext.getEl('textareaEl');
         ownerContext.iframeContext   = ownerContext.getEl('iframeEl');
-        ownerContext.toolbarContext  = ownerContext.context.getCmp(this.owner.getToolbar());
     },
     
-    // It's not a container, can never add/remove dynamically
-    renderItems: Ext.emptyFn,
-
-    getItemSizePolicy: function (item) {
-        // we are only ever called by the toolbar
-        return this.toolbarSizePolicy;
-    },
-
-    getLayoutItems: function () {
-        var toolbar = this.owner.getToolbar();
-        // The toolbar may not exist if we're destroying
-        return toolbar ? [toolbar] : [];
-    },
-
-    getRenderTarget: function() {
-        return this.owner.bodyEl;
-    },
-
-    publishInnerHeight: function (ownerContext, height) {
+    beginLayoutCycle: function(ownerContext) {
         var me = this,
-            innerHeight = height - me.measureLabelErrorHeight(ownerContext) -
-                          ownerContext.toolbarContext.getProp('height') -
-                          ownerContext.bodyCellContext.getPaddingInfo().height;
-
-        // If the Toolbar has not acheieved a height yet, we are not done laying out.
-        if (Ext.isNumber(innerHeight)) {
-            ownerContext.textAreaContext.setHeight(innerHeight);
-            ownerContext.iframeContext.setHeight(innerHeight);
-        } else {
-            me.done = false;
+            widthModel = ownerContext.widthModel,
+            heightModel = ownerContext.heightModel,
+            owner = me.owner,
+            iframeEl = owner.iframeEl,
+            textareaEl = owner.textareaEl,
+            height = (heightModel.natural || heightModel.shrinkWrap) ? me.naturalHeight : '';
+            
+        me.callParent(arguments);
+        if (widthModel.shrinkWrap) {
+            iframeEl.setStyle('width', '');
+            textareaEl.setStyle('width', '');
+        } else if (widthModel.natural) {
+            ownerContext.bodyCellContext.setWidth(me.naturalWidth);
+        }
+        
+        iframeEl.setStyle('height', height);
+        textareaEl.setStyle('height', height);
+    },
+    
+    finishedLayout: function(){
+        var owner = this.owner;
+        
+        this.callParent(arguments);
+        if (Ext.isGecko) {
+            owner.textareaEl.dom.value = this.lastValue;
         }
     }
 });

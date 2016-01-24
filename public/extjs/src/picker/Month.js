@@ -8,43 +8,55 @@ Ext.define('Ext.picker.Month', {
     requires: [
         'Ext.XTemplate', 
         'Ext.util.ClickRepeater', 
-        'Ext.Date', 
+        'Ext.Date',
         'Ext.button.Button'
     ],
     alias: 'widget.monthpicker',
     alternateClassName: 'Ext.MonthPicker',
+    
+    isMonthPicker: true,
+    
+    focusable: true,
 
     childEls: [
-        'bodyEl', 'prevEl', 'nextEl', 'buttonsEl', 'monthEl', 'yearEl'
+        'bodyEl', 'prevEl', 'nextEl', 'monthEl', 'yearEl'
     ],
 
     renderTpl: [
-        '<div id="{id}-bodyEl" class="{baseCls}-body">',
-          '<div id="{id}-monthEl" class="{baseCls}-months">',
+        '<div id="{id}-bodyEl" data-ref="bodyEl" class="{baseCls}-body">',
+          '<div id="{id}-monthEl" data-ref="monthEl" class="{baseCls}-months">',
               '<tpl for="months">',
-                  '<div class="{parent.baseCls}-item {parent.baseCls}-month"><a style="{parent.monthStyle}" href="#" hidefocus="on">{.}</a></div>',
+                  '<div class="{parent.baseCls}-item {parent.baseCls}-month">',
+                      '<a style="{parent.monthStyle}" role="button" hidefocus="on" class="{parent.baseCls}-item-inner">{.}</a>',
+                  '</div>',
               '</tpl>',
           '</div>',
-          '<div id="{id}-yearEl" class="{baseCls}-years">',
+          '<div id="{id}-yearEl" data-ref="yearEl" class="{baseCls}-years">',
               '<div class="{baseCls}-yearnav">',
-                  '<button id="{id}-prevEl" class="{baseCls}-yearnav-prev"></button>',
-                  '<button id="{id}-nextEl" class="{baseCls}-yearnav-next"></button>',
+                  '<div class="{baseCls}-yearnav-button-ct">',
+                      '<a id="{id}-prevEl" data-ref="prevEl" class="{baseCls}-yearnav-button {baseCls}-yearnav-prev" hidefocus="on" role="button"></a>',
+                  '</div>',
+                  '<div class="{baseCls}-yearnav-button-ct">',
+                      '<a id="{id}-nextEl" data-ref="nextEl" class="{baseCls}-yearnav-button {baseCls}-yearnav-next" hidefocus="on" role="button"></a>',
+                  '</div>',
               '</div>',
               '<tpl for="years">',
-                  '<div class="{parent.baseCls}-item {parent.baseCls}-year"><a href="#" hidefocus="on">{.}</a></div>',
+                  '<div class="{parent.baseCls}-item {parent.baseCls}-year">',
+                      '<a hidefocus="on" class="{parent.baseCls}-item-inner" role="button">{.}</a>',
+                  '</div>',
               '</tpl>',
           '</div>',
           '<div class="' + Ext.baseCSSPrefix + 'clear"></div>',
-        '</div>',
-        '<tpl if="showButtons">',
-            '<div id="{id}-buttonsEl" class="{baseCls}-buttons">{%',
-                'var me=values.$comp, okBtn=me.okBtn, cancelBtn=me.cancelBtn;',
-                'okBtn.ownerLayout = cancelBtn.ownerLayout = me.componentLayout;',
-                'okBtn.ownerCt = cancelBtn.ownerCt = me;',
-                'Ext.DomHelper.generateMarkup(okBtn.getRenderTree(), out);',
-                'Ext.DomHelper.generateMarkup(cancelBtn.getRenderTree(), out);',
-            '%}</div>',
-        '</tpl>'
+          '<tpl if="showButtons">',
+              '<div class="{baseCls}-buttons">{%',
+                  'var me=values.$comp, okBtn=me.okBtn, cancelBtn=me.cancelBtn;',
+                  'okBtn.ownerLayout = cancelBtn.ownerLayout = me.componentLayout;',
+                  'okBtn.ownerCt = cancelBtn.ownerCt = me;',
+                  'Ext.DomHelper.generateMarkup(okBtn.getRenderTree(), out);',
+                  'Ext.DomHelper.generateMarkup(cancelBtn.getRenderTree(), out);',
+              '%}</div>',
+          '</tpl>',
+        '</div>'
     ],
 
     //<locale>
@@ -80,80 +92,72 @@ Ext.define('Ext.picker.Month', {
      * @cfg {Date/Number[]} value The default value to set. See {@link #setValue}
      */
     
-    
-    width: 178,
     measureWidth: 35,
     measureMaxHeight: 20,
 
     // used when attached to date picker which isnt showing buttons
     smallCls: Ext.baseCSSPrefix + 'monthpicker-small',
 
-    // private
+    // @private
     totalYears: 10,
     yearOffset: 5, // 10 years in total, 2 per row
     monthOffset: 6, // 12 months, 2 per row
 
-    // private, inherit docs
+    /**
+     * @event cancelclick
+     * Fires when the cancel button is pressed.
+     * @param {Ext.picker.Month} this
+     */
+
+    /**
+     * @event monthclick
+     * Fires when a month is clicked.
+     * @param {Ext.picker.Month} this
+     * @param {Array} value The current value
+     */
+
+    /**
+     * @event monthdblclick
+     * Fires when a month is clicked.
+     * @param {Ext.picker.Month} this
+     * @param {Array} value The current value
+     */
+
+    /**
+     * @event okclick
+     * Fires when the ok button is pressed.
+     * @param {Ext.picker.Month} this
+     * @param {Array} value The current value
+     */
+
+    /**
+     * @event select
+     * Fires when a month/year is selected.
+     * @param {Ext.picker.Month} this
+     * @param {Array} value The current value
+     */
+
+    /**
+     * @event yearclick
+     * Fires when a year is clicked.
+     * @param {Ext.picker.Month} this
+     * @param {Array} value The current value
+     */
+
+    /**
+     * @event yeardblclick
+     * Fires when a year is clicked.
+     * @param {Ext.picker.Month} this
+     * @param {Array} value The current value
+     */
+
+    // @private
+    // @inheritdoc
     initComponent: function(){
         var me = this;
 
         me.selectedCls = me.baseCls + '-selected';
-        me.addEvents(
-            /**
-             * @event cancelclick
-             * Fires when the cancel button is pressed.
-             * @param {Ext.picker.Month} this
-             */
-            'cancelclick',
 
-            /**
-             * @event monthclick
-             * Fires when a month is clicked.
-             * @param {Ext.picker.Month} this
-             * @param {Array} value The current value
-             */
-            'monthclick',
-
-            /**
-             * @event monthdblclick
-             * Fires when a month is clicked.
-             * @param {Ext.picker.Month} this
-             * @param {Array} value The current value
-             */
-            'monthdblclick',
-
-            /**
-             * @event okclick
-             * Fires when the ok button is pressed.
-             * @param {Ext.picker.Month} this
-             * @param {Array} value The current value
-             */
-            'okclick',
-
-            /**
-             * @event select
-             * Fires when a month/year is selected.
-             * @param {Ext.picker.Month} this
-             * @param {Array} value The current value
-             */
-            'select',
-
-            /**
-             * @event yearclick
-             * Fires when a year is clicked.
-             * @param {Ext.picker.Month} this
-             * @param {Array} value The current value
-             */
-            'yearclick',
-
-            /**
-             * @event yeardblclick
-             * Fires when a year is clicked.
-             * @param {Ext.picker.Month} this
-             * @param {Array} value The current value
-             */
-            'yeardblclick'
-        );
         if (me.small) {
             me.addCls(me.smallCls);
         }
@@ -176,7 +180,8 @@ Ext.define('Ext.picker.Month', {
         this.callParent();
     },
 
-    // private, inherit docs
+    // @private
+    // @inheritdoc
     beforeRender: function(){
         var me = this,
             i = 0,
@@ -185,6 +190,10 @@ Ext.define('Ext.picker.Month', {
             monthLen = me.monthOffset,
             margin = me.monthMargin,
             style = '';
+
+        if (me.padding && !me.width) {
+            me.cacheWidth();
+        }
 
         me.callParent();
 
@@ -204,11 +213,24 @@ Ext.define('Ext.picker.Month', {
         });
     },
 
-    // private, inherit docs
+    cacheWidth: function() {
+        var me = this,
+            padding = me.parseBox(me.padding),
+            widthEl = Ext.getBody().createChild({
+                cls: me.baseCls + ' ' + me.borderBoxCls,
+                style: 'position:absolute;top:-1000px;left:-1000px;',
+                html: '&nbsp;' // required for opera 11.64 to measure a width
+            });
+
+        me.self.prototype.width = widthEl.getWidth() + padding.left + padding.right;
+        widthEl.destroy();
+    },
+
+    // @private
+    // @inheritdoc
     afterRender: function(){
         var me = this,
-            body = me.bodyEl,
-            buttonsEl = me.buttonsEl;
+            body = me.bodyEl;
 
         me.callParent();
 
@@ -368,7 +390,7 @@ Ext.define('Ext.picker.Month', {
                 year = yearNumbers[y];
                 el.dom.innerHTML = year;
                 if (year == value) {
-                    el.dom.className = cls;
+                    el.addCls(cls);
                 }
             }
             if (month !== null) {
@@ -485,7 +507,8 @@ Ext.define('Ext.picker.Month', {
         }
     },
 
-    // private, inherit docs
+    // @private
+    // @inheritdoc
     beforeDestroy: function(){
         var me = this;
         me.years = me.months = null;
@@ -493,22 +516,23 @@ Ext.define('Ext.picker.Month', {
         me.callParent();
     },
 
-    // Do the job of a container layout at this point even though we are not a Container.
-    // TODO: Refactor as a Container.
-    finishRenderChildren: function () {
-        var me = this;
-
-        this.callParent(arguments);
-
-        if (this.showButtons) {
-            me.okBtn.finishRender();
-            me.cancelBtn.finishRender();
-        }
-    },
-
     onDestroy: function() {
         Ext.destroyMembers(this, 'okBtn', 'cancelBtn');
         this.callParent();
+    },
+
+    privates: {
+        // Do the job of a container layout at this point even though we are not a Container.
+        // TODO: Refactor as a Container.
+        finishRenderChildren: function () {
+            var me = this;
+
+            this.callParent(arguments);
+
+            if (this.showButtons) {
+                me.okBtn.finishRender();
+                me.cancelBtn.finishRender();
+            }
+        }
     }
-    
 });

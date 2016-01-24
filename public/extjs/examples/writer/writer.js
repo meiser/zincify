@@ -5,7 +5,6 @@ Ext.define('Writer.Form', {
     requires: ['Ext.form.field.Text'],
 
     initComponent: function(){
-        this.addEvents('create');
         Ext.apply(this, {
             activeRecord: null,
             iconCls: 'icon-user',
@@ -182,7 +181,14 @@ Ext.define('Writer.Grid', {
                 text: 'ID',
                 width: 40,
                 sortable: true,
-                dataIndex: 'id'
+                resizable: false,
+                draggable: false,
+                hideable: false,
+                menuDisabled: true,
+                dataIndex: 'id',
+                renderer: function(value){
+                    return Ext.isNumber(value) ? value : '&nbsp;';
+                }
             }, {
                 header: 'Email',
                 flex: 1,
@@ -251,19 +257,20 @@ Ext.define('Writer.Person', {
         type: 'int',
         useNull: true
     }, 'email', 'first', 'last'],
-    validations: [{
-        type: 'length',
-        field: 'email',
-        min: 1
-    }, {
-        type: 'length',
-        field: 'first',
-        min: 1
-    }, {
-        type: 'length',
-        field: 'last',
-        min: 1
-    }]
+    validators: {
+        email: {
+            type: 'length',
+            min: 1
+        },
+        first: {
+            type: 'length',
+            min: 1
+        },
+        last: {
+            type: 'length',
+            min: 1
+        }
+    }
 });
 
 Ext.require([
@@ -312,7 +319,7 @@ Ext.onReady(function(){
                 }
             });
         }
-    })
+    });
     
     var store = Ext.create('Ext.data.Store', {
         model: 'Writer.Person',
@@ -353,7 +360,7 @@ Ext.onReady(function(){
                 if (operation.action == 'destroy') {
                     main.child('#form').setActiveRecord(null);
                 }
-                Ext.example.msg(operation.action, operation.resultSet.message);
+                Ext.example.msg(operation.action, operation.getResultSet().message);
             }
         }
     });
@@ -361,7 +368,7 @@ Ext.onReady(function(){
     var main = Ext.create('Ext.container.Container', {
         padding: '0 0 0 20',
         width: 500,
-        height: 450,
+        height: Ext.themeName === 'neptune' ? 700 : 650,
         renderTo: document.body,
         layout: {
             type: 'vbox',
@@ -370,8 +377,8 @@ Ext.onReady(function(){
         items: [{
             itemId: 'form',
             xtype: 'writerform',
-            height: 150,
-            margins: '0 0 10 0',
+            manageHeight: false,
+            margin: '0 0 10 0',
             listeners: {
                 create: function(form, data){
                     store.insert(0, data);

@@ -15,6 +15,13 @@ Ext.define('Ext.dd.DragSource', {
      */
 
     /**
+     * @property {Object} dragData
+     * This property contains the data representing the dragged object. This data is set up by the implementation of the
+     * {@link #getDragData} method. It must contain a ddel property, but can contain any other data according to the
+     * application's needs.
+     */
+
+    /**
      * @cfg {String} dropAllowed
      * The CSS class returned to the drag source when drop is allowed.
      */
@@ -41,7 +48,7 @@ Ext.define('Ext.dd.DragSource', {
 
     /**
      * Creates new drag-source.
-     * @param {String/HTMLElement/Ext.Element} el The container element or ID of it.
+     * @param {String/HTMLElement/Ext.dom.Element} el The container element or ID of it.
      * @param {Object} config (optional) Config object.
      */
     constructor: function(el, config) {
@@ -72,7 +79,7 @@ Ext.define('Ext.dd.DragSource', {
         return this.dragData;
     },
 
-    // private
+    // @private
     onDragEnter : function(e, id){
         var target = Ext.dd.DragDropManager.getDDById(id),
             status;
@@ -112,7 +119,7 @@ Ext.define('Ext.dd.DragSource', {
         return true;
     },
 
-    // private
+    // @private
     onDragOver: function(e, id) {
         var target = this.cachedTarget || Ext.dd.DragDropManager.getDDById(id),
             status;
@@ -149,7 +156,7 @@ Ext.define('Ext.dd.DragSource', {
         return true;
     },
 
-    // private
+    // @private
     onDragOut: function(e, id) {
         var target = this.cachedTarget || Ext.dd.DragDropManager.getDDById(id);
         if (this.beforeDragOut(target, e, id) !== false) {
@@ -185,7 +192,7 @@ Ext.define('Ext.dd.DragSource', {
         return true;
     },
 
-    // private
+    // @private
     onDragDrop: function(e, id){
         var target = this.cachedTarget || Ext.dd.DragDropManager.getDDById(id);
         if (this.beforeDragDrop(target, e, id) !== false) {
@@ -227,7 +234,7 @@ Ext.define('Ext.dd.DragSource', {
         return true;
     },
 
-    // private
+    // @private
     onValidDrop: function(target, e, id){
         this.hideProxy();
         if(this.afterValidDrop){
@@ -243,43 +250,46 @@ Ext.define('Ext.dd.DragSource', {
         }
     },
 
-    // private
+    // @private
     getRepairXY: function(e, data){
         return this.el.getXY();
     },
 
-    // private
+    // @private
     onInvalidDrop: function(target, e, id) {
         // This method may be called by the DragDropManager.
         // To preserve backwards compat, it only passes the event object
         // Here we correct the arguments.
+        var me = this;
+        
         if (!e) {
             e = target;
             target = null;
             id = e.getTarget().id;
         }
-        this.beforeInvalidDrop(target, e, id);
-        if (this.cachedTarget) {
-            if(this.cachedTarget.isNotifyTarget){
-                this.cachedTarget.notifyOut(this, e, this.dragData);
+        if (me.beforeInvalidDrop(target, e, id) !== false) {
+            if (me.cachedTarget) {
+                if(me.cachedTarget.isNotifyTarget){
+                    me.cachedTarget.notifyOut(me, e, me.dragData);
+                }
+                me.cacheTarget = null;
             }
-            this.cacheTarget = null;
-        }
-        this.proxy.repair(this.getRepairXY(e, this.dragData), this.afterRepair, this);
+            me.proxy.repair(me.getRepairXY(e, me.dragData), me.afterRepair, me);
 
-        if (this.afterInvalidDrop) {
-            /**
-             * An empty function by default, but provided so that you can perform a custom action
-             * after an invalid drop has occurred by providing an implementation.
-             * @param {Event} e The event object
-             * @param {String} id The id of the dropped element
-             * @method afterInvalidDrop
-             */
-            this.afterInvalidDrop(e, id);
+            if (me.afterInvalidDrop) {
+                /**
+                * An empty function by default, but provided so that you can perform a custom action
+                * after an invalid drop has occurred by providing an implementation.
+                * @param {Event} e The event object
+                * @param {String} id The id of the dropped element
+                * @method afterInvalidDrop
+                */
+                me.afterInvalidDrop(e, id);
+            }
         }
     },
 
-    // private
+    // @private
     afterRepair: function() {
         var me = this;
         if (Ext.enableFx) {
@@ -301,7 +311,7 @@ Ext.define('Ext.dd.DragSource', {
         return true;
     },
 
-    // private
+    // @private
     handleMouseDown: function(e) {
         if (this.dragging) {
             return;
@@ -341,7 +351,7 @@ Ext.define('Ext.dd.DragSource', {
         return this.callParent(arguments);
     },
 
-    // private override
+    // @private
     startDrag: function(x, y) {
         this.proxy.reset();
         this.proxy.hidden = false;
@@ -351,7 +361,7 @@ Ext.define('Ext.dd.DragSource', {
         this.proxy.show();
     },
 
-    // private
+    // @private
     onInitDrag: function(x, y) {
         var clone = this.el.dom.cloneNode(true);
         clone.id = Ext.id(); // prevent duplicate ids
@@ -377,25 +387,25 @@ Ext.define('Ext.dd.DragSource', {
         this.dragging = false;
     },
 
-    // private
+    // @private
     triggerCacheRefresh: function() {
         Ext.dd.DDM.refreshCache(this.groups);
     },
 
-    // private - override to prevent hiding
+    // @private
     b4EndDrag: function(e) {
     },
 
-    // private - override to prevent moving
+    // @private
     endDrag : function(e){
         this.onEndDrag(this.dragData, e);
     },
 
-    // private
+    // @private
     onEndDrag : function(data, e){
     },
 
-    // private - pin to cursor
+    // @private
     autoOffset : function(x, y) {
         this.setDelta(-12, -20);
     },

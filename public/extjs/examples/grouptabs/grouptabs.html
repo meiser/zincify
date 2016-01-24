@@ -1,17 +1,23 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html>
 <html>
 <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>GroupTabs Example</title>
     <!-- Ext -->
-    <link rel="stylesheet" type="text/css" href="../../resources/css/ext-all.css" />
+
     <link rel="stylesheet" type="text/css" href="../shared/example.css" />
-    <link rel="stylesheet" type="text/css" href="../portal/portal.css" />
+    <link rel="stylesheet" type="text/css" href="../portal/_portal.css" />
     <link rel="stylesheet" type="text/css" href="../ux/css/GroupTabPanel.css" />
 
     <!-- GC -->
 
-    <script type="text/javascript" src="../../ext.js"></script>
+    <!-- <x-compile> -->
+    <!-- <x-bootstrap> -->
+    <script type="text/javascript" src="../../examples/shared/include-ext.js"></script>
+    <script type="text/javascript" src="../../examples/shared/options-toolbar.js"></script>
+    <!-- </x-bootstrap> -->
+    <script type="text/javascript" src="../../packages/ext-charts/build/ext-charts.js"></script>
     <script type="text/javascript" src="all-classes.js"></script>
 
     <!-- shared example code -->
@@ -19,7 +25,11 @@
     <script type="text/javascript">
         Ext.Loader.setPath({
             'Ext.ux': '../ux/',
-            'Ext.app': '../portal/classes/'
+            'Portal.model': '../portal/app/model/',
+            'Portal.store': '../portal/app/store/',
+            'Portal.view': '../portal/attic/',
+            'Portal.view.markets': '../portal/app/view/markets/',
+            'Portal.view.stocks': '../portal/app/view/stocks/'
         });
 
         Ext.require([
@@ -29,15 +39,19 @@
             'Ext.tab.Panel',
             'Ext.ux.GroupTabPanel',
             'Ext.grid.*',
-            'Ext.app.PortalColumn',
-            'Ext.app.PortalDropZone',
-            'Ext.app.Portlet',
-            'Ext.app.GridPortlet',
-            'Ext.app.PortalPanel',
-            'Ext.app.ChartPortlet'
+            'Portal.model.Company',
+            'Portal.store.Markets',
+            'Portal.store.Stocks',
+            'Portal.view.PortalColumn',
+            'Portal.view.PortalDropZone',
+            'Portal.view.Portlet',
+            'Portal.view.PortalPanel',            
+            'Portal.view.markets.Markets',
+            'Portal.view.stocks.Stocks'
         ]);
     </script>
     <script type="text/javascript" src="grouptabs.js"></script>
+    <!-- </x-compile> -->
 
     <!-- page specific -->
     <style type="text/css">

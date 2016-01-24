@@ -14,7 +14,8 @@ Ext.define('FV.view.Viewport', {
         xtype: 'viewer'
     }, {
         region: 'west',
-        width: 225,
+        width: Ext.themeName === 'neptune-touch' || Ext.themeName === 'crisp' ? 275 : 225,
+        split:true,
         xtype: 'feedlist'
     }]
 });

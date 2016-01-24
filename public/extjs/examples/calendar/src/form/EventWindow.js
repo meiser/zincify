@@ -13,6 +13,7 @@ Ext.define('Ext.calendar.form.EventWindow', {
     
     requires: [
         'Ext.form.Panel',
+        'Ext.calendar.util.Date',
         'Ext.calendar.data.EventModel',
         'Ext.calendar.data.EventMappings'
     ],
@@ -113,52 +114,49 @@ Ext.define('Ext.calendar.form.EventWindow', {
     // private
     newId: 10000,
 
+    /**
+     * @event eventadd
+     * Fires after a new event is added
+     * @param {Ext.calendar.form.EventWindow} this
+     * @param {Ext.calendar.EventRecord} rec The new {@link Ext.calendar.EventRecord record} that was added
+     */
+
+    /**
+     * @event eventupdate
+     * Fires after an existing event is updated
+     * @param {Ext.calendar.form.EventWindow} this
+     * @param {Ext.calendar.EventRecord} rec The new {@link Ext.calendar.EventRecord record} that was updated
+     */
+
+    /**
+     * @event eventdelete
+     * Fires after an event is deleted
+     * @param {Ext.calendar.form.EventWindow} this
+     * @param {Ext.calendar.EventRecord} rec The new {@link Ext.calendar.EventRecord record} that was deleted
+     */
+
+    /**
+     * @event eventcancel
+     * Fires after an event add/edit operation is canceled by the user and no store update took place
+     * @param {Ext.calendar.form.EventWindow} this
+     * @param {Ext.calendar.EventRecord} rec The new {@link Ext.calendar.EventRecord record} that was canceled
+     */
+
+    /**
+     * @event editdetails
+     * Fires when the user selects the option in this window to continue editing in the detailed edit form
+     * (by default, an instance of {@link Ext.calendar.EventEditForm}. Handling code should hide this window
+     * and transfer the current event record to the appropriate instance of the detailed form by showing it
+     * and calling {@link Ext.calendar.EventEditForm#loadRecord loadRecord}.
+     * @param {Ext.calendar.form.EventWindow} this
+     * @param {Ext.calendar.EventRecord} rec The {@link Ext.calendar.EventRecord record} that is currently being edited
+     */
+
     // private
     initComponent: function() {
         this.callParent();
 
         this.formPanel = this.items.items[0];
-
-        this.addEvents({
-            /**
-             * @event eventadd
-             * Fires after a new event is added
-             * @param {Ext.calendar.form.EventWindow} this
-             * @param {Ext.calendar.EventRecord} rec The new {@link Ext.calendar.EventRecord record} that was added
-             */
-            eventadd: true,
-            /**
-             * @event eventupdate
-             * Fires after an existing event is updated
-             * @param {Ext.calendar.form.EventWindow} this
-             * @param {Ext.calendar.EventRecord} rec The new {@link Ext.calendar.EventRecord record} that was updated
-             */
-            eventupdate: true,
-            /**
-             * @event eventdelete
-             * Fires after an event is deleted
-             * @param {Ext.calendar.form.EventWindow} this
-             * @param {Ext.calendar.EventRecord} rec The new {@link Ext.calendar.EventRecord record} that was deleted
-             */
-            eventdelete: true,
-            /**
-             * @event eventcancel
-             * Fires after an event add/edit operation is canceled by the user and no store update took place
-             * @param {Ext.calendar.form.EventWindow} this
-             * @param {Ext.calendar.EventRecord} rec The new {@link Ext.calendar.EventRecord record} that was canceled
-             */
-            eventcancel: true,
-            /**
-             * @event editdetails
-             * Fires when the user selects the option in this window to continue editing in the detailed edit form
-             * (by default, an instance of {@link Ext.calendar.EventEditForm}. Handling code should hide this window
-             * and transfer the current event record to the appropriate instance of the detailed form by showing it
-             * and calling {@link Ext.calendar.EventEditForm#loadRecord loadRecord}.
-             * @param {Ext.calendar.form.EventWindow} this
-             * @param {Ext.calendar.EventRecord} rec The {@link Ext.calendar.EventRecord record} that is currently being edited
-             */
-            editdetails: true
-        });
     },
 
     // private
@@ -195,7 +193,8 @@ Ext.define('Ext.calendar.form.EventWindow', {
         // Work around the CSS day cell height hack needed for initial render in IE8/strict:
         var me = this,
             anim = (Ext.isIE8 && Ext.isStrict) ? null: animateTarget,
-            M = Ext.calendar.data.EventMappings;
+            M = Ext.calendar.data.EventMappings,
+            data = {};
 
         this.callParent([anim, function(){
             me.titleField.focus(true);
@@ -216,11 +215,11 @@ Ext.define('Ext.calendar.form.EventWindow', {
 
             var start = o[M.StartDate.name],
                 end = o[M.EndDate.name] || Ext.calendar.util.Date.add(start, {hours: 1});
-
-            rec = Ext.create('Ext.calendar.data.EventModel');
-            rec.data[M.StartDate.name] = start;
-            rec.data[M.EndDate.name] = end;
-            rec.data[M.IsAllDay.name] = !!o[M.IsAllDay.name] || start.getDate() != Ext.calendar.util.Date.add(end, {millis: 1}).getDate();
+            
+            data[M.StartDate.name] = start;
+            data[M.EndDate.name] = end;
+            data[M.IsAllDay.name] = !!o[M.IsAllDay.name] || start.getDate() != Ext.calendar.util.Date.add(end, {millis: 1}).getDate();
+            rec = new Ext.calendar.data.EventModel(data);
 
             f.reset();
             f.loadRecord(rec);
@@ -264,13 +263,13 @@ Ext.define('Ext.calendar.form.EventWindow', {
 
     // private
     updateRecord: function(record, keepEditing) {
-        var fields = record.fields,
+        var fields = record.getFields(),
             values = this.formPanel.getForm().getValues(),
             name,
             M = Ext.calendar.data.EventMappings,
             obj = {};
 
-        fields.each(function(f) {
+        Ext.Array.each(fields, function(f) {
             name = f.name;
             if (name in values) {
                 obj[name] = values[name];

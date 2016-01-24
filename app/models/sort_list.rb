@@ -1,7 +1,7 @@
 class SortList < ActiveRecord::Base
   attr_accessible :description, :number, :ranking
   
-  has_many :weightings, :dependent => :restrict
+  has_many :weightings, :dependent => :restrict_with_error
   
   validates :number,
 	:presence => true,

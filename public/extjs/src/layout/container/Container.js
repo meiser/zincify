@@ -3,16 +3,15 @@
  * configuration property.  See {@link Ext.container.Container#layout} for additional details.
  */
 Ext.define('Ext.layout.container.Container', {
-
-    /* Begin Definitions */
-
     extend: 'Ext.layout.Layout',
+
+    alias: 'layout.container',
 
     alternateClassName: 'Ext.layout.ContainerLayout',
 
-    mixins: {
-        elementCt: 'Ext.util.ElementContainer'
-    },
+    mixins: [
+        'Ext.util.ElementContainer'
+    ],
 
     requires: [
         'Ext.XTemplate'
@@ -30,16 +29,6 @@ Ext.define('Ext.layout.container.Container', {
      */
 
     /**
-     * @cfg {Number} [manageOverflow=0]
-     * One of the following values:
-     *
-     *  - 0 if the layout should ignore overflow.
-     *  - 1 if the layout should be rerun if scrollbars are needed.
-     *  - 2 if the layout should also correct padding when overflowed.
-     */
-    manageOverflow: 0,
-
-    /**
      * @private
      * Called by an owning Panel before the Panel begins its collapse process.
      * Most layouts will not need to override the default Ext.emptyFn implementation.
@@ -54,7 +43,7 @@ Ext.define('Ext.layout.container.Container', {
     beginExpand: Ext.emptyFn,
 
     /**
-     * An object which contains boolean properties specifying which properties are to be 
+     * An object which contains boolean properties specifying which properties are to be
      * animated upon flush of child Component ContextItems. For example, Accordion would
      * have:
      *
@@ -67,13 +56,11 @@ Ext.define('Ext.layout.container.Container', {
      */
     animatePolicy: null,
 
-    childEls: [
-        /**
-         * @property {Ext.Element} overflowPadderEl
-         * The element used to correct body padding during overflow.
-         */
-        'overflowPadderEl'
-    ],
+    /**
+     * @private
+     * tracks the number of child items that do not use "liquid" CSS layout
+     */
+    activeItemCount: 0,
 
     renderTpl: [
         '{%this.renderBody(out,values)%}'
@@ -83,134 +70,6 @@ Ext.define('Ext.layout.container.Container', {
     usesContainerWidth: true,
     usesHeight: true,
     usesWidth: true,
-
-
-    /**
-     * @cfg {Boolean} [reserveScrollbar=false]
-     * Set to `true` to leave space for a vertical scrollbar (if the OS shows space-consuming scrollbars) regardless
-     * of whether a scrollbar is needed.
-     *
-     * This is useful if content height changes during application usage, but you do not want the calculated width
-     * of child items to change when a scrollbar appears or disappears. The scrollbar will appear in the reserved space,
-     * and the calculated width of child Components will not change.
-     *
-     *     @example
-     *     Ext.define('Employee', {
-     *         extend: 'Ext.data.Model',
-     *         fields: [
-     *            {name: 'rating', type: 'int'},
-     *            {name: 'salary', type: 'float'},
-     *            {name: 'name'}
-     *         ]
-     *     });
-     *
-     *     function createFakeData(count) {
-     *         var firstNames   = ['Ed', 'Tommy', 'Aaron', 'Abe', 'Jamie', 'Adam', 'Dave', 'David', 'Jay', 'Nicolas', 'Nige'],
-     *             lastNames    = ['Spencer', 'Maintz', 'Conran', 'Elias', 'Avins', 'Mishcon', 'Kaneda', 'Davis', 'Robinson', 'Ferrero', 'White'],
-     *             ratings      = [1, 2, 3, 4, 5],
-     *             salaries     = [100, 400, 900, 1500, 1000000];
-     *
-     *         var data = [];
-     *         for (var i = 0; i < (count || 25); i++) {
-     *             var ratingId    = Math.floor(Math.random() * ratings.length),
-     *                 salaryId    = Math.floor(Math.random() * salaries.length),
-     *                 firstNameId = Math.floor(Math.random() * firstNames.length),
-     *                 lastNameId  = Math.floor(Math.random() * lastNames.length),
-     *
-     *                 rating      = ratings[ratingId],
-     *                 salary      = salaries[salaryId],
-     *                 name        = Ext.String.format("{0} {1}", firstNames[firstNameId], lastNames[lastNameId]);
-     *
-     *             data.push({
-     *                 rating: rating,
-     *                 salary: salary,
-     *                 name: name
-     *             });
-     *         }
-     *         store.loadData(data);
-     *     }
-     *
-     *     // create the Data Store
-     *     var store = Ext.create('Ext.data.Store', {
-     *         id: 'store',
-     *         model: 'Employee',
-     *         proxy: {
-     *             type: 'memory'
-     *         }
-     *     });
-     *     createFakeData(10);
-     *
-     *     var grid = Ext.create('Ext.grid.Panel', {
-     *         title: 'Grid loaded with varying number of records',
-     *         anchor: '100%',
-     *         store: store,
-     *         columns: [{
-     *             xtype: 'rownumberer',
-     *             width: 40,
-     *             sortable: false
-     *         },{
-     *             text: 'Name',
-     *             flex: 1,
-     *             sortable: true,
-     *             dataIndex: 'name'
-     *         },{
-     *             text: 'Rating',
-     *             width: 125,
-     *             sortable: true,
-     *             dataIndex: 'rating'
-     *         },{
-     *             text: 'Salary',
-     *             width: 125,
-     *             sortable: true,
-     *             dataIndex: 'salary',
-     *             align: 'right',
-     *             renderer: Ext.util.Format.usMoney
-     *         }]
-     *     });
-     *
-     *     Ext.create('Ext.panel.Panel', {
-     *         renderTo: document.body,
-     *         width: 800,
-     *         height: 600,
-     *         layout: {
-     *             type: 'anchor',
-     *             reserveScrollbar: true // There will be a gap even when there's no scrollbar
-     *         },
-     *         autoScroll: true,
-     *         items: grid,
-     *         tbar: {
-     *             defaults: {
-     *                 handler: function(b) {
-     *                     createFakeData(b.count);
-     *                 }
-     *             },
-     *             items: [{
-     *                  text: '10 Items',
-     *                  count: 10
-     *             },{
-     *                  text: '100 Items',
-     *                  count: 100
-     *             },{
-     *                  text: '300 Items',
-     *                  count: 300
-     *             },{
-     *                  text: '1000 Items',
-     *                  count: 1000
-     *             },{
-     *                  text: '5000 Items',
-     *                  count: 5000
-     *             }]
-     *         }
-     *     });
-     *
-     */
-    reserveScrollbar: false,
-
-    // Begin with no previous adjustments
-    lastOverflowAdjust: {
-        width: 0,
-        height: 0
-    },
 
     constructor: function () {
         this.callParent(arguments);
@@ -222,29 +81,10 @@ Ext.define('Ext.layout.container.Container', {
         this.mixins.elementCt.destroy.call(this);
     },
 
-    initLayout: function() {
-        var me = this,
-            scrollbarWidth = Ext.getScrollbarSize().width;
-
-        me.callParent();
-
-        // Create a default lastOverflowAdjust based upon scrolling configuration.
-        // If the Container is to overflow, or we *always* reserve space for a scrollbar
-        // then reserve space for a vertical scrollbar
-        if (scrollbarWidth && me.manageOverflow && !me.hasOwnProperty('lastOverflowAdjust')) {
-            if (me.owner.autoScroll || me.reserveScrollbar) {
-                me.lastOverflowAdjust = {
-                    width: scrollbarWidth,
-                    height: 0
-                };
-            }
-        }
-    },
-
     /**
      * In addition to work done by our base classes, containers benefit from some extra
      * cached data. The following properties are added to the ownerContext:
-     * 
+     *
      *  - visibleItems: the result of {@link #getVisibleItems}
      *  - childItems: the ContextItem[] for each visible item
      *  - targetContext: the ContextItem for the {@link #getTarget} element
@@ -252,22 +92,15 @@ Ext.define('Ext.layout.container.Container', {
     beginLayout: function (ownerContext) {
         this.callParent(arguments);
 
-        ownerContext.targetContext = ownerContext.getEl('getTarget', this);
+        ownerContext.targetContext = ownerContext.paddingContext = ownerContext.getEl('getTarget', this);
 
         this.cacheChildItems(ownerContext);
     },
 
     beginLayoutCycle: function (ownerContext, firstCycle) {
-        var me = this,
-            padEl = me.overflowPadderEl;
+        var me = this;
 
         me.callParent(arguments);
-
-        // Begin with the scrollbar adjustment that we used last time - this is more likely to be correct
-        // than beginning with no adjustment at all
-        if (!ownerContext.state.overflowAdjust) {
-            ownerContext.state.overflowAdjust = me.lastOverflowAdjust;
-        }
 
         if (firstCycle) {
             if (me.usesContainerHeight) {
@@ -277,254 +110,42 @@ Ext.define('Ext.layout.container.Container', {
                 ++ownerContext.consumersContainerWidth;
             }
         }
-
-        if (padEl) {
-            padEl.setStyle('display', 'none');
-        }
-    },
-
-    completeLayout: function (ownerContext) {
-        // Cache the scrollbar adjustment
-        this.lastOverflowAdjust = ownerContext.state.overflowAdjust;
     },
 
     cacheChildItems: function (ownerContext) {
-        var context = ownerContext.context,
-            childItems = [],
-            items = this.getVisibleItems(),
-            length = items.length,
-            i;
+        var me = this,
+            context, childItems, items, length, i;
 
-        ownerContext.childItems = childItems;
-        ownerContext.visibleItems = items;
+        // if we neither read nor set the size of our items, we can skip creation of
+        // the childItems array
+        if (me.needsItemSize || me.setsItemSize) {
+            context = ownerContext.context;
+            childItems = ownerContext.childItems = [];
+            items = ownerContext.visibleItems = me.getVisibleItems();
+            length = items.length;
 
-        for (i = 0; i < length; ++i) {
-            childItems.push(context.getCmp(items[i]));
+            for (i = 0; i < length; ++i) {
+                childItems.push(context.getCmp(items[i]));
+            }
         }
     },
 
     cacheElements: function () {
         var owner = this.owner;
 
-        this.applyChildEls(owner.el, owner.id); // from ElementContainer mixin
+        this.attachChildEls(owner.el, owner); // from ElementContainer mixin
     },
 
-    calculateContentSize: function (ownerContext, dimensions) {
-        var me = this,
-            containerDimensions = (dimensions || 0) | me.manageOverflow |
-                   ((ownerContext.widthModel.shrinkWrap ? 1 : 0) |
-                    (ownerContext.heightModel.shrinkWrap ? 2 : 0)),
-            calcWidth = (containerDimensions & 1) || undefined,
-            calcHeight = (containerDimensions & 2) || undefined,
-            childItems = ownerContext.childItems,
-            length = childItems.length,
-            contentHeight = 0,
-            contentWidth = 0,
-            needed = 0,
-            props = ownerContext.props,
-            targetXY, targetX, targetY, targetPadding,
-            borders, child, childContext, childX, childY, height, i, margins, width, xy;
+    calculate: function(ownerContext) {
+        var props = ownerContext.props,
+            el = ownerContext.el;
 
-        if (calcWidth) {
-            if (isNaN(props.contentWidth)) {
-                ++needed;
-            } else {
-                calcWidth = undefined;
-            }
-        }
-        if (calcHeight) {
-            if (isNaN(props.contentHeight)) {
-                ++needed;
-            } else {
-                calcHeight = undefined;
-            }
+        if (ownerContext.widthModel.shrinkWrap && isNaN(props.width)) {
+            ownerContext.setContentWidth(el.getWidth());
         }
 
-        if (needed) {
-            // TODO - this is rather brute force... maybe a wrapping el or clientHeight/Width
-            // trick might help. Whatever we do, it must either work for Absolute layout or
-            // at least be correctable by an overridden method in that derived class.
-            for (i = 0; i < length; ++i) {
-                childContext = childItems[i];
-                child = childContext.target;
-                height = calcHeight && childContext.getProp('height');
-                width = calcWidth && childContext.getProp('width');
-                margins = childContext.getMarginInfo();
-
-                // getXY is the root method here (meaning that we cannot avoid getting both
-                // even if we need only one), so dip into the DOM if something is needed
-                if ((calcWidth && isNaN(child.x)) || (calcHeight && isNaN(child.y))) {
-                    xy = child.el.getXY();
-                    if (!targetXY) {
-                        targetXY = ownerContext.targetContext.el.getXY();
-                        borders = ownerContext.targetContext.getBorderInfo();
-                        targetX = targetXY[0] + borders.left;
-                        targetY = targetXY[1] + borders.top;
-                    }
-                    // not worth avoiding the possibly useless calculation here:
-                    childX = xy[0] - targetX;
-                    childY = xy[1] - targetY;
-                } else {
-                    // not worth avoiding these either:
-                    childX = child.x;
-                    childY = child.y;
-                }
-                // XY includes the top/left margin
-
-                height += margins.bottom;
-                width  += margins.right;
-
-                contentHeight = Math.max(contentHeight, childY + height);
-                contentWidth = Math.max(contentWidth, childX + width);
-
-                if (isNaN(contentHeight) && isNaN(contentWidth)) {
-                    me.done = false;
-                    return;
-                }
-            }
-
-            if (calcWidth || calcHeight) {
-                targetPadding = ownerContext.targetContext.getPaddingInfo();
-            }
-            if (calcWidth && !ownerContext.setContentWidth(contentWidth + targetPadding.right)) {
-                me.done = false;
-            }
-            if (calcHeight && !ownerContext.setContentHeight(contentHeight + targetPadding.bottom)) {
-                me.done = false;
-            }
-
-            /* add a '/' to turn on this log ('//* enables, '/*' disables)
-            if (me.done) {
-                var el = ownerContext.targetContext.el.dom;
-                Ext.log(this.owner.id, '.contentSize: ', contentWidth, 'x', contentHeight,
-                    ' => scrollSize: ', el.scrollWidth, 'x', el.scrollHeight);
-            }/**/
-        }
-    },
-
-    /**
-     * Handles overflow processing for a container. This should be called once the layout
-     * has determined contentWidth/Height. In addition to the ownerContext passed to the
-     * {@link #calculate} method, this method also needs the containerSize (the object
-     * returned by {@link #getContainerSize}).
-     * 
-     * @param {Ext.layout.ContextItem} ownerContext
-     * @param {Object} containerSize
-     * @param {Number} dimensions A bit mask for the overflow managed dimensions. The 0-bit
-     * is for `width` and the 1-bit is for `height`. In other words, a value of 1 would be
-     * only `width`, 2 would be only `height` and 3 would be both.
-     */
-    calculateOverflow: function (ownerContext, containerSize, dimensions) {
-        var me = this,
-            owner = me.owner,
-            manageOverflow = me.manageOverflow,
-            state = ownerContext.state,
-            overflowAdjust = state.overflowAdjust,
-            padWidth, padHeight, padElContext, padding, scrollRangeFlags,
-            overflow, scrollbarSize, contentW, contentH, ownerW, ownerH, scrollbars,
-            xauto, yauto;
-
-        if (manageOverflow && !state.secondPass && !me.reserveScrollbar) {
-            // Determine the dimensions that have overflow:auto applied. If these come by
-            // way of component config, this does not require a DOM read:
-            if (owner.autoScroll) {
-                xauto = yauto = true;
-            } else {
-                if (owner.overflowX) {
-                    xauto = owner.overflowX == 'auto';
-                } else {
-                    overflow = ownerContext.targetContext.getStyle('overflow-x');
-                    xauto = overflow && overflow != 'hidden' && overflow != 'scroll';
-                }
-
-                if (owner.overflowY) {
-                    yauto = owner.overflowY == 'auto';
-                } else {
-                    overflow = ownerContext.targetContext.getStyle('overflow-y');
-                    yauto = overflow && overflow != 'hidden' && overflow != 'scroll';
-                }
-            }
-
-            // If the container layout is not using width, we don't need to adjust for the
-            // vscroll (likewise for height). Perhaps we don't even need to run the layout
-            // again if the adjustments won't have any effect on the result!
-            if (!containerSize.gotWidth) {
-                xauto = false;
-            }
-            if (!containerSize.gotHeight) {
-                yauto = false;
-            }
-
-            if (xauto || yauto) {
-                scrollbarSize = Ext.getScrollbarSize();
-
-                // as a container we calculate contentWidth/Height, so we don't want
-                // to use getProp and make it look like we are triggered by them...
-                contentW = ownerContext.peek('contentWidth');
-                contentH = ownerContext.peek('contentHeight');
-                ownerW = containerSize.width;
-                ownerH = containerSize.height;
-
-                scrollbars = me.getScrollbarsNeeded(ownerW, ownerH, contentW, contentH);
-                state.overflowState = scrollbars;
-
-                if (typeof dimensions == 'number') {
-                    scrollbars &= ~dimensions; // ignore dimensions that have no effect
-                }
-
-                overflowAdjust = {
-                    width:  (xauto && (scrollbars & 2)) ? scrollbarSize.width : 0,
-                    height: (yauto && (scrollbars & 1)) ? scrollbarSize.height : 0
-                };
-
-                // We can have 0-sized scrollbars (new Mac OS) and so don't invalidate
-                // the layout unless this will change something...
-                if (overflowAdjust.width !== me.lastOverflowAdjust.width || overflowAdjust.height !== me.lastOverflowAdjust.height) {
-                    me.done = false;
-
-                    // we pass overflowAdjust and overflowState in as state for the next
-                    // cycle (these are discarded if one of our ownerCt's invalidates):
-                    ownerContext.invalidate({
-                        state: {
-                            overflowAdjust: overflowAdjust,
-                            overflowState: state.overflowState,
-                            secondPass: true
-                        }
-                    });
-                }
-            }
-        }
-
-        if (!me.done) {
-            return;
-        }
-
-        padElContext = ownerContext.padElContext ||
-                      (ownerContext.padElContext = ownerContext.getEl('overflowPadderEl', me));
-
-        // Even if overflow does not effect the layout, we still do need the padEl to be
-        // sized or hidden appropriately...
-        if (padElContext) {
-            scrollbars = state.overflowState; // the true overflow state
-            padWidth = containerSize.width;
-            padHeight = 0;//  TODO me.padHeightAdj; // 0 or 1
-
-            if (scrollbars) {
-                padding = ownerContext.targetContext.getPaddingInfo();
-                scrollRangeFlags = me.scrollRangeFlags;
-
-                if ((scrollbars & 2) && (scrollRangeFlags & 1)) { // if (vscroll and loses bottom)
-                    padHeight += padding.bottom;
-                }
-
-                if ((scrollbars & 1) && (scrollRangeFlags & 4)) { // if (hscroll and loses right)
-                    padWidth += padding.right;
-                }
-                padElContext.setProp('display', '');
-                padElContext.setSize(padWidth, padHeight);
-            } else {
-                padElContext.setProp('display', 'none');
-            }
+        if (ownerContext.heightModel.shrinkWrap && isNaN(props.height)) {
+            ownerContext.setContentHeight(el.getHeight());
         }
     },
 
@@ -534,15 +155,33 @@ Ext.define('Ext.layout.container.Container', {
      */
     configureItem: function(item) {
         var me = this,
+            itemCls = me.itemCls,
             ownerItemCls = me.owner.itemCls,
-            addClasses = [].concat(me.itemCls || []);
+            needsCopy,
+            addClasses;
 
-        me.callParent(arguments);
+        // Effectively callParent but without the function overhead
+        item.ownerLayout = me;
 
-        if (ownerItemCls) {
-            addClasses = Ext.Array.push(addClasses, ownerItemCls);
+        if (itemCls) {
+            // itemCls can be a single class or an array
+            if (typeof itemCls === 'string') {
+                addClasses = [itemCls];
+            } else {
+                addClasses = itemCls;
+                needsCopy = !!addClasses;
+            }
         }
-        item.addCls(addClasses);
+        if (ownerItemCls) {
+            // Add some extra logic so we don't clone the array unnecessarily
+            if (needsCopy) {
+                addClasses = Ext.Array.clone(addClasses);
+            }
+            addClasses = Ext.Array.push(addClasses || [], ownerItemCls);
+        }
+        if (addClasses) {
+            item.addCls(addClasses);
+        }
     },
 
     doRenderBody: function (out, renderData) {
@@ -576,47 +215,6 @@ Ext.define('Ext.layout.container.Container', {
         }
     },
 
-    /**
-     * Creates an element that makes bottom/right body padding consistent across browsers.
-     * This element is sized based on the need for scrollbars in {@link #calculateOverflow}.
-     * If the {@link #manageOverflow} option is false, this element is not created.
-     *
-     * See {@link #getScrollRangeFlags} for more details.
-     */
-    doRenderPadder: function (out, renderData) {
-        // Careful! This method is bolted on to the renderTpl so all we get for context is
-        // the renderData! The "this" pointer is the renderTpl instance!
-
-        var me = renderData.$layout,
-            owner = me.owner,
-            scrollRangeFlags = me.getScrollRangeFlags();
-
-        if (me.manageOverflow == 2) {
-            if (scrollRangeFlags & 5) { // if (loses parent bottom and/or right padding)
-                out.push('<div id="',owner.id,'-overflowPadderEl" ',
-                    'style="font-size: 1px; width:1px; height: 1px;');
-
-                // We won't want the height of the padder to cause problems when we only
-                // want to adjust for right padding, so we relatively position it up 1px so
-                // its height of 1px will have no vertical effect. This trick does not work
-                // on IE due to bugs (the effects are worse than the off-by-1px in scroll
-                // height).
-                //
-                /* turns out this does not work on FF (5) either... TODO
-                if (Ext.isIE || Ext.isGecko) {
-                    me.padHeightAdj = 0;
-                } else {
-                    me.padHeightAdj = 1;
-                    out.push('position: relative; top: -1px;');
-                }/**/
-
-                out.push('"></div>');
-
-                me.scrollRangeFlags = scrollRangeFlags; // remember for calculateOverflow
-            }
-        }
-    }, 
-
     finishRender: function () {
         var me = this,
             target, items;
@@ -628,10 +226,6 @@ Ext.define('Ext.layout.container.Container', {
         target = me.getRenderTarget();
         items = me.getLayoutItems();
 
-        if (me.targetCls) {
-            me.getTarget().addCls(me.targetCls);
-        }
-
         me.finishRenderItems(target, items);
     },
 
@@ -640,6 +234,12 @@ Ext.define('Ext.layout.container.Container', {
      * Called for every layout in the layout context after all the layouts have been finally flushed
      */
     notifyOwner: function() {
+        //<debug>
+        if (!this._hasTargetWarning && this.targetCls && !this.getTarget().hasCls(this.targetCls)) {
+            this._hasTargetWarning = true;
+            Ext.log.warn('targetCls is missing. This may mean that getTargetEl() is being overridden but not applyTargetCls(). ' + this.owner.id);
+        }
+        //</debug>
         this.owner.afterLayout(this);
     },
 
@@ -648,9 +248,6 @@ Ext.define('Ext.layout.container.Container', {
      * be returned because the shrinkWrap dimensions are based on the contentWidth/Height
      * as determined by the container layout.
      *
-     * If the {@link #calculateOverflow} method is used and if {@link #manageOverflow} is
-     * true, this may adjust the width/height by the size of scrollbars.
-     * 
      * @param {Ext.layout.ContextItem} ownerContext The owner's context item.
      * @param {Boolean} [inDom=false] True if the container size must be in the DOM.
      * @return {Object} The size
@@ -660,17 +257,16 @@ Ext.define('Ext.layout.container.Container', {
      */
     getContainerSize : function(ownerContext, inDom) {
         // Subtle But Important:
-        // 
+        //
         // We don't want to call getProp/hasProp et.al. unless we in fact need that value
         // for our results! If we call it and don't need it, the layout manager will think
         // we depend on it and will schedule us again should it change.
 
         var targetContext = ownerContext.targetContext,
             frameInfo = targetContext.getFrameInfo(),
-            padding = targetContext.getPaddingInfo(),
+            padding = ownerContext.paddingContext.getPaddingInfo(),
             got = 0,
             needed = 0,
-            overflowAdjust = ownerContext.state.overflowAdjust,
             gotWidth, gotHeight, width, height;
 
         // In an shrinkWrap width/height case, we must not ask for any of these dimensions
@@ -688,8 +284,8 @@ Ext.define('Ext.layout.container.Container', {
             if (gotWidth) {
                 ++got;
                 width -= frameInfo.width + padding.width;
-                if (overflowAdjust) {
-                    width -= overflowAdjust.width;
+                if (width < 0) {
+                    width = 0;
                 }
             }
         }
@@ -701,8 +297,8 @@ Ext.define('Ext.layout.container.Container', {
             if (gotHeight) {
                 ++got;
                 height -= frameInfo.height + padding.height;
-                if (overflowAdjust) {
-                    height -= overflowAdjust.height;
+                if (height < 0) {
+                    height = 0;
                 }
             }
         }
@@ -716,6 +312,24 @@ Ext.define('Ext.layout.container.Container', {
             gotWidth: gotWidth,
             gotHeight: gotHeight
         };
+    },
+
+    // This method is used to offset the DOM position when checking
+    // whether the element is a certain child of the target. This is
+    // required in cases where the extra elements prepended to the target
+    // before any of the items. An example of this is when using labelAlign: 'top'
+    // on a field. The label appears first in the DOM before any child items are
+    // created, so when we check the position we need to add an extra offset.
+    // Containers that create an innerCt are exempt because this new element
+    // preserves the order
+    getPositionOffset: function(position) {
+        if (!this.createsInnerCt) {
+            var offset = this.owner.itemNodeOffset;
+            if (offset) {
+                position += offset;
+            }
+        }
+        return position;
     },
 
     /**
@@ -769,7 +383,7 @@ Ext.define('Ext.layout.container.Container', {
      *
      * May be overridden in layout managers which implement an inner element.
      *
-     * @return {Ext.Element}
+     * @return {Ext.dom.Element}
      */
     getRenderTarget: function() {
         return this.owner.getTargetEl();
@@ -780,7 +394,7 @@ Ext.define('Ext.layout.container.Container', {
      *
      * May be overridden in Component layout managers which implement a {@link #getRenderTarget component render target} which must only
      * contain child components.
-     * @return {Ext.Element}
+     * @return {Ext.dom.Element}
      */
     getElementTarget: function() {
         return this.getRenderTarget();
@@ -804,12 +418,28 @@ Ext.define('Ext.layout.container.Container', {
             items = this.owner.items,
             itemsGen,
             renderCfgs = {};
-        
+
         do {
             itemsGen = items.generation;
             result = this.getItemsRenderTree(this.getLayoutItems(), renderCfgs);
         } while (items.generation !== itemsGen);
         return result;
+    },
+
+    renderChildren: function () {
+        var me = this,
+            ownerItems = me.owner.items,
+            target = me.getRenderTarget(),
+            itemsGen, items;
+
+        // During the render phase, new items may be added. Specifically, a panel will
+        // create a placeholder component during render if required, so we need to catch
+        // it here so we can render it.
+        do {
+            itemsGen = ownerItems.generation;
+            items = me.getLayoutItems();
+            me.renderItems(items, target);
+        } while (ownerItems.generation !== itemsGen);
     },
 
     getScrollbarsNeeded: function (width, height, contentWidth, contentHeight) {
@@ -842,87 +472,8 @@ Ext.define('Ext.layout.container.Container', {
     },
 
     /**
-     * Returns flags indicating cross-browser handling of scrollHeight/Width. In particular,
-     * IE has issues with padding-bottom in a scrolling element (it does not include that
-     * padding in the scrollHeight). Also, margin-bottom on a child in a scrolling element
-     * can be lost.
-     * 
-     * All browsers seem to ignore margin-right on children and padding-right on the parent
-     * element (the one with the overflow)
-     * 
-     * This method returns a number with the follow bit positions set based on things not
-     * accounted for in scrollHeight and scrollWidth:
-     *
-     *  - 1: Scrolling element's padding-bottom is not included in scrollHeight.
-     *  - 2: Last child's margin-bottom is not included in scrollHeight.
-     *  - 4: Scrolling element's padding-right is not included in scrollWidth.
-     *  - 8: Child's margin-right is not included in scrollWidth.
-     *
-     * To work around the margin-bottom issue, it is sufficient to create a 0px tall last
-     * child that will "hide" the margin. This can also be handled by wrapping the children
-     * in an element, again "hiding" the margin. Wrapping the elements is about the only
-     * way to preserve their right margins. This is the strategy used by Column layout.
-     *
-     * To work around the padding-bottom problem, since it is comes from a style on the
-     * parent element, about the only simple fix is to create a last child with height
-     * equal to padding-bottom. To preserve the right padding, the sizing element needs to
-     * have a width that includes the right padding.
-     */
-    getScrollRangeFlags: (function () {
-        var flags = -1;
-
-        return function () {
-            if (flags < 0) {
-                var div = Ext.getBody().createChild({
-                        //cls: 'x-border-box x-hide-offsets',
-                        cls: Ext.baseCSSPrefix + 'border-box',
-                        style: {
-                            width: '100px', height: '100px', padding: '10px',
-                            overflow: 'auto'
-                        },
-                        children: [{
-                            style: {
-                                border: '1px solid red',
-                                width: '150px', height: '150px',
-                                margin: '0 5px 5px 0' // TRBL
-                            }
-                        }]
-                    }),
-                    scrollHeight = div.dom.scrollHeight,
-                    scrollWidth = div.dom.scrollWidth,
-                    heightFlags = {
-                        // right answer, nothing missing:
-                        175: 0,
-                        // missing parent padding-bottom:
-                        165: 1,
-                        // missing child margin-bottom:
-                        170: 2,
-                        // missing both
-                        160: 3
-                    },
-                    widthFlags = {
-                        // right answer, nothing missing:
-                        175: 0,
-                        // missing parent padding-right:
-                        165: 4,
-                        // missing child margin-right:
-                        170: 8,
-                        // missing both
-                        160: 12
-                    };
-
-                flags = (heightFlags[scrollHeight] || 0) | (widthFlags[scrollWidth] || 0);
-                //Ext.log('flags=',flags.toString(2));
-                div.remove();
-            }
-
-            return flags;
-        };
-    }()),
-
-    /**
      * Returns the owner component's resize element.
-     * @return {Ext.Element}
+     * @return {Ext.dom.Element}
      */
     getTarget: function() {
         return this.owner.getTargetEl();
@@ -934,7 +485,7 @@ Ext.define('Ext.layout.container.Container', {
      * @return {Array} All matching items
      */
     getVisibleItems: function() {
-        var target   = this.getRenderTarget(),
+        var target = this.getRenderTarget(),
             items = this.getLayoutItems(),
             ln = items.length,
             visibleItems = [],
@@ -942,7 +493,7 @@ Ext.define('Ext.layout.container.Container', {
 
         for (i = 0; i < ln; i++) {
             item = items[i];
-            if (item.rendered && this.isValidParent(item, target, i) && item.hidden !== true) {
+            if (item.rendered && this.isValidParent(item, target, i) && item.hidden !== true && !item.floated) {
                 visibleItems.push(item);
             }
         }
@@ -950,12 +501,47 @@ Ext.define('Ext.layout.container.Container', {
         return visibleItems;
     },
 
-    setupRenderTpl: function (renderTpl) {
-        var me = this;
+    getMoveAfterIndex: function (after) {
+        return this.owner.items.indexOf(after) + 1;
+    },
 
-        renderTpl.renderBody = me.doRenderBody;
-        renderTpl.renderContainer = me.doRenderContainer;
-        renderTpl.renderItems = me.doRenderItems;
-        renderTpl.renderPadder = me.doRenderPadder;
+    moveItemBefore: function (item, before) {
+        var owner = this.owner,
+            items = owner.items,
+            toIndex;
+
+        if (item === before) {
+            return item;
+        }
+
+        toIndex = before ?
+            items.indexOf(before) :
+            items.length;
+
+        return owner.insert(toIndex, item);
+    },
+
+    setupRenderTpl: function (renderTpl) {
+        renderTpl.renderBody = this.doRenderBody;
+        renderTpl.renderContainer = this.doRenderContainer;
+        renderTpl.renderItems = this.doRenderItems;
+    },
+
+    getContentTarget: function(){
+        return this.owner.getDefaultContentTarget();
+    },
+
+    onAdd: function (item) {
+        if (!item.liquidLayout) {
+            ++this.activeItemCount;
+        }
+        this.callParent([item]);
+    },
+
+    onRemove: function(item) {
+        if (!item.liquidLayout) {
+            --this.activeItemCount;
+        }
+        this.callParent([item]);
     }
 });

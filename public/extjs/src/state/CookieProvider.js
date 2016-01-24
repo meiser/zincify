@@ -51,7 +51,7 @@ Ext.define('Ext.state.CookieProvider', {
     constructor : function(config){
         var me = this;
         me.path = "/";
-        me.expires = new Date(new Date().getTime()+(1000*60*60*24*7)); //7 days
+        me.expires = new Date(Ext.Date.now() + (1000*60*60*24*7)); //7 days
         me.domain = null;
         me.secure = false;
         me.callParent(arguments);
@@ -102,7 +102,7 @@ Ext.define('Ext.state.CookieProvider', {
         var me = this;
 
         document.cookie = me.prefix + name + "=" + me.encodeValue(value) +
-           ((me.expires == null) ? "" : ("; expires=" + me.expires.toGMTString())) +
+           ((me.expires == null) ? "" : ("; expires=" + me.expires.toUTCString())) +
            ((me.path == null) ? "" : ("; path=" + me.path)) +
            ((me.domain == null) ? "" : ("; domain=" + me.domain)) +
            ((me.secure == true) ? "; secure" : "");
@@ -112,7 +112,7 @@ Ext.define('Ext.state.CookieProvider', {
     clearCookie : function(name){
         var me = this;
 
-        document.cookie = me.prefix + name + "=null; expires=Thu, 01-Jan-70 00:00:01 GMT" +
+        document.cookie = me.prefix + name + "=null; expires=Thu, 01-Jan-1970 00:00:01 GMT" +
            ((me.path == null) ? "" : ("; path=" + me.path)) +
            ((me.domain == null) ? "" : ("; domain=" + me.domain)) +
            ((me.secure == true) ? "; secure" : "");

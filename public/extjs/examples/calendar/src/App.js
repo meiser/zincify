@@ -23,7 +23,7 @@ Ext.define('Ext.calendar.App', {
         'Ext.calendar.data.Calendars',
         'Ext.calendar.form.EventWindow'
     ],
-    
+
     constructor : function() {
         // Minor workaround for OSX Lion scrollbars
         this.checkScrollOffset();
@@ -48,10 +48,10 @@ Ext.define('Ext.calendar.App', {
             layout: 'border',
             renderTo: 'calendar-ct',
             items: [{
+                xtype: 'component',
                 id: 'app-header',
                 region: 'north',
                 height: 35,
-                border: false,
                 contentEl: 'app-header-content'
             },{
                 id: 'app-center',
@@ -64,10 +64,9 @@ Ext.define('Ext.calendar.App', {
                     }
                 },
                 items: [{
+                    xtype: 'container',
                     id:'app-west',
                     region: 'west',
-                    width: 179,
-                    border: false,
                     items: [{
                         xtype: 'datepicker',
                         id: 'app-nav-picker',
@@ -256,11 +255,11 @@ Ext.define('Ext.calendar.App', {
         var p = Ext.getCmp('app-center'),
             fmt = Ext.Date.format;
         
-        if(Ext.Date.clearTime(startDt).getTime() == Ext.Date.clearTime(endDt).getTime()){
+        if(Ext.Date.clearTime(startDt).getTime() === Ext.Date.clearTime(endDt).getTime()){
             p.setTitle(fmt(startDt, 'F j, Y'));
         }
-        else if(startDt.getFullYear() == endDt.getFullYear()){
-            if(startDt.getMonth() == endDt.getMonth()){
+        else if(startDt.getFullYear() === endDt.getFullYear()){
+            if(startDt.getMonth() === endDt.getMonth()){
                 p.setTitle(fmt(startDt, 'F j') + ' - ' + fmt(endDt, 'j, Y'));
             }
             else{
@@ -328,7 +327,7 @@ function() {
         updateOperation: function(operation, callback, scope) {
             operation.setCompleted();
             operation.setSuccessful();
-            Ext.callback(callback, scope || me, [operation]);
+            Ext.callback(callback, scope || this, [operation]);
         },
         create: function() {
             this.updateOperation.apply(this, arguments);

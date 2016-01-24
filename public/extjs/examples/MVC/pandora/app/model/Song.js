@@ -7,7 +7,7 @@ Ext.define('Pandora.model.Song', {
         url: 'data/recentsongs.json',
         reader: {
             type: 'json',
-            root: 'results'
+            rootProperty: 'results'
         }
     }
 });

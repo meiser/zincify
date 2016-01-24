@@ -51,42 +51,41 @@ Ext.define('Ext.calendar.form.EventDetails', {
 
     // private properties:
     newId: 10000,
-    layout: 'column',
+    layout: {
+        type: 'hbox',
+        align: 'stretch'
+    },
+
+    /**
+     * @event eventadd
+     * Fires after a new event is added
+     * @param {Ext.calendar.form.EventDetails} this
+     * @param {Ext.calendar.EventRecord} rec The new {@link Ext.calendar.EventRecord record} that was added
+     */
+
+    /**
+     * @event eventupdate
+     * Fires after an existing event is updated
+     * @param {Ext.calendar.form.EventDetails} this
+     * @param {Ext.calendar.EventRecord} rec The new {@link Ext.calendar.EventRecord record} that was updated
+     */
+
+    /**
+     * @event eventdelete
+     * Fires after an event is deleted
+     * @param {Ext.calendar.form.EventDetails} this
+     * @param {Ext.calendar.EventRecord} rec The new {@link Ext.calendar.EventRecord record} that was deleted
+     */
+
+    /**
+     * @event eventcancel
+     * Fires after an event add/edit operation is canceled by the user and no store update took place
+     * @param {Ext.calendar.form.EventDetails} this
+     * @param {Ext.calendar.EventRecord} rec The new {@link Ext.calendar.EventRecord record} that was canceled
+     */
 
     // private
     initComponent: function() {
-
-        this.addEvents({
-            /**
-             * @event eventadd
-             * Fires after a new event is added
-             * @param {Ext.calendar.form.EventDetails} this
-             * @param {Ext.calendar.EventRecord} rec The new {@link Ext.calendar.EventRecord record} that was added
-             */
-            eventadd: true,
-            /**
-             * @event eventupdate
-             * Fires after an existing event is updated
-             * @param {Ext.calendar.form.EventDetails} this
-             * @param {Ext.calendar.EventRecord} rec The new {@link Ext.calendar.EventRecord record} that was updated
-             */
-            eventupdate: true,
-            /**
-             * @event eventdelete
-             * Fires after an event is deleted
-             * @param {Ext.calendar.form.EventDetails} this
-             * @param {Ext.calendar.EventRecord} rec The new {@link Ext.calendar.EventRecord record} that was deleted
-             */
-            eventdelete: true,
-            /**
-             * @event eventcancel
-             * Fires after an event add/edit operation is canceled by the user and no store update took place
-             * @param {Ext.calendar.form.EventDetails} this
-             * @param {Ext.calendar.EventRecord} rec The new {@link Ext.calendar.EventRecord record} that was canceled
-             */
-            eventcancel: true
-        });
-
         this.titleField = new Ext.form.Text({
             fieldLabel: 'Title',
             name: Ext.calendar.data.EventMappings.Title.name,
@@ -135,14 +134,14 @@ Ext.define('Ext.calendar.form.EventDetails', {
 
         this.items = [{
             id: 'left-col',
-            columnWidth: 0.65,
+            flex: 0.65,
             layout: 'anchor',
             border: false,
             items: leftFields
         },
         {
             id: 'right-col',
-            columnWidth: 0.35,
+            flex: 0.35,
             layout: 'anchor',
             border: false,
             items: rightFields
@@ -210,7 +209,7 @@ Ext.define('Ext.calendar.form.EventDetails', {
         // does not map directly to the record values, so for now we'll duplicate
         // the setter logic here (we need to be able to pick up any custom-added 
         // fields generically). Need to revisit this later and come up with a better solution.
-        fs.each(function(f){
+        Ext.Array.each(fs, function(f){
             var field = this.form.findField(f.name);
             if(field){
                 var value = field.getValue();

@@ -13,7 +13,7 @@
  * simpler way to allow a DragZone to manage any number of draggable elements is to configure the DragZone with an
  * implementation of the {@link #getDragData} method which interrogates the passed mouse event to see if it has taken
  * place within an element, or class of elements. This is easily done by using the event's {@link
- * Ext.EventObject#getTarget getTarget} method to identify a node based on a {@link Ext.DomQuery} selector. For example,
+ * Ext.event.Event#getTarget getTarget} method to identify a node based on a CSS selector. For example,
  * to make the nodes of a DataView draggable, use the following technique. Knowledge of the use of the DataView is
  * required:
  *
@@ -61,26 +61,34 @@ Ext.define('Ext.dd.DragZone', {
 
     /**
      * Creates new DragZone.
-     * @param {String/HTMLElement/Ext.Element} el The container element or ID of it.
+     * @param {String/HTMLElement/Ext.dom.Element} el The container element or ID of it.
      * @param {Object} config
      */
     constructor : function(el, config){
-        this.callParent([el, config]);
-        if (this.containerScroll) {
-            Ext.dd.ScrollManager.register(this.el);
+        var me = this,
+            scroll = me.containerScroll;
+        
+        me.callParent([el, config]);
+        if (scroll) {
+            el = me.scrollEl || el;
+            el = Ext.get(el);
+            if (Ext.isObject(scroll)) {
+                el.ddScrollConfig = scroll;
+            }
+            Ext.dd.ScrollManager.register(el);
         }
     },
 
     /**
-     * @property {Object} dragData
-     * This property contains the data representing the dragged object. This data is set up by the implementation of the
-     * {@link #getDragData} method. It must contain a ddel property, but can contain any other data according to the
-     * application's needs.
-     */
-
-    /**
-     * @cfg {Boolean} containerScroll
+     * @cfg {Object/Boolean} containerScroll
      * True to register this container with the Scrollmanager for auto scrolling during drag operations.
+     * A {@link Ext.dd.ScrollManager} configuration may also be passed.
+     */
+    
+    /**
+     * @cfg {String/HTMLElement/Ext.dom.Element} scrollEl
+     * An element to register with the ScrollManager if {@link #containerScroll}
+     * is set. Defaults to the drag element.
      */
 
     /**
@@ -109,18 +117,6 @@ Ext.define('Ext.dd.DragZone', {
     },
 
     /**
-     * Called after a repair of an invalid drop. By default, highlights this.dragData.ddel
-     * @template
-     */
-    afterRepair : function(){
-        var me = this;
-        if (Ext.enableFx) {
-            Ext.fly(me.dragData.ddel).highlight(me.repairHighlightColor);
-        }
-        me.dragging = false;
-    },
-
-    /**
      * Called before a repair of an invalid drop to get the XY to animate to. By default returns the XY of
      * this.dragData.ddel
      * @param {Event} e The mouse up event
@@ -134,7 +130,7 @@ Ext.define('Ext.dd.DragZone', {
     destroy : function(){
         this.callParent();
         if (this.containerScroll) {
-            Ext.dd.ScrollManager.unregister(this.el);
+            Ext.dd.ScrollManager.unregister(this.scrollEl || this.el);
         }
     }
 });

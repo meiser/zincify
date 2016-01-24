@@ -5,7 +5,7 @@ Ext.define('Ext.layout.component.field.FieldContainer', {
 
     /* Begin Definitions */
 
-    extend: 'Ext.layout.component.field.Field',
+    extend: 'Ext.layout.component.Auto',
 
     alias: 'layout.fieldcontainer',
 
@@ -17,11 +17,15 @@ Ext.define('Ext.layout.component.field.FieldContainer', {
     waitForOuterWidthInDom: true,
 
     beginLayout: function(ownerContext) {
+        var containerEl = this.owner.containerEl;
+
         this.callParent(arguments);
 
-        // Tell Component.measureAutoDimensions to measure the DOM when containerChildrenDone is true
+        // Tell Component.measureAutoDimensions to measure the DOM when containerChildrenSizeDone is true
         ownerContext.hasRawContent = true;
-        ownerContext.target.bodyEl.setStyle('height', '');
+        containerEl.setStyle('width', '');
+        containerEl.setStyle('height', '');
+        ownerContext.containerElContext = ownerContext.getEl('containerEl');
     },
 
     measureContentHeight: function (ownerContext) {
@@ -36,13 +40,36 @@ Ext.define('Ext.layout.component.field.FieldContainer', {
         return ownerContext.hasDomProp('containerLayoutDone') ? this.callParent(arguments) : NaN;
     },
 
-    publishInnerWidth: function (ownerContext, width) {
-        var bodyContext = ownerContext.bodyCellContext;
-        bodyContext.setWidth(bodyContext.el.getWidth(), false);
-    },
-    
     publishInnerHeight: function (ownerContext, height) {
-        var bodyContext = ownerContext.bodyCellContext;
-        bodyContext.setHeight(height - this.measureLabelErrorHeight(ownerContext));
+        var owner = this.owner;
+
+        if (owner.labelAlign === 'top' && owner.hasVisibleLabel()) {
+            height -= owner.labelEl.getHeight();
+        }
+
+        if (owner.msgTarget === 'under' && owner.hasActiveError()) {
+            height -= owner.errorWrapEl.getHeight();
+        }
+
+        height -= owner.bodyEl.getPadding('tb');
+
+        ownerContext.containerElContext.setHeight(height);
+    },
+
+    publishInnerWidth: function (ownerContext, width) {
+        var owner = this.owner;
+
+        if (owner.labelAlign !== 'top' && owner.hasVisibleLabel()) {
+            width -= (owner.labelWidth + (owner.labelPad || 0));
+        }
+
+        if (owner.msgTarget === 'side' && owner.hasActiveError()) {
+            width -= owner.errorWrapEl.getWidth();
+        }
+
+        width -= owner.bodyEl.getPadding('lr');
+
+        ownerContext.containerElContext.setWidth(width);
     }
+
 });

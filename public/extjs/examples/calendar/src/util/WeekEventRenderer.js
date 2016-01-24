@@ -4,8 +4,8 @@
  * box-oriented layout that supports day spanning (MonthView, MultiWeekView, DayHeaderView).
  */
 Ext.define('Ext.calendar.util.WeekEventRenderer', {
-    
-    requires: ['Ext.core.DomHelper'],
+
+    requires: ['Ext.calendar.util.Date'],
     
     statics: {
         // private
@@ -60,35 +60,37 @@ Ext.define('Ext.calendar.util.WeekEventRenderer', {
 
                     for (; d < dayCount; d++) {
                         if (wk[d]) {
-                            var ev = emptyCells = skipped = 0,
+                            var ev = 0,
+                                emptyCells = 0,
+                                skipped = 0,
                                 day = wk[d],
                                 ct = day.length,
                                 evt;
 
                             for (; ev < ct; ev++) {
-                                if (!day[ev]) {
-                                    emptyCells++;
-                                    continue;
-                                }
-                                if (emptyCells > 0 && ev - emptyCells < max) {
-                                    row = this.getEventRow(o.id, w, ev - emptyCells);
+                                evt = day[ev];
+
+                                // Add an empty cell for days that have sparse arrays.
+                                // See EXTJSIV-7832.
+                                if (!evt && (ev < max)) {
+                                    row = this.getEventRow(o.id, w, ev);
                                     cellCfg = {
                                         tag: 'td',
                                         cls: 'ext-cal-ev',
                                         id: o.id + '-empty-' + ct + '-day-' + Ext.Date.format(dt, 'Ymd')
                                     };
-                                    if (emptyCells > 1 && max - ev > emptyCells) {
-                                        cellCfg.rowspan = Math.min(emptyCells, max - ev);
-                                    }
+
                                     Ext.core.DomHelper.append(row, cellCfg);
-                                    emptyCells = 0;
+                                }
+
+                                if (!evt) {
+                                    continue;
                                 }
 
                                 if (ev >= max) {
                                     skipped++;
                                     continue;
                                 }
-                                evt = day[ev];
 
                                 if (!evt.isSpan || evt.isSpanStart) {
                                     //skip non-starting span cells

@@ -4,8 +4,7 @@ class ArticleGrid < Netzke::Basepack::Grid
    c.on_sync_master_data = <<-JS
       function(a){
 		var cmp = this;
-		var myMask = new Ext.LoadMask(cmp.getEl(), {msg:"Bitte warten..."});
-		myMask.show();
+		this.mask("Loading...");
 		Rails.ItemBaseDataController.sync_master_data(function(r,e){
 			cmp.unmask();
 			if (r.success == true){

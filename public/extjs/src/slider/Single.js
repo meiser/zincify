@@ -17,7 +17,34 @@
 Ext.define('Ext.slider.Single', {
     extend: 'Ext.slider.Multi',
     alias: ['widget.slider', 'widget.sliderfield'],
-    alternateClassName: ['Ext.Slider', 'Ext.form.SliderField', 'Ext.slider.SingleSlider', 'Ext.slider.Slider'],
+    alternateClassName: [
+        'Ext.Slider',
+        'Ext.form.SliderField',
+        'Ext.slider.SingleSlider',
+        'Ext.slider.Slider'
+    ],
+
+    /**
+     * @inheritdoc
+     */
+    defaultBindProperty: 'value',
+
+    initComponent: function() {
+        if (this.publishOnComplete) {
+            this.valuePublishEvent = 'changecomplete';
+        }
+        this.callParent();
+    },
+
+    /**
+     * @cfg {Boolean} [publishOnComplete=true]
+     * This controls when the value of the slider is published to the `ViewModel`. By
+     * default this is done only when the thumb is released (the change is complete). To
+     * cause this to happen on every change of the thumb position, specify `false`. This
+     * setting is `true` by default for improved performance on slower devices (such as
+     * older browsers or tablets).
+     */
+    publishOnComplete: true,
 
     /**
      * Returns the current value of the slider
@@ -32,7 +59,9 @@ Ext.define('Ext.slider.Single', {
      * Programmatically sets the value of the Slider. Ensures that the value is constrained within the minValue and
      * maxValue.
      * @param {Number} value The value to set the slider to. (This will be constrained within minValue and maxValue)
-     * @param {Boolean} [animate] Turn on or off animation
+     * @param {Object/Boolean} [animate] `false` to not animate. `true` to use the default animation. This may also be an
+     * animate configuration object, see {@link #animate}. If this configuration is omitted, the {@link #animate} configuration
+     * will be used.
      */
     setValue: function(value, animate) {
         var args = arguments,
@@ -45,6 +74,7 @@ Ext.define('Ext.slider.Single', {
             args = Ext.toArray(args);
             args.unshift(0);
         }
+
         return this.callParent(args);
     },
 

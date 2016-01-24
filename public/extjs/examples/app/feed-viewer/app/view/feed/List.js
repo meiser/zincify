@@ -7,10 +7,17 @@ Ext.define('FV.view.feed.List', {
     title: 'Feeds',
     collapsible: true,
     animCollapse: true,
-    margins: '5 0 5 5',
+    margin: '5 0 5 5',
     layout: 'fit',
 
     initComponent: function() {
+        var theme = Ext.themeName,
+            cls = '';
+        
+        if(theme.lastIndexOf('neptune') >= 0 || theme === 'crisp'){
+            cls = 'neptune';
+        }
+        
         Ext.apply(this, {
             items: [{
                 xtype: 'dataview',
@@ -19,7 +26,7 @@ Ext.define('FV.view.feed.List', {
                 cls: 'feed-list',
                 itemSelector: '.feed-list-item',
                 overItemCls: 'feed-list-item-hover',
-                tpl: '<tpl for="."><div class="feed-list-item">{name}</div></tpl>',
+                tpl: '<tpl for="."><div class="feed-list-item ' + cls + '">{name}</div></tpl>',
                 listeners: {
                     selectionchange: this.onSelectionChange,
                     scope: this
@@ -30,11 +37,11 @@ Ext.define('FV.view.feed.List', {
                 xtype: 'toolbar',
                 items: [{
                     iconCls: 'feed-add',
-                    text: 'Add Feed',
+                    text: 'Add',
                     action: 'add'
                 }, {
                     iconCls: 'feed-remove',
-                    text: 'Remove Feed',
+                    text: 'Remove',
                     disabled: true,
                     action: 'remove'
                 }]

@@ -66,7 +66,7 @@
  */
 Ext.define('Ext.layout.container.Column', {
 
-    extend: 'Ext.layout.container.Container',
+    extend: 'Ext.layout.container.Auto',
     alias: ['layout.column'],
     alternateClassName: 'Ext.layout.ColumnLayout',
 
@@ -78,75 +78,58 @@ Ext.define('Ext.layout.container.Column', {
 
     // Columns with a columnWidth have their width managed.
     columnWidthSizePolicy: {
+        readsWidth: 0,
+        readsHeight: 1,
         setsWidth: 1,
         setsHeight: 0
     },
+    
+    createsInnerCt: true,
 
-    childEls: [
-        'innerCt'
-    ],
+    manageOverflow: true,
 
-    manageOverflow: 2,
+    // Column layout needs to set the size of items configured with columnWidth, and it
+    // needs to read the size of items with a configured width.
+    setsItemSize: true,
+    needsItemSize: true,
+    
+    isItemShrinkWrap: function(ownerContext){
+        return true;
+    },
 
-    renderTpl: [
-        '<div id="{ownerId}-innerCt" class="',Ext.baseCSSPrefix,'column-inner">',
-            '{%this.renderBody(out,values)%}',
-            '<div class="',Ext.baseCSSPrefix,'clear"></div>',
-        '</div>',
-        '{%this.renderPadder(out,values)%}'
-    ],
-
-    getItemSizePolicy: function (item) {
+    getItemSizePolicy: function (item, ownerSizeModel) {
         if (item.columnWidth) {
-            return this.columnWidthSizePolicy;
+            if (!ownerSizeModel) {
+                ownerSizeModel = this.owner.getSizeModel();
+            }
+
+            if (!ownerSizeModel.width.shrinkWrap) {
+                return this.columnWidthSizePolicy;
+            }
         }
         return this.autoSizePolicy;
     },
 
-    beginLayout: function() {
-        this.callParent(arguments);
-        this.innerCt.dom.style.width = '';
-    },
-
-    calculate: function (ownerContext) {
+    calculateItems: function (ownerContext, containerSize) {
         var me = this,
-            containerSize = me.getContainerSize(ownerContext),
-            state = ownerContext.state;
-
-        if (state.calculatedColumns || (state.calculatedColumns = me.calculateColumns(ownerContext))) {
-            if (me.calculateHeights(ownerContext)) {
-                me.calculateOverflow(ownerContext, containerSize);
-                return;
-            }
-        }
-
-        me.done = false;
-    },
-
-    calculateColumns: function (ownerContext) {
-        var me = this,
-            containerSize = me.getContainerSize(ownerContext),
-            innerCtContext = ownerContext.getEl('innerCt', me),
+            targetContext = ownerContext.targetContext,
             items = ownerContext.childItems,
             len = items.length,
             contentWidth = 0,
+            gotWidth = containerSize.gotWidth,
             blocked, availableWidth, i, itemContext, itemMarginWidth, itemWidth;
 
-        // Can never decide upon necessity of vertical scrollbar (and therefore, narrower
-        // content width) until the component layout has published a height for the target
-        // element.
-        if (!ownerContext.heightModel.shrinkWrap && !ownerContext.targetContext.hasProp('height')) {
-            return false;
-        }
-
         // No parallel measurement, cannot lay out boxes.
-        if (!containerSize.gotWidth) { //\\ TODO: Deal with target padding width
-            ownerContext.targetContext.block(me, 'width');
+        if (gotWidth === false) { //\\ TODO: Deal with target padding width
+            // TODO: only block if we have items with columnWidth
+            targetContext.domBlock(me, 'width');
             blocked = true;
-        } else {
+        } else if (gotWidth) {
             availableWidth = containerSize.width;
-
-            innerCtContext.setWidth(availableWidth);
+        } else {
+            // gotWidth is undefined, which means we must be width shrink wrap.
+            // cannot calculate columnWidths if we're shrink wrapping.
+            return true;
         }
 
         // we need the widths of the columns we don't manage to proceed so we block on them
@@ -161,11 +144,10 @@ Ext.define('Ext.layout.container.Column', {
 
             if (!itemContext.widthModel.calculated) {
                 itemWidth = itemContext.getProp('width');
-                if (typeof itemWidth != 'number') {
+                if (typeof itemWidth !== 'number') {
                     itemContext.block(me, 'width');
                     blocked = true;
                 }
-
                 contentWidth += itemWidth + itemMarginWidth;
             }
         }
@@ -175,6 +157,7 @@ Ext.define('Ext.layout.container.Column', {
 
             for (i = 0; i < len; ++i) {
                 itemContext = items[i];
+
                 if (itemContext.widthModel.calculated) {
                     itemMarginWidth = itemContext.marginInfo.width; // always set by above loop
                     itemWidth = itemContext.target.columnWidth;
@@ -184,51 +167,10 @@ Ext.define('Ext.layout.container.Column', {
                 }
             }
 
-            ownerContext.setContentWidth(contentWidth);
+            ownerContext.setContentWidth(contentWidth + ownerContext.paddingContext.getPaddingInfo().width);
         }
 
         // we registered all the values that block this calculation, so abort now if blocked...
         return !blocked;
-    },
-
-    calculateHeights: function (ownerContext) {
-        var me = this,
-            items = ownerContext.childItems,
-            len = items.length,
-            blocked, i, itemContext;
-
-        // in order for innerCt to have the proper height, all the items must have height
-        // correct in the DOM...
-        blocked = false;
-        for (i = 0; i < len; ++i) {
-            itemContext = items[i];
-
-            if (!itemContext.hasDomProp('height')) {
-                itemContext.domBlock(me, 'height');
-                blocked = true;
-            }
-        }
-
-        if (!blocked) {
-            ownerContext.setContentHeight(me.innerCt.getHeight() + ownerContext.targetContext.getPaddingInfo().height);
-        }
-
-        return !blocked;
-    },
-
-    finishedLayout: function (ownerContext) {
-        var bc = ownerContext.bodyContext;
-
-        // Owner may not have a body - this seems to only be needed for Panels.
-        if (bc && (Ext.isIE6 || Ext.isIE7 || Ext.isIEQuirks)) {
-            // Fix for https://sencha.jira.com/browse/EXTJSIV-4979
-            bc.el.repaint();
-        }
-
-        this.callParent(arguments);
-    },
-
-    getRenderTarget : function() {
-        return this.innerCt;
     }
 });

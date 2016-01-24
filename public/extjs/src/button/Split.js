@@ -40,52 +40,52 @@ Ext.define('Ext.button.Split', {
     extend: 'Ext.button.Button',
     alternateClassName: 'Ext.SplitButton',
     /* End Definitions */
+
+    isSplitButton: true,
     
     /**
      * @cfg {Function} arrowHandler
      * A function called when the arrow button is clicked (can be used instead of click event)
      * @cfg {Ext.button.Split} arrowHandler.this
-     * @cfg {Event} arrowHandler.e The click event
+     * @cfg {Event} arrowHandler.e The click event.
      */
     /**
      * @cfg {String} arrowTooltip
-     * The title attribute of the arrow
+     * The title attribute of the arrow.
      */
 
-    // private
+    // @private
     arrowCls      : 'split',
     split         : true,
 
-    // private
-    initComponent : function(){
-        this.callParent();
-        /**
-         * @event arrowclick
-         * Fires when this button's arrow is clicked.
-         * @param {Ext.button.Split} this
-         * @param {Event} e The click event
-         */
-        this.addEvents("arrowclick");
-    },
+    /**
+     * @event arrowclick
+     * Fires when this button's arrow is clicked.
+     * @param {Ext.button.Split} this
+     * @param {Event} e The click event.
+     */
 
     /**
      * Sets this button's arrow click handler.
-     * @param {Function} handler The function to call when the arrow is clicked
-     * @param {Object} scope (optional) Scope for the function passed above
+     * @param {Function} handler The function to call when the arrow is clicked.
+     * @param {Object} scope (optional) Scope for the function passed above.
      */
     setArrowHandler : function(handler, scope){
         this.arrowHandler = handler;
         this.scope = scope;
     },
 
-    // private
-    onClick : function(e, t) {
+    // @private
+    onClick : function(e) {
         var me = this;
-        
-        e.preventDefault();
+
+        me.doPreventDefault(e);
         if (!me.disabled) {
-            if (me.overMenuTrigger) {
-                me.maybeShowMenu();
+            if (me.isWithinTrigger(e)) {
+                // Force prevent default here, if we click on the arrow part
+                // we want to trigger the menu, not any link if we have it
+                e.preventDefault();
+                me.maybeShowMenu(e);
                 me.fireEvent("arrowclick", me, e);
                 if (me.arrowHandler) {
                     me.arrowHandler.call(me.scope || me, me, e);

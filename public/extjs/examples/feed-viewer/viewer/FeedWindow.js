@@ -26,19 +26,17 @@ Ext.define('FeedViewer.FeedWindow', {
         ['http://news.google.com/news?ned=us&topic=t&output=rss', 'Sci/Tech - Google News'],
         ['http://rss.news.yahoo.com/rss/software', 'Yahoo Software News']
     ],
-    
+
+    /**
+     * @event feedvalid
+     * @param {FeedViewer.FeedWindow} this
+     * @param {String} title
+     * @param {String} url
+     * @param {String} description
+     */
+
     initComponent: function(){
         var me = this;
-        me.addEvents(
-            /**
-             * @event feedvalid
-             * @param {FeedViewer.FeedWindow} this
-             * @param {String} title
-             * @param {String} url
-             * @param {String} description
-             */
-            'feedvalid'
-        );
         
         me.form = Ext.create('widget.form', {
             bodyPadding: '12 10 10',
@@ -72,10 +70,14 @@ Ext.define('FeedViewer.FeedWindow', {
                 xtype: 'button',
                 text: 'Cancel',
                 scope: me,
-                handler: me.hide
+                handler: me.doHide
             }]
         });
         me.callParent(arguments);
+    },
+    
+    doHide: function(){
+        this.hide();
     },
     
     /**

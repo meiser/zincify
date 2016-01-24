@@ -17,14 +17,53 @@ Ext.define('Ext.layout.container.Editor', {
         height: 'field'    
     },
 
+    sizePolicies: {
+        // indexed by autoSize.width
+        $: {
+            // indexed by autoSize.height
+            $: {
+                readsWidth: 1,
+                readsHeight: 1,
+                setsWidth: 0,
+                setsHeight: 0
+            },
+            boundEl: {
+                readsWidth: 1,
+                readsHeight: 0,
+                setsWidth: 0,
+                setsHeight: 1
+            }
+        },
+
+        boundEl: {
+            // indexed by autoSize.height
+            $: {
+                readsWidth: 0,
+                readsHeight: 1,
+                setsWidth: 1,
+                setsHeight: 0
+            },
+            boundEl: {
+                readsWidth: 0,
+                readsHeight: 0,
+                setsWidth: 1,
+                setsHeight: 1
+            }
+        }
+    },
+
     getItemSizePolicy: function (item) {
         var me = this,
-            autoSize = me.owner.autoSize;
+            autoSize = me.owner.autoSize,
+            key = autoSize && autoSize.width,
+            policy = me.sizePolicies;
 
-        return me.sizePolicy || (me.sizePolicy = {
-            setsWidth:  autoSize && autoSize.width  === 'boundEl' ? 1 : 0,
-            setsHeight: autoSize && autoSize.height === 'boundEl' ? 1 : 0
-        });
+        policy = policy[key] || policy.$;
+
+        key = autoSize && autoSize.height;
+        policy = policy[key] || policy.$;
+
+        return policy;
     },
 
     calculate: function(ownerContext) {

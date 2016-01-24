@@ -9,7 +9,7 @@
  *         }
  *     });
  *
- * In general this class will not be instanced directly, rather the {@link Ext.Element#method-load} method
+ * In general this class will not be instanced directly, rather the {@link Ext.dom.Element#method-load} method
  * will be used.
  */
 Ext.define('Ext.ElementLoader', {
@@ -28,7 +28,7 @@ Ext.define('Ext.ElementLoader', {
     statics: {
         Renderer: {
             Html: function(loader, response, active){
-                loader.getTarget().update(response.responseText, active.scripts === true);
+                loader.getTarget().setHtml(response.responseText, active.scripts === true);
                 return true;
             }
         }
@@ -57,14 +57,14 @@ Ext.define('Ext.ElementLoader', {
 
     /**
      * @cfg {Boolean/Object} autoLoad
-     * True to have the loader make a request as soon as it is created.
-     * This argument can also be a set of options that will be passed to {@link #method-load} is called.
+     * `true` to have the loader make a request as soon as it is created.
+     * This argument can also be a set of options that will be passed to {@link #method-load} when it is called.
      */
     autoLoad: false,
 
     /**
-     * @cfg {HTMLElement/Ext.Element/String} target
-     * The target element for the loader. It can be the DOM element, the id or an {@link Ext.Element}.
+     * @cfg {HTMLElement/Ext.dom.Element/String} target
+     * The target element for the loader. It can be the DOM element, the id or an {@link Ext.dom.Element}.
      */
     target: null,
 
@@ -129,6 +129,11 @@ Ext.define('Ext.ElementLoader', {
      * - The response
      * - The active request
      */
+    
+    /**
+     * @cfg {Object} rendererScope
+     * The scope to execute the {@link #renderer} function in.
+     */
 
     /**
      * @property {Boolean} isLoader
@@ -136,59 +141,57 @@ Ext.define('Ext.ElementLoader', {
      */
     isLoader: true,
 
+    /**
+     * @event beforeload
+     * Fires before a load request is made to the server.
+     * Returning false from an event listener can prevent the load
+     * from occurring.
+     * @param {Ext.ElementLoader} this
+     * @param {Object} options The options passed to the request
+     */
+
+    /**
+     * @event exception
+     * Fires after an unsuccessful load.
+     * @param {Ext.ElementLoader} this
+     * @param {Object} response The response from the server
+     * @param {Object} options The options passed to the request
+     */
+
+    /**
+     * @event load
+     * Fires after a successful load.
+     * @param {Ext.ElementLoader} this
+     * @param {Object} response The response from the server
+     * @param {Object} options The options passed to the request
+     */
+
     constructor: function(config) {
         var me = this,
             autoLoad;
 
         config = config || {};
         Ext.apply(me, config);
-        me.setTarget(me.target);
-        me.addEvents(
-            /**
-             * @event beforeload
-             * Fires before a load request is made to the server.
-             * Returning false from an event listener can prevent the load
-             * from occurring.
-             * @param {Ext.ElementLoader} this
-             * @param {Object} options The options passed to the request
-             */
-            'beforeload',
-
-            /**
-             * @event exception
-             * Fires after an unsuccessful load.
-             * @param {Ext.ElementLoader} this
-             * @param {Object} response The response from the server
-             * @param {Object} options The options passed to the request
-             */
-            'exception',
-
-            /**
-             * @event load
-             * Fires after a successful load.
-             * @param {Ext.ElementLoader} this
-             * @param {Object} response The response from the server
-             * @param {Object} options The options passed to the request
-             */
-            'load'
-        );
-
+        
         // don't pass config because we have already applied it.
         me.mixins.observable.constructor.call(me);
+
+        me.setTarget(me.target);
+
 
         if (me.autoLoad) {
             autoLoad = me.autoLoad;
             if (autoLoad === true) {
-                autoLoad = {};
+                autoLoad = null;
             }
             me.load(autoLoad);
         }
     },
 
     /**
-     * Sets an {@link Ext.Element} as the target of this loader.
+     * Sets an {@link Ext.dom.Element} as the target of this loader.
      * Note that if the target is changed, any active requests will be aborted.
-     * @param {String/HTMLElement/Ext.Element} target The element or its ID.
+     * @param {String/HTMLElement/Ext.dom.Element} target The element or its ID.
      */
     setTarget: function(target){
         var me = this;
@@ -254,13 +257,12 @@ Ext.define('Ext.ElementLoader', {
         options = Ext.apply({}, options);
 
         var me = this,
-            target = me.target,
             mask = Ext.isDefined(options.loadMask) ? options.loadMask : me.loadMask,
             params = Ext.apply({}, options.params),
             ajaxOptions = Ext.apply({}, options.ajaxOptions),
             callback = options.callback || me.callback,
             scope = options.scope || me.scope || me,
-            request;
+            rendererScope = options.rendererScope || me.rendererScope || me;
 
         Ext.applyIf(ajaxOptions, me.ajaxOptions);
         Ext.applyIf(options, ajaxOptions);
@@ -292,18 +294,18 @@ Ext.define('Ext.ElementLoader', {
             me.addMask(mask);
         }
 
-        request = Ext.Ajax.request(options);
         me.active = {
-            request: request,
             options: options,
             mask: mask,
             scope: scope,
+            rendererScope: rendererScope,
             callback: callback,
             success: options.success || me.success,
             failure: options.failure || me.failure,
             renderer: options.renderer || me.renderer,
             scripts: Ext.isDefined(options.scripts) ? options.scripts : me.scripts
         };
+        me.active.request = Ext.Ajax.request(options);
         me.setOptions(me.active, options);
     },
 
@@ -325,25 +327,27 @@ Ext.define('Ext.ElementLoader', {
     onComplete: function(options, success, response) {
         var me = this,
             active = me.active,
-            scope = active.scope,
-            renderer = me.getRenderer(active.renderer);
+            rendererScope,
+            scope;
 
+        if (active) {
+            scope = active.scope;
+            rendererScope = active.rendererScope;
+            if (success) {
+                success = me.getRenderer(active.renderer).call(rendererScope, me, response, active) !== false;
+            }
 
-        if (success) {
-            success = renderer.call(me, me, response, active) !== false;
-        }
-
-        if (success) {
-            Ext.callback(active.success, scope, [me, response, options]);
-            me.fireEvent('load', me, response, options);
-        } else {
-            Ext.callback(active.failure, scope, [me, response, options]);
-            me.fireEvent('exception', me, response, options);
-        }
-        Ext.callback(active.callback, scope, [me, success, response, options]);
-
-        if (active.mask) {
-            me.removeMask();
+            if (success) {
+                Ext.callback(active.success, scope, [me, response, options]);
+                me.fireEvent('load', me, response, options);
+            } else {
+                Ext.callback(active.failure, scope, [me, response, options]);
+                me.fireEvent('exception', me, response, options);
+            }
+            Ext.callback(active.callback, scope, [me, success, response, options]);
+            if (active.mask) {
+                me.removeMask();
+            }
         }
 
         delete me.active;
@@ -370,7 +374,7 @@ Ext.define('Ext.ElementLoader', {
     startAutoRefresh: function(interval, options){
         var me = this;
         me.stopAutoRefresh();
-        me.autoRefresh = setInterval(function(){
+        me.autoRefresh = Ext.interval(function(){
             me.load(options);
         }, interval);
     },

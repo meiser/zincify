@@ -100,7 +100,7 @@ Ext.onReady(function() {
             text     : 'Price',
             width    : 97,
             sortable : true,
-            renderer : 'usMoney',
+            formatter: 'usMoney',
             dataIndex: 'price',
             editor: {
                 xtype: 'numberfield'
@@ -127,7 +127,7 @@ Ext.onReady(function() {
             text     : 'Last Updated',
             width    : 97,
             sortable : true,
-            renderer : Ext.util.Format.dateRenderer('m/d/Y'),
+            formatter: 'date("m/d/Y")',
             dataIndex: 'lastChange',
             editor: {
                 xtype: 'datefield'

@@ -1,6 +1,6 @@
 /*!
  * Ext JS Library 3.3.1
- * Copyright(c) 2006-2010 Sencha Inc.
+ * Copyright(c) 2006-2014 Sencha Inc.
  * licensing@sencha.com
  * http://www.sencha.com/license
  */
@@ -37,8 +37,8 @@ Ext.extend(Ext.app.App, Ext.util.Observable, {
 
         this.init();
 
-        Ext.EventManager.on(window, 'beforeunload', this.onUnload, this);
-		this.fireEvent('ready', this);
+        Ext.getWin().on('beforeunload', this.onUnload, this);
+        this.fireEvent('ready', this);
         this.isReady = true;
     },
 

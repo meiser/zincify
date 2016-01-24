@@ -1,78 +1,89 @@
 /**
- * Adds custom behavior for left/right keyboard navigation for use with a tree.
- * Depends on the view having an expand and collapse method which accepts a
- * record.
- * 
- * @private
+ * This selection model is created by default for {@link Ext.tree.Panel}.
+ *
+ * It implements a row selection model.
  */
 Ext.define('Ext.selection.TreeModel', {
     extend: 'Ext.selection.RowModel',
     alias: 'selection.treemodel',
+
+    /**
+     * @cfg {Boolean} pruneRemoved @hide
+     */
     
-    // typically selection models prune records from the selection
-    // model when they are removed, because the TreeView constantly
-    // adds/removes records as they are expanded/collapsed
-    pruneRemoved: false,
-    
-    onKeyRight: function(e, t) {
-        var focused = this.getLastFocused(),
-            view    = this.view;
-            
-        if (focused) {
-            // tree node is already expanded, go down instead
-            // this handles both the case where we navigate to firstChild and if
-            // there are no children to the nextSibling
-            if (focused.isExpanded()) {
-                this.onKeyDown(e, t);
-            // if its not a leaf node, expand it
-            } else if (focused.isExpandable()) {
-                view.expand(focused);
+    /**
+     * @cfg {Boolean} selectOnExpanderClick
+     * `true` to select the row when clicking on the icon to collapse or expand
+     * a tree node.
+     *
+     * @since 5.1.0
+     */
+    selectOnExpanderClick: false,
+
+    constructor: function(config) {
+        var me = this;
+
+        me.callParent([config]);
+
+        // If pruneRemoved is required, we must listen to the the Store's bubbled noderemove event to know when nodes
+        // are added and removed from parentNodes.
+        // The Store's remove event will be fired during collapses.
+        if (me.pruneRemoved) {
+            me.pruneRemoved = false;
+            me.pruneRemovedNodes = true;
+        }
+    },
+
+    getStoreListeners: function() {
+        var me = this,
+            result = me.callParent();
+
+        result.noderemove = me.onNodeRemove;
+        return result;
+    },
+
+    onNodeRemove: function(parent, node, isMove) {
+        // deselection of deleted records done in base Model class
+        if (!isMove) {
+            var toDeselect = [];
+            this.gatherSelected(node, toDeselect);
+            if (toDeselect.length) {
+                this.deselect(toDeselect);
             }
         }
     },
-    
-    onKeyLeft: function(e, t) {
-        var focused = this.getLastFocused(),
-            view    = this.view,
-            viewSm  = view.getSelectionModel(),
-            parentNode, parentRecord;
 
-        if (focused) {
-            parentNode = focused.parentNode;
-            // if focused node is already expanded, collapse it
-            if (focused.isExpanded()) {
-                view.collapse(focused);
-            // has a parentNode and its not root
-            // TODO: this needs to cover the case where the root isVisible
-            } else if (parentNode && !parentNode.isRoot()) {
-                // Select a range of records when doing multiple selection.
-                if (e.shiftKey) {
-                    viewSm.selectRange(parentNode, focused, e.ctrlKey, 'up');
-                    viewSm.setLastFocused(parentNode);
-                // just move focus, not selection
-                } else if (e.ctrlKey) {
-                    viewSm.setLastFocused(parentNode);
-                // select it
-                } else {
-                    viewSm.select(parentNode);
+    // onStoreRefresh asks if it should remove from the selection any selected records which are no
+    // longer findable in the store after the refresh.
+    // TreeModel does not use the pruneRemoved flag because records are being added and removed
+    // from TreeStores on exand and collapse. It uses the pruneRemovedNodes flag.
+    pruneRemovedOnRefresh: function() {
+        return this.pruneRemovedNodes;
+    },
+
+    vetoSelection: function(e) {
+        var view = this.view,
+            select = this.selectOnExpanderClick,
+            veto = !select && e.type === 'click' && e.getTarget(view.expanderSelector || (view.lockingPartner && view.lockingPartner.expanderSelector));
+
+        return veto || this.callParent([e]);
+    },
+
+    privates: {
+        gatherSelected: function(node, toDeselect) {
+            var childNodes = node.childNodes,
+                i, len, child;
+
+            if (this.selected.containsKey(node.id)) {
+                toDeselect.push(node);
+            }
+
+            if (childNodes) {
+                for (i = 0, len = childNodes.length; i < len; ++i) {
+                    child = childNodes[i];
+                    this.gatherSelected(child, toDeselect);
                 }
             }
-        }
-    },
-    
-    onKeySpace: function(e, t) {
-        this.toggleCheck(e);
-    },
-    
-    onKeyEnter: function(e, t) {
-        this.toggleCheck(e);
-    },
-    
-    toggleCheck: function(e){
-        e.stopEvent();
-        var selected = this.getLastSelected();
-        if (selected) {
-            this.view.onCheckChange(selected);
         }
     }
 });

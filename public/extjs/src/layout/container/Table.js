@@ -68,12 +68,9 @@ Ext.define('Ext.layout.container.Table', {
      * this layout will be rendered into a single row using one column per Component.
      */
 
-    // private
-    monitorResize:false,
-
     type: 'table',
-
-    clearEl: true, // Base class will not create it if already truthy. Not needed in tables.
+    
+    createsInnerCt: true,
 
     targetCls: Ext.baseCSSPrefix + 'table-layout-ct',
     tableCls: Ext.baseCSSPrefix + 'table-layout',
@@ -81,7 +78,7 @@ Ext.define('Ext.layout.container.Table', {
 
     /**
      * @cfg {Object} tableAttrs
-     * An object containing properties which are added to the {@link Ext.DomHelper DomHelper} specification used to
+     * An object containing properties which are added to the {@link Ext.dom.Helper DomHelper} specification used to
      * create the layout's `<table>` element. Example:
      *
      *     {
@@ -101,23 +98,22 @@ Ext.define('Ext.layout.container.Table', {
 
     /**
      * @cfg {Object} trAttrs
-     * An object containing properties which are added to the {@link Ext.DomHelper DomHelper} specification used to
+     * An object containing properties which are added to the {@link Ext.dom.Helper DomHelper} specification used to
      * create the layout's `<tr>` elements.
      */
 
     /**
      * @cfg {Object} tdAttrs
-     * An object containing properties which are added to the {@link Ext.DomHelper DomHelper} specification used to
+     * An object containing properties which are added to the {@link Ext.dom.Helper DomHelper} specification used to
      * create the layout's `<td>` elements.
      */
 
-    itemSizePolicy: {
-        setsWidth: 0,
-        setsHeight: 0
-    },
-
     getItemSizePolicy: function (item) {
-        return this.itemSizePolicy;
+        return this.autoSizePolicy;
+    },
+    
+    initInheritedState: function (inheritedState, inheritedStateInner) {
+        inheritedStateInner.inShrinkWrapTable  = true;
     },
 
     getLayoutItems: function() {
@@ -135,6 +131,21 @@ Ext.define('Ext.layout.container.Table', {
         }
         return result;
     },
+    
+    getHiddenItems: function(){
+        var result = [],
+            items = this.owner.items.items,
+            len = items.length,
+            i = 0, item;
+            
+        for (; i < len; ++i) {
+            item = items[i];
+            if (item.rendered && item.hidden) {
+                result.push(item);
+            }
+        }    
+        return result;
+    },
 
     /**
      * @private
@@ -148,7 +159,8 @@ Ext.define('Ext.layout.container.Table', {
             rows = tbody.rows,
             i = 0,
             len = items.length,
-            cells, curCell, rowIdx, cellIdx, item, trEl, tdEl, itemCt;
+            hiddenItems = me.getHiddenItems(),
+            cells, curCell, rowIdx, cellIdx, item, trEl, tdEl, itemCt, el;
 
         // Calculate the correct cell structure for the current items
         cells = me.calculateCells(items);
@@ -174,15 +186,14 @@ Ext.define('Ext.layout.container.Table', {
             // If no cell present, create and insert one
             itemCt = tdEl = Ext.get(trEl.cells[cellIdx] || trEl.insertCell(cellIdx));
             if (me.needsDivWrap()) { //create wrapper div if needed - see docs below
-                itemCt = tdEl.first() || tdEl.createChild({tag: 'div'});
+                itemCt = tdEl.first() || tdEl.createChild({ tag: 'div', role: 'presentation' });
                 itemCt.setWidth(null);
             }
 
             // Render or move the component into the cell
             if (!item.rendered) {
                 me.renderItem(item, itemCt, 0);
-            }
-            else if (!me.isValidParent(item, itemCt, rowIdx, cellIdx, tbody)) {
+            } else if (!me.isValidParent(item, itemCt, rowIdx, cellIdx, tbody)) {
                 me.moveItem(item, itemCt, 0);
             }
 
@@ -214,10 +225,28 @@ Ext.define('Ext.layout.container.Table', {
         while (tbody.rows[rowIdx]) {
             tbody.deleteRow(rowIdx);
         }
+        
+        // Check if we've removed any cells that contain a component, we need to move
+        // them so they don't get cleaned up by the gc
+        for (i = 0, len = hiddenItems.length; i < len; ++i) {
+            me.ensureInDocument(hiddenItems[i].getEl());
+        }
+    },
+    
+    ensureInDocument: function(el){
+        var dom = el.dom.parentNode;
+        while (dom) {
+            if (dom.tagName.toUpperCase() == 'BODY') {
+                return;
+            }
+            dom = dom.parentNode;
+        } 
+        
+        Ext.getDetachedBody().appendChild(el);
     },
 
     calculate: function (ownerContext) {
-        if (!ownerContext.hasDomProp('containerChildrenDone')) {
+        if (!ownerContext.hasDomProp('containerChildrenSizeDone')) {
             this.done = false;
         } else {
             var targetContext = ownerContext.targetContext,
@@ -250,10 +279,6 @@ Ext.define('Ext.layout.container.Table', {
 
                 Ext.fly(item.el.dom.parentNode).setWidth(item.getWidth());
             }
-        }
-        if (Ext.isIE6 || (Ext.isIEQuirks)) {
-            // Fixes an issue where the table won't paint
-            this.owner.getTargetEl().child('table').repaint();
         }
     },
 
@@ -324,8 +349,10 @@ Ext.define('Ext.layout.container.Table', {
                 role: 'presentation',
                 cls: me.tableCls,
                 cellspacing: 0,
+                cellpadding: 0,
                 cn: {
                     tag: 'tbody',
+                    role: 'presentation',
                     cn: rows
                 }
             }, me.tableAttrs),
@@ -348,6 +375,7 @@ Ext.define('Ext.layout.container.Table', {
             if (!tr) {
                 tr = rows[rowIdx] = {
                     tag: 'tr',
+                    role: 'presentation',
                     cn: []
                 };
                 if (me.trAttrs) {
@@ -357,7 +385,8 @@ Ext.define('Ext.layout.container.Table', {
 
             // If no cell present, create and insert one
             cell = tr.cn[cellIdx] = {
-                tag: 'td'
+                tag: 'td',
+                role: 'presentation'
             };
             if (tdAttrs) {
                 Ext.apply(cell, tdAttrs);
@@ -371,7 +400,8 @@ Ext.define('Ext.layout.container.Table', {
 
             if (needsDivWrap) { //create wrapper div if needed - see docs below
                 cell = cell.cn = {
-                    tag: 'div'
+                    tag: 'div',
+                    role: 'presentation'
                 };
             }
 

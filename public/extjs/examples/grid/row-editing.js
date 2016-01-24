@@ -1,15 +1,9 @@
-Ext.Loader.setConfig({
-    enabled: true
-});
-Ext.Loader.setPath('Ext.ux', '../ux');
-
 Ext.require([
     'Ext.grid.*',
     'Ext.data.*',
     'Ext.util.*',
     'Ext.state.*',
-    'Ext.form.*',
-    'Ext.ux.CheckColumn'
+    'Ext.form.*'
 ]);
 
 Ext.onReady(function(){
@@ -33,8 +27,10 @@ Ext.onReady(function(){
             firstLen = firsts.length,
             usedNames = {},
             data = [],
-            s = new Date(2007, 0, 1),
+            eDate = Ext.Date,
             now = new Date(),
+            s = new Date(now.getFullYear() - 4, 0, 1),
+            end = Ext.Date.subtract(now, Ext.Date.MONTH, 1),
             getRandomInt = Ext.Number.randomInt,
 
             generateName = function() {
@@ -46,19 +42,19 @@ Ext.onReady(function(){
                 return name;
             };
 
-        while (s.getTime() < now.getTime()) {
+        while (s.getTime() < end) {
             var ecount = getRandomInt(0, 3);
             for (var i = 0; i < ecount; i++) {
                 var name = generateName();
                 data.push({
-                    start : Ext.Date.add(Ext.Date.clearTime(s, true), Ext.Date.DAY, getRandomInt(0, 27)),
+                    start : eDate.add(eDate.clearTime(s, true), eDate.DAY, getRandomInt(0, 27)),
                     name : name,
                     email: name.toLowerCase().replace(' ', '.') + '@sencha-test.com',
                     active: getRandomInt(0, 1),
                     salary: Math.floor(getRandomInt(35000, 85000) / 1000) * 1000
                 });
             }
-            s = Ext.Date.add(s, Ext.Date.MONTH, 1);
+            s = eDate.add(s, eDate.MONTH, 1);
         }
 
         return data;
@@ -75,7 +71,7 @@ Ext.onReady(function(){
         data: data,
         sorters: [{
             property: 'start',
-            direction: 'ASC'
+            direction: 'DESC'
         }]
     });
 
@@ -108,7 +104,7 @@ Ext.onReady(function(){
             xtype: 'datecolumn',
             header: 'Start Date',
             dataIndex: 'start',
-            width: 90,
+            width: 135,
             editor: {
                 xtype: 'datefield',
                 allowBlank: false,
@@ -122,7 +118,7 @@ Ext.onReady(function(){
             header: 'Salary',
             dataIndex: 'salary',
             format: '$0,0',
-            width: 90,
+            width: 130,
             editor: {
                 xtype: 'numberfield',
                 allowBlank: false,
@@ -139,11 +135,6 @@ Ext.onReady(function(){
                 cls: 'x-grid-checkheader-editor'
             }
         }],
-        renderTo: 'editor-grid',
-        width: 600,
-        height: 400,
-        title: 'Employee Salaries',
-        frame: true,
         tbar: [{
             text: 'Add Employee',
             iconCls: 'employee-add',
@@ -154,7 +145,7 @@ Ext.onReady(function(){
                 var r = Ext.create('Employee', {
                     name: 'New Guy',
                     email: 'new@sencha-test.com',
-                    start: new Date(),
+                    start: Ext.Date.clearTime(new Date()),
                     salary: 50000,
                     active: true
                 });
@@ -183,4 +174,12 @@ Ext.onReady(function(){
             }
         }
     });
+    new Ext.window.Window({
+        width: 700,
+        height: 400,
+        title: 'Employee Salaries',
+        items: grid,
+        layout: 'fit',
+        closable: false
+    }).show();
 });

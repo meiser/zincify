@@ -28,7 +28,7 @@ Ext.define('Ext.resizer.BorderSplitterTracker', {
             bottom = box.bottom,
             size = splitter.vertical ? (right - left) : (bottom - top),
             //neighborSizes = [],
-            i, neighbor, minRange, maxRange, maxGrowth, maxShrink, targetSize;
+            i, neighbor, neighborMaxSize, minRange, maxRange, maxGrowth, maxShrink, targetSize;
 
         // if size=100 and minSize=80, we can reduce by 20 so minRange = minSize-size = -20
         minRange = (collapseTarget[minSizeProp] || Math.min(size,defaultSplitMin)) - size;
@@ -45,9 +45,16 @@ Ext.define('Ext.resizer.BorderSplitterTracker', {
         for (i = 0; i < length; ++i) {
             neighbor = neighbors[i];
             size = neighbor[getSizeMethod]();
-            //neighborSizes.push(size);
+            neighborMaxSize = neighbor[maxSizeProp];
+            if (neighborMaxSize === null) {
+                // calculations that follow expect NaN as a result if max size is undefined
+                // e.g. (10 - undefined) returns NaN
+                // Unfortunately the same is not true for null - (10 - null === 10) so
+                // we convert null into undefined to make sure they both behave the same
+                neighborMaxSize = undefined;
+            }
 
-            maxGrowth = size - neighbor[maxSizeProp]; // NaN if no maxSize or negative
+            maxGrowth = size - neighborMaxSize; // NaN if no maxSize or negative
             maxShrink = size - (neighbor[minSizeProp] || Math.min(size,defaultSplitMin));
 
             if (!isNaN(maxGrowth)) {
@@ -71,7 +78,7 @@ Ext.define('Ext.resizer.BorderSplitterTracker', {
 
         box = new Ext.util.Region(top, right, bottom, left);
 
-        me.constraintAdjusters[splitter.collapseDirection](box, minRange, maxRange, splitter);
+        me.constraintAdjusters[me.getCollapseDirection()](box, minRange, maxRange, splitter);
 
         me.dragInfo = {
             minRange: minRange,
@@ -105,7 +112,7 @@ Ext.define('Ext.resizer.BorderSplitterTracker', {
         // splitter is to the left of the box
         right: function (box, minRange, maxRange, splitter) {
             box.right = box.left - minRange;
-            box.left -= maxRange + splitter.getWidth();
+            box[0] = box.x = box.left = box.x - maxRange + splitter.getWidth();
         }
     },
 
@@ -114,14 +121,8 @@ Ext.define('Ext.resizer.BorderSplitterTracker', {
             splitter = me.splitter,
             collapseTarget = splitter.collapseTarget,
             neighbors = splitter.neighbors,
-            collapseEl = me.getSplitter().collapseEl,
-            target = e.getTarget(),
             length = neighbors.length,
             i, neighbor;
-            
-        if (collapseEl && target === splitter.collapseEl.dom) {
-            return false;
-        }
 
         if (collapseTarget.collapsed) {
             return false;
@@ -140,14 +141,13 @@ Ext.define('Ext.resizer.BorderSplitterTracker', {
             return false;
         }
 
-        me.createDragOverlay();
         return true;
     },
 
     performResize: function(e, offset) {
         var me = this,
             splitter = me.splitter,
-            collapseDirection = splitter.collapseDirection,
+            collapseDirection = splitter.getCollapseDirection(),
             collapseTarget = splitter.collapseTarget,
             // a vertical splitter adjusts horizontal dimensions
             adjusters = me.splitAdjusters[splitter.vertical ? 'horz' : 'vert'],
@@ -206,5 +206,9 @@ Ext.define('Ext.resizer.BorderSplitterTracker', {
                 target.setSize(undefined, targetSize + delta);
             }
         }
+    },
+
+    getCollapseDirection: function() {
+        return this.splitter.getCollapseDirection();
     }
 });

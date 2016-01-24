@@ -1,7 +1,40 @@
 /**
- * @class Ext.ux.GMapPanel
- * @extends Ext.Panel
  * @author Shea Frederick
+ *
+ * The GMap Panel UX extends `Ext.panel.Panel` in order to display Google Maps.
+ *
+ * It is important to note that you must include the following Google Maps API above bootstrap.js in your 
+ * application's index.html file (or equivilant).
+ *
+ *     <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?v=3&sensor=false"></script>
+ *
+ * It is important to note that due to the Google Maps loader, you cannot currently include
+ * the above JS resource in the Cmd generated app.json file.  Doing so interferes with the loading of
+ * Ext JS and Google Maps. 
+ *
+ * The following example creates a window containing a GMap Panel.  In this case, the center 
+ * is set as geoCodeAddr, which is a string that Google translates into longitude and latitude.
+ * 
+ *     var mapwin = Ext.create('Ext.Window', {
+ *         layout: 'fit',
+ *         title: 'GMap Window',
+ *         width: 450,
+ *         height: 250,
+ *         items: {
+ *             xtype: 'gmappanel',
+ *             gmapType: 'map',
+ *             center: {
+ *                 geoCodeAddr: "221B Baker Street",
+ *                 marker: {
+ *                     title: 'Holmes Home'
+ *                 }
+ *             },
+ *             mapOptions : {
+ *                 mapTypeId: google.maps.MapTypeId.ROADMAP
+ *             }
+ *         }
+ *     }).show();
+ * 
  */
 Ext.define('Ext.ux.GMapPanel', {
     extend: 'Ext.panel.Panel',
@@ -20,9 +53,9 @@ Ext.define('Ext.ux.GMapPanel', {
         this.callParent();        
     },
     
-    afterFirstLayout : function(){
+    onBoxReady : function(){
         var center = this.center;
-        this.callParent();       
+        this.callParent(arguments);       
         
         if (center) {
             if (center.geoCodeAddr) {
@@ -37,7 +70,8 @@ Ext.define('Ext.ux.GMapPanel', {
     },
     
     createMap: function(center, marker) {
-        options = Ext.apply({}, this.mapOptions);
+        var options = Ext.apply({}, this.mapOptions);
+        
         options = Ext.applyIf(options, {
             zoom: 14,
             center: center,
@@ -51,6 +85,7 @@ Ext.define('Ext.ux.GMapPanel', {
         }
         
         Ext.each(this.markers, this.addMarker, this);
+        this.fireEvent('mapready', this, this.gmap);
     },
     
     addMarker: function(marker) {

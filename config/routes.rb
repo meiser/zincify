@@ -5,7 +5,7 @@ Zincify::Application.routes.draw do
   
   netzke
 
-  devise_for :users
+  #devise_for :users
   
   resources :weighting, :only => [:index, :new] do
 	collection do
@@ -14,13 +14,13 @@ Zincify::Application.routes.draw do
 	end
   end
   
-  match 'buero' => "application#start"
-  match 'waage' => "weighting#new"
-  match '/waage/:year/:month/:day/:shift' => "weighting#list", :defaults => { :format => 'html' }
-  match '/waage/:year/:month/:day/:shift' => "weighting#list", :as => 'shift_list', :defaults => { :format => 'html' }
-  match 'warenannahme' => "application#delivery_control"
+  get 'buero' => "application#start"
+  get'waage' => "weighting#new"
+  get '/waage/:year/:month/:day/:shift' => "weighting#list", :defaults => { :format => 'html' }
+  get '/waage/:year/:month/:day/:shift' => "weighting#list", :as => 'shift_list', :defaults => { :format => 'html' }
+  get 'warenannahme' => "application#delivery_control"
   
-  match 'abrechnung/:year/:month/:day' => "weighting#calc", :defaults => { :format => 'html' }
+  get 'abrechnung/:year/:month/:day' => "weighting#calc", :defaults => { :format => 'html' }
   #resources :sort_lists
 
   #resources :completions
@@ -80,7 +80,7 @@ Zincify::Application.routes.draw do
   
   #match "weighting/poll" => "weighting#poll", :defaults => { :format => 'json' }
   
-  match "admin" => "application#admin_panel"
+  get "admin" => "application#admin_panel"
 
 end
 

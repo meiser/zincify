@@ -60,7 +60,7 @@ Ext.define('Ext.container.ButtonGroup', {
     baseCls: Ext.baseCSSPrefix + 'btn-group',
 
     /**
-     * @cfg {Object} layout
+     * @cfg {Ext.enums.Layout/Object} layout
      * @inheritdoc
      */
     layout: {
@@ -75,22 +75,34 @@ Ext.define('Ext.container.ButtonGroup', {
      */
     frame: true,
 
+    /**
+     * @cfg {String} defaultButtonUI
+     * A default {@link Ext.Component#ui ui} to use for {@link Ext.button.Button Button} items
+     */
+
     frameHeader: false,
 
+    /**
+     * @cfg {String} titleAlign
+     * The alignment of the title text within the available space between the icon and the tools.
+     */
     titleAlign: 'center',
+
+    noTitleCls: 'notitle',
+    
+    ariaRole: 'group',
 
     initComponent : function() {
         // Copy the component's columns config to the layout if specified
         var me = this,
             cols = me.columns;
 
-        me.noTitleCls = me.baseCls + '-notitle';
         if (cols) {
             me.layout = Ext.apply({}, {columns: cols}, me.layout);
         }
 
         if (!me.title) {
-            me.addCls(me.noTitleCls);
+            me.addClsWithUI(me.noTitleCls);
         }
         me.callParent(arguments);
     },
@@ -98,17 +110,23 @@ Ext.define('Ext.container.ButtonGroup', {
     // private
     onBeforeAdd: function(component) {
         if (component.isButton) {
-            component.ui = component.ui + '-toolbar';
+            if (this.defaultButtonUI && component.ui === 'default' &&
+                !component.hasOwnProperty('ui')) {
+                component.ui = this.defaultButtonUI;
+            } else {
+                component.ui = component.ui + '-toolbar';
+            }
         }
         this.callParent(arguments);
     },
 
-    //private
-    applyDefaults: function(c) {
-        if (!Ext.isString(c)) {
-            c = this.callParent(arguments);
+    privates: {
+        applyDefaults: function (c) {
+            if (!Ext.isString(c)) {
+                c = this.callParent(arguments);
+            }
+            return c;
         }
-        return c;
     }
 
     /**

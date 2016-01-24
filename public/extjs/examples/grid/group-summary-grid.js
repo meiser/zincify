@@ -41,9 +41,9 @@ var data = [
 ];
 
 Ext.onReady(function(){
-    
+
     Ext.tip.QuickTipManager.init();
-    
+
     var store = Ext.create('Ext.data.Store', {
         model: 'Task',
         data: data,
@@ -54,9 +54,9 @@ Ext.onReady(function(){
     var cellEditing = Ext.create('Ext.grid.plugin.CellEditing', {
         clicksToEdit: 1
     });
-    var showSummary = true;
+
     var grid = Ext.create('Ext.grid.Panel', {
-        width: 800,
+        width: 840,
         height: 450,
         frame: true,
         title: 'Sponsored Projects',
@@ -72,11 +72,8 @@ Ext.onReady(function(){
                 text: 'Toggle Summary',
                 enableToggle: true,
                 pressed: true,
-                handler: function(){
-                    var view = grid.getView();
-                    showSummary = !showSummary;
-                    view.getFeature('group').toggleSummaryRow(showSummary);
-                    view.refresh();
+                handler: function() {
+                    grid.getView().getFeature('group').toggleSummaryRow();
                 }
             }]
         }],
@@ -105,7 +102,7 @@ Ext.onReady(function(){
             dataIndex: 'project'
         }, {
             header: 'Due Date',
-            width: 80,
+            width: 136,
             sortable: true,
             dataIndex: 'due',
             summaryType: 'max',
@@ -116,7 +113,7 @@ Ext.onReady(function(){
             }
         }, {
             header: 'Estimate',
-            width: 75,
+            width: 100,
             sortable: true,
             dataIndex: 'estimate',
             summaryType: 'sum',
@@ -131,7 +128,7 @@ Ext.onReady(function(){
             }
         }, {
             header: 'Rate',
-            width: 75,
+            width: 120,
             sortable: true,
             renderer: Ext.util.Format.usMoney,
             summaryRenderer: Ext.util.Format.usMoney,
@@ -143,14 +140,14 @@ Ext.onReady(function(){
         }, {
             id: 'cost',
             header: 'Cost',
-            width: 75,
+            width: 100,
             sortable: false,
             groupable: false,
             renderer: function(value, metaData, record, rowIdx, colIdx, store, view) {
                 return Ext.util.Format.usMoney(record.get('estimate') * record.get('rate'));
             },
             dataIndex: 'cost',
-            summaryType: function(records){
+            summaryType: function(records, values) {
                 var i = 0,
                     length = records.length,
                     total = 0,

@@ -18,30 +18,26 @@ Ext.define('FeedViewer.FeedPanel', {
     layout: 'fit',
     title: 'Feeds',
 
+    /**
+     * @event feedremove Fired when a feed is removed
+     * @param {FeedPanel} this
+     * @param {String} title The title of the feed
+     * @param {String} url The url of the feed
+     */
+
+    /**
+     * @event feedselect Fired when a feed is selected
+     * @param {FeedPanel} this
+     * @param {String} title The title of the feed
+     * @param {String} url The url of the feed
+     */
+
     initComponent: function(){
         Ext.apply(this, {
             items: this.createView(),
             dockedItems: this.createToolbar()
         });
         this.createMenu();
-        this.addEvents(
-            /**
-             * @event feedremove Fired when a feed is removed
-             * @param {FeedPanel} this
-             * @param {String} title The title of the feed
-             * @param {String} url The url of the feed
-             */
-            'feedremove',
-
-            /**
-             * @event feedselect Fired when a feed is selected
-             * @param {FeedPanel} this
-             * @param {String} title The title of the feed
-             * @param {String} url The url of the feed
-             */
-            'feedselect'
-        );
-
         this.callParent(arguments);
     },
 
@@ -52,6 +48,7 @@ Ext.define('FeedViewer.FeedPanel', {
      */
     createView: function(){
         this.view = Ext.create('widget.dataview', {
+            scrollable: true,
             store: Ext.create('Ext.data.Store', {
                 model: 'Feed',
                 data: this.feeds
@@ -78,7 +75,9 @@ Ext.define('FeedViewer.FeedPanel', {
     },
 
     onViewReady: function(){
+        Ext.suspendLayouts();
         this.view.getSelectionModel().select(this.view.store.first());
+        Ext.resumeLayouts(true);
     },
 
     /**
@@ -102,7 +101,7 @@ Ext.define('FeedViewer.FeedPanel', {
         this.addAction = Ext.create('Ext.Action', {
             scope: this,
             handler: this.onAddFeedClick,
-            text: 'Add feed',
+            text: 'Add',
             iconCls: 'feed-add'
         });
 
@@ -110,7 +109,7 @@ Ext.define('FeedViewer.FeedPanel', {
             itemId: 'remove',
             scope: this,
             handler: this.onRemoveFeedClick,
-            text: 'Remove feed',
+            text: 'Remove',
             iconCls: 'feed-remove'
         });
     },
@@ -142,7 +141,9 @@ Ext.define('FeedViewer.FeedPanel', {
     onSelectionChange: function(){
         var selected = this.getSelectedItem();
         this.toolbar.getComponent('remove').setDisabled(!selected);
-        this.loadFeed(selected);
+        if (selected) {
+            this.loadFeed(selected);
+        }
     },
 
     /**
@@ -189,18 +190,21 @@ Ext.define('FeedViewer.FeedPanel', {
      * React to a feed being removed
      * @private
      */
-    onRemoveFeedClick: function(){
+    onRemoveFeedClick: function() {
         var active = this.menu.activeFeed || this.getSelectedItem();
 
 
-        this.animateNode(this.view.getNode(active), 1, 0, {
-            scope: this,
-            afteranimate: function(){
-                this.view.store.remove(active);
-            }
-        });
-        this.fireEvent('feedremove', this, active.get('title'), active.get('url'));
-
+        if (active) {
+            this.view.getSelectionModel().deselectAll();
+            this.animateNode(this.view.getNode(active), 1, 0, {
+                scope: this,
+                afteranimate: function() {
+                    this.view.store.remove(active);
+                    
+                }
+            });
+            this.fireEvent('feedremove', this, active.get('title'), active.get('url'));
+        }
     },
 
     /**

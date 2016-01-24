@@ -1,10 +1,10 @@
 Ext.define('Ext.app.ContactForm', {
     extend: 'Ext.form.Panel',
     requires: [
-     'Ext.data.ArrayStore',
-     'Ext.data.reader.Array',
-     'Ext.form.field.ComboBox',
-     'Ext.form.field.Date'
+        'Ext.data.ArrayStore', 
+        'Ext.data.reader.Array',
+        'Ext.form.field.ComboBox',
+        'Ext.form.field.Date'
     ],
     formTitle: 'Contact Information (English)',
     firstName: 'First Name',
@@ -22,7 +22,7 @@ Ext.define('Ext.app.ContactForm', {
             url: 'save-form.php',
             frame: true,
             title: this.formTitle,
-            bodyStyle: 'padding:5px 5px 0',
+            bodyPadding: '5 5 0',
             width: 370,
             defaultType: 'textfield',
             defaults: {

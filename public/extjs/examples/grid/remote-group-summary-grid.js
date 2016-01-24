@@ -25,13 +25,12 @@ Ext.onReady(function(){
         model: 'Task',
         autoLoad: true,
         remoteSort: true,
-        remoteGroup: true,
         proxy: {
             type: 'ajax',
             url: 'remote-group-summary-grid.php',
             reader: {
                 type: 'json',
-                root: 'data'
+                rootProperty: 'data'
             }
         },
         sorters: {property: 'due', direction: 'ASC'},
@@ -57,7 +56,6 @@ Ext.onReady(function(){
                 toggleHandler: function(btn, pressed){
                     var view = grid.getView();
                     view.getFeature('group').toggleSummaryRow(pressed);
-                    view.refresh();
                 }
             }]
         }],
@@ -66,8 +64,8 @@ Ext.onReady(function(){
             ftype: 'groupingsummary',
             groupHeaderTpl: '{name}',
             hideGroupedHeader: true,
-            remoteRoot: 'summaryData',
-            enableGroupingMenu: false
+            enableGroupingMenu: false,
+            remoteRoot: 'summaryData'
         }],
         columns: [{
             text: 'Task',
@@ -87,13 +85,14 @@ Ext.onReady(function(){
             dataIndex: 'project'
         }, {
             header: 'Due Date',
-            width: 80,
+            width: 120,
             sortable: true,
             dataIndex: 'due',
-            renderer: Ext.util.Format.dateRenderer('m/d/Y')
+            renderer: Ext.util.Format.dateRenderer('m/d/Y'),
+            summaryRenderer: Ext.util.Format.dateRenderer('m/d/Y')
         }, {
             header: 'Estimate',
-            width: 75,
+            width: 95,
             sortable: true,
             dataIndex: 'estHours',
             renderer: function(value, metaData, record, rowIdx, colIdx, store, view){
@@ -104,7 +103,7 @@ Ext.onReady(function(){
             }
         }, {
             header: 'Rate',
-            width: 75,
+            width: 95,
             sortable: true,
             renderer: Ext.util.Format.usMoney,
             summaryRenderer: Ext.util.Format.usMoney,
@@ -113,7 +112,7 @@ Ext.onReady(function(){
         }, {
             id: 'cost',
             header: 'Cost',
-            width: 75,
+            width: 95,
             sortable: false,
             groupable: false,
             renderer: function(value, metaData, record, rowIdx, colIdx, store, view) {

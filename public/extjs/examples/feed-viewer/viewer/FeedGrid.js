@@ -3,24 +3,21 @@ Ext.define('FeedViewer.FeedGrid', {
 
     alias: 'widget.feedgrid',
 
-    initComponent: function(){
-        this.addEvents(
-            /**
-             * @event rowdblclick
-             * Fires when a row is double clicked
-             * @param {FeedViewer.FeedGrid} this
-             * @param {Ext.data.Model} model
-             */
-            'rowdblclick',
-            /**
-             * @event select
-             * Fires when a grid row is selected
-             * @param {FeedViewer.FeedGrid} this
-             * @param {Ext.data.Model} model
-             */
-            'select'
-        );
+    /**
+     * @event rowdblclick
+     * Fires when a row is double clicked
+     * @param {FeedViewer.FeedGrid} this
+     * @param {Ext.data.Model} model
+     */
 
+    /**
+     * @event select
+     * Fires when a grid row is selected
+     * @param {FeedViewer.FeedGrid} this
+     * @param {Ext.data.Model} model
+     */
+
+    initComponent: function(){
         Ext.apply(this, {
             cls: 'feed-grid',
             store: Ext.create('Ext.data.Store', {
@@ -46,6 +43,7 @@ Ext.define('FeedViewer.FeedGrid', {
                     scope: this
                 }
             }),
+
             viewConfig: {
                 itemId: 'view',
                 plugins: [{
@@ -132,7 +130,8 @@ Ext.define('FeedViewer.FeedGrid', {
      */
     loadFeed: function(url){
         var store = this.store;
-        store.getProxy().extraParams.feed = url;
+        
+        store.getProxy().setExtraParam('feed', url);
         store.load();
     },
 

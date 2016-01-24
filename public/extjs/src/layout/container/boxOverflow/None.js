@@ -6,10 +6,26 @@
  */
 Ext.define('Ext.layout.container.boxOverflow.None', {
     alternateClassName: 'Ext.layout.boxOverflow.None',
+    alias: [
+        'box.overflow.none',
+        'box.overflow.None' // capitalized for 4.x compat
+    ],
+
+    mixins: [
+        'Ext.mixin.Factoryable'
+    ],
+
+    factoryConfig: {
+        defaultType: 'none'
+    },
+
+    isBoxOverflowHandler: true,
+
+    $configPrefixed: false,
+    $configStrict: false,
     
-    constructor: function(layout, config) {
-        this.layout = layout;
-        Ext.apply(this, config);
+    constructor: function(config) {
+        this.initConfig(config);
     },
 
     handleOverflow: Ext.emptyFn,
@@ -18,9 +34,8 @@ Ext.define('Ext.layout.container.boxOverflow.None', {
 
     beginLayout: Ext.emptyFn,
     beginLayoutCycle: Ext.emptyFn,
-    finishedLayout: Ext.emptyFn,
 
-    completeLayout: function (ownerContext) {
+    calculate: function(ownerContext) {
         var me = this,
             plan = ownerContext.state.boxPlan,
             overflow;
@@ -49,6 +64,25 @@ Ext.define('Ext.layout.container.boxOverflow.None', {
         }
     },
 
+    completeLayout: Ext.emptyFn,
+
+    finishedLayout: function (ownerContext) {
+        var me = this,
+            owner = me.layout.owner,
+            hiddens,
+            hiddenCount;
+
+        // Only count hidden children if someone is interested when the overflow state changes
+        if (owner.hasListeners.overflowchange) {
+            hiddens = owner.query('>[hidden]');
+            hiddenCount = hiddens.length;
+            if (hiddenCount !== me.lastHiddenCount) {
+                owner.fireEvent('overflowchange', me.lastHiddenCount, hiddenCount, hiddens);
+                me.lastHiddenCount = hiddenCount;
+            }
+        }
+    },
+
     onRemove: Ext.emptyFn,
 
     /**
@@ -60,15 +94,17 @@ Ext.define('Ext.layout.container.boxOverflow.None', {
     getItem: function(item) {
         return this.layout.owner.getComponent(item);
     },
-    
+
     getOwnerType: function(owner){
         var type;
         if (owner.isToolbar) {
             type = 'toolbar';
         } else if (owner.isTabBar) {
-            type = 'tabbar';
+            type = 'tab-bar';
         } else if (owner.isMenu) {
             type = 'menu';
+        } else if (owner.isBreadcrumb) {
+            type = 'breadcrumb';
         } else {
             type = owner.getXType();
         }
@@ -80,5 +116,14 @@ Ext.define('Ext.layout.container.boxOverflow.None', {
     getSuffixConfig: Ext.emptyFn,
     getOverflowCls: function() {
         return '';
+    },
+
+    setVertical: function() {
+        var me = this,
+            layout = me.layout,
+            innerCt = layout.innerCt;
+
+        innerCt.removeCls(me.getOverflowCls(layout.oppositeDirection));
+        innerCt.addCls(me.getOverflowCls(layout.direction));
     }
 });

@@ -47,7 +47,7 @@ Ext.define('Ext.panel.Proxy', {
 
     /**
      * Gets the proxy's element
-     * @return {Ext.Element} The proxy's element
+     * @return {Ext.dom.Element} The proxy's element
      */
     getEl: function(){
         return this.ghost.el;
@@ -64,7 +64,7 @@ Ext.define('Ext.panel.Proxy', {
     /**
      * Gets the proxy element. This is the element that represents where the
      * Panel was before we started the drag operation.
-     * @return {Ext.Element} The proxy's element
+     * @return {Ext.dom.Element} The proxy's element
      */
     getProxy: function(){
         return this.proxy;
@@ -78,7 +78,7 @@ Ext.define('Ext.panel.Proxy', {
         
         if (me.ghost) {
             if (me.proxy) {
-                me.proxy.remove();
+                me.proxy.destroy();
                 delete me.proxy;
             }
 
@@ -102,7 +102,10 @@ Ext.define('Ext.panel.Proxy', {
             if (me.insertProxy) {
                 // bc Panels aren't absolute positioned we need to take up the space
                 // of where the panel previously was
-                me.proxy = me.panel.el.insertSibling({cls: Ext.baseCSSPrefix + 'panel-dd-spacer'});
+                me.proxy = me.panel.el.insertSibling({
+                    role: 'presentation',
+                    cls: Ext.baseCSSPrefix + 'panel-dd-spacer'
+                });
                 me.proxy.setSize(panelSize);
             }
         }
