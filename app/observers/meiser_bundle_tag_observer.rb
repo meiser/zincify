@@ -4,7 +4,7 @@ class MeiserBundleTagObserver < ActiveRecord::Observer
 	def after_save(bundle)
 		if bundle.deliver_reference.name == 'ScannerWA'
 			#Rückmeldung Ankunft in Verzinkerei Plauen für Bunde mobiler Handscanner
-			Delayed::Job.enqueue BundleArrivalJobByHandheld.new(bundle.barcode, bundle.created_at)
+			Delayed::Job.enqueue BundleArrivalJobByHandheld.new(bundle.id)
 		end	
 		
 		# Hole Etiketteninfos aus Baan

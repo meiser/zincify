@@ -86,8 +86,9 @@ class WeightingObserver < ActiveRecord::Observer
  def after_save(weighting)
   if weighting.barcode.present?
 	#Rueckmeldung Verzinkungsbunde Gewicht, Datum, User
-	Delayed::Job.enqueue BaanCompletionJob.new(weighting.barcode, weighting.weight_netto, weighting.created_at, weighting.pid)
-	
+	if weighting.barcode.length == 15
+		Delayed::Job.enqueue BaanCompletionJob.new(weighting.barcode, weighting.weight_netto, weighting.created_at, weighting.pid)
+	end
 	#Rueckmeldung Verzinkungsbunde Auf- und Abruestdatum
 	#Delayed::Job.enqueue BundleDatiJob.new(weighting.id)
 	
